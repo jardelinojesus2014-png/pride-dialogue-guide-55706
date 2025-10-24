@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Moon, Sun, FileDown, ClipboardList } from 'lucide-react';
+import { Moon, Sun, FileDown } from 'lucide-react';
 import { GoldenRule } from '@/components/GoldenRule';
 import { ScriptSections } from '@/components/ScriptSections';
 import { DosDonts } from '@/components/DosDonts';
 import { PodcastSection } from '@/components/PodcastSection';
 import { VideoSection } from '@/components/VideoSection';
 import { MotivationalPopup } from '@/components/MotivationalPopup';
+import logoPride from '@/assets/Logo_Pride.png';
 
 const Index = () => {
   const [darkMode, setDarkMode] = useState(false);
@@ -28,8 +29,8 @@ const Index = () => {
           <header className="bg-gradient-hero rounded-lg shadow-xl p-6 sm:p-8 mb-6">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-4">
-                <div className="bg-gradient-accent rounded-full p-4 shadow-xl">
-                  <ClipboardList className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
+                <div className="bg-gradient-accent rounded-full p-3 shadow-xl">
+                  <img src={logoPride} alt="Pride Consultoria" className="w-12 h-12 sm:w-16 sm:h-16 object-contain" />
                 </div>
                 <div>
                   <h1 className="text-2xl sm:text-4xl font-black text-accent">
