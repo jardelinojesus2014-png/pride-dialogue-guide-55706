@@ -13,7 +13,7 @@ export const GoldenRule = ({ darkMode }: GoldenRuleProps) => {
             <Lightbulb className="w-8 h-8 text-accent animate-pulse" />
           </div>
           <div>
-            <h2 className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-hero">
+            <h2 className="text-xl sm:text-2xl font-black text-accent">
               ⚡ REGRA DE OURO DA PROSPECÇÃO
             </h2>
             <p className="text-sm font-semibold text-muted-foreground">
