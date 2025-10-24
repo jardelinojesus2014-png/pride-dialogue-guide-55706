@@ -21,7 +21,7 @@ const Index = () => {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'dark' : ''}`}>
+    <div className="min-h-screen transition-colors duration-300">
       <div className="min-h-screen bg-gradient-subtle p-4 sm:p-6">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
