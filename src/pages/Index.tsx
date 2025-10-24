@@ -29,9 +29,7 @@ const Index = () => {
           <header className="bg-gradient-hero rounded-lg shadow-xl p-6 sm:p-8 mb-6">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-4">
-                <div className="bg-gradient-accent rounded-full p-3 shadow-xl">
-                  <img src={logoPride} alt="Pride Consultoria" className="w-12 h-12 sm:w-16 sm:h-16 object-contain" />
-                </div>
+                <img src={logoPride} alt="Pride Consultoria" className="w-16 h-16 sm:w-20 sm:h-20 object-contain" />
                 <div>
                   <h1 className="text-2xl sm:text-4xl font-black text-accent">
                     PRIDE CONSULTORIA
