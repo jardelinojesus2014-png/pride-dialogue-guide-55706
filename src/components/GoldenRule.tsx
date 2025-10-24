@@ -24,11 +24,11 @@ export const GoldenRule = ({ darkMode }: GoldenRuleProps) => {
 
         <div className="bg-accent/10 rounded-lg p-5 border-l-4 border-accent mb-4">
           <div className="mb-4">
-            <div className="inline-block bg-primary text-accent px-4 py-2 rounded-full text-base sm:text-lg font-bold mb-3 shadow-lg">
+            <div className="inline-block bg-primary text-primary-foreground px-4 py-2 rounded-full text-base sm:text-lg font-bold mb-3 shadow-lg">
               ⏱️ 30-40 segundos iniciais
             </div>
             <p className="text-lg sm:text-xl font-bold text-foreground">
-              São <span className="text-accent">DECISIVOS</span> para o sucesso de toda a ligação
+              São <span className="text-accent-foreground bg-accent px-2 rounded">DECISIVOS</span> para o sucesso de toda a ligação
             </p>
           </div>
 
@@ -46,7 +46,7 @@ export const GoldenRule = ({ darkMode }: GoldenRuleProps) => {
             <div className="flex items-start gap-3 bg-card p-4 rounded-lg shadow-sm border-l-4 border-accent">
               <span className="text-2xl sm:text-3xl">💬</span>
               <div>
-                <h3 className="font-bold text-accent mb-1">RESPIRE!</h3>
+                <h3 className="font-bold text-accent-foreground bg-accent px-2 rounded mb-1">RESPIRE!</h3>
                 <p className="text-sm text-muted-foreground">
                   É um diálogo, não um monólogo robotizado.
                 </p>
@@ -56,7 +56,7 @@ export const GoldenRule = ({ darkMode }: GoldenRuleProps) => {
         </div>
 
         <div className="bg-primary rounded-lg p-4 text-center shadow-lg">
-          <p className="text-accent font-bold flex items-center justify-center gap-2 flex-wrap text-sm sm:text-base">
+          <p className="text-primary-foreground font-bold flex items-center justify-center gap-2 flex-wrap text-sm sm:text-base">
             <AlertTriangle className="w-5 h-5 animate-pulse flex-shrink-0" />
             <span>Esta orientação vale para TODAS as etapas do roteiro</span>
             <AlertTriangle className="w-5 h-5 animate-pulse flex-shrink-0" />
