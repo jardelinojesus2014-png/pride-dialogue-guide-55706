@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Moon, Sun, FileDown, ClipboardList } from 'lucide-react';
 import { GoldenRule } from '@/components/GoldenRule';
 import { ScriptSections } from '@/components/ScriptSections';
@@ -10,6 +10,24 @@ import { MotivationalPopup } from '@/components/MotivationalPopup';
 const Index = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [showMotivationalPopup, setShowMotivationalPopup] = useState(false);
+  const [showMotivationalButton, setShowMotivationalButton] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollHeight = document.documentElement.scrollHeight;
+      const scrollTop = document.documentElement.scrollTop;
+      const clientHeight = document.documentElement.clientHeight;
+      
+      // Mostra o botão quando estiver próximo ao final da página (80% ou mais)
+      const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
+      setShowMotivationalButton(scrollPercentage > 0.8);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Verifica a posição inicial
+    
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -83,14 +101,16 @@ const Index = () => {
             </p>
           </footer>
 
-          {/* Botão Motivacional Fixo e Centralizado */}
-          <button
-            onClick={() => setShowMotivationalPopup(true)}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-gradient-to-r from-orange-500 via-red-600 to-purple-700 hover:from-orange-600 hover:via-red-700 hover:to-purple-800 text-white font-black px-6 py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 z-50 animate-pulse text-sm sm:text-base"
-            title="Mensagem motivacional"
-          >
-            Em caso de medo ou insegurança: CLIQUE AQUI!
-          </button>
+          {/* Botão Motivacional Fixo e Centralizado - Aparece apenas no final da página */}
+          {showMotivationalButton && (
+            <button
+              onClick={() => setShowMotivationalPopup(true)}
+              className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-gradient-to-r from-orange-500 via-red-600 to-purple-700 hover:from-orange-600 hover:via-red-700 hover:to-purple-800 text-white font-black px-6 py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 z-50 animate-pulse text-sm sm:text-base"
+              title="Mensagem motivacional"
+            >
+              Em caso de medo ou insegurança: CLIQUE AQUI!
+            </button>
+          )}
 
           {/* Popup Motivacional */}
           {showMotivationalPopup && <MotivationalPopup onClose={() => setShowMotivationalPopup(false)} />}
