@@ -43,7 +43,7 @@ const Index = () => {
               <div className="flex gap-3">
                 <button
                   onClick={exportToPrint}
-                  className="bg-accent hover:bg-accent/90 text-primary font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
                 >
                   <FileDown className="w-5 h-5" />
                   <span className="hidden sm:inline">Exportar</span>

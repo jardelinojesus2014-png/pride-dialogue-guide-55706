@@ -28,7 +28,7 @@ export const GoldenRule = ({ darkMode }: GoldenRuleProps) => {
               ⏱️ 30-40 segundos iniciais
             </div>
             <p className="text-lg sm:text-xl font-bold text-foreground">
-              São <span className="text-accent-foreground bg-accent px-2 rounded">DECISIVOS</span> para o sucesso de toda a ligação
+              São <span className="text-accent">DECISIVOS</span> para o sucesso de toda a ligação
             </p>
           </div>
 
@@ -46,7 +46,7 @@ export const GoldenRule = ({ darkMode }: GoldenRuleProps) => {
             <div className="flex items-start gap-3 bg-card p-4 rounded-lg shadow-sm border-l-4 border-accent">
               <span className="text-2xl sm:text-3xl">💬</span>
               <div>
-                <h3 className="font-bold text-accent-foreground bg-accent px-2 rounded mb-1">RESPIRE!</h3>
+                <h3 className="font-bold text-accent mb-1">RESPIRE!</h3>
                 <p className="text-sm text-muted-foreground">
                   É um diálogo, não um monólogo robotizado.
                 </p>
