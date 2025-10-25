@@ -7,7 +7,7 @@ interface PodcastSectionProps {
 
 export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
   const [podcastFile, setPodcastFile] = useState<{ url: string; name: string } | null>({
-    url: 'https://www.googleapis.com/drive/v3/files/1h1LqUVvldJXZBC_rryyqqzR36Wa41y-0?alt=media&key=AIzaSyDummy',
+    url: 'https://drive.google.com/uc?export=download&id=1h1LqUVvldJXZBC_rryyqqzR36Wa41y-0',
     name: 'Podcast - Guia do Roteiro Pride',
   });
   const [showPodcastInput, setShowPodcastInput] = useState(false);
@@ -18,12 +18,11 @@ export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
   const handlePodcastLinkSave = (link: string) => {
     if (link.trim()) {
       let processedUrl = link.trim();
-      // Convert Google Drive links to streamable format
+      // Convert Google Drive preview links to direct download links
       if (processedUrl.includes('drive.google.com/file/d/')) {
         const fileId = processedUrl.match(/\/d\/([^/]+)/)?.[1];
         if (fileId) {
-          // Use the embedded player format which works better for streaming
-          processedUrl = `https://drive.google.com/uc?export=open&id=${fileId}`;
+          processedUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
         }
       }
       setPodcastFile({ url: processedUrl, name: 'Podcast - Guia do Roteiro' });
@@ -146,22 +145,14 @@ export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
               onEnded={() => setIsPlaying(false)}
-              crossOrigin="anonymous"
               className="hidden"
             />
             
             <audio
               src={podcastFile.url}
               controls
-              crossOrigin="anonymous"
               className="w-full rounded-lg"
             />
-            
-            <div className="bg-accent/10 border border-accent/20 rounded-lg p-3 mt-2">
-              <p className="text-xs text-muted-foreground">
-                ℹ️ <strong>Nota:</strong> Se o áudio não carregar no preview, publique o site - o Google Drive pode bloquear streaming em ambientes de preview por questões de segurança.
-              </p>
-            </div>
             
             <div className="flex flex-wrap items-center justify-between gap-3 bg-card p-3 rounded-lg border border-border">
               <div className="flex items-center gap-2">
