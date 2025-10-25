@@ -7,7 +7,7 @@ interface PodcastSectionProps {
 
 export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
   const [podcastFile, setPodcastFile] = useState<{ url: string; name: string } | null>({
-    url: 'https://drive.google.com/uc?export=download&id=1h1LqUVvldJXZBC_rryyqqzR36Wa41y-0',
+    url: 'https://www.googleapis.com/drive/v3/files/1h1LqUVvldJXZBC_rryyqqzR36Wa41y-0?alt=media&key=AIzaSyDummy',
     name: 'Podcast - Guia do Roteiro Pride',
   });
   const [showPodcastInput, setShowPodcastInput] = useState(false);
@@ -18,11 +18,12 @@ export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
   const handlePodcastLinkSave = (link: string) => {
     if (link.trim()) {
       let processedUrl = link.trim();
-      // Convert Google Drive preview links to direct download links
+      // Convert Google Drive links to streamable format
       if (processedUrl.includes('drive.google.com/file/d/')) {
         const fileId = processedUrl.match(/\/d\/([^/]+)/)?.[1];
         if (fileId) {
-          processedUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+          // Use the embedded player format which works better for streaming
+          processedUrl = `https://drive.google.com/uc?export=open&id=${fileId}`;
         }
       }
       setPodcastFile({ url: processedUrl, name: 'Podcast - Guia do Roteiro' });
