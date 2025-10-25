@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Upload, X } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Upload, X, Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 
 interface PodcastSectionProps {
   darkMode: boolean;
@@ -7,17 +7,54 @@ interface PodcastSectionProps {
 
 export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
   const [podcastFile, setPodcastFile] = useState<{ url: string; name: string } | null>({
-    url: 'https://drive.google.com/file/d/1h1LqUVvldJXZBC_rryyqqzR36Wa41y-0/preview',
+    url: 'https://drive.google.com/uc?export=download&id=1h1LqUVvldJXZBC_rryyqqzR36Wa41y-0',
     name: 'Podcast - Guia do Roteiro Pride',
   });
   const [showPodcastInput, setShowPodcastInput] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   const handlePodcastLinkSave = (link: string) => {
     if (link.trim()) {
-      setPodcastFile({ url: link.trim(), name: 'Podcast - Guia do Roteiro' });
+      let processedUrl = link.trim();
+      // Convert Google Drive preview links to direct download links
+      if (processedUrl.includes('drive.google.com/file/d/')) {
+        const fileId = processedUrl.match(/\/d\/([^/]+)/)?.[1];
+        if (fileId) {
+          processedUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+        }
+      }
+      setPodcastFile({ url: processedUrl, name: 'Podcast - Guia do Roteiro' });
       setShowPodcastInput(false);
     }
   };
+
+  const togglePlayPause = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleSpeedChange = (speed: number) => {
+    setPlaybackSpeed(speed);
+    if (audioRef.current) {
+      audioRef.current.playbackRate = speed;
+    }
+  };
+
+  const skipTime = (seconds: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime += seconds;
+    }
+  };
+
+  const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
   return (
     <div className="bg-card rounded-xl shadow-lg p-6 mb-8 border-2 border-border">
@@ -101,8 +138,57 @@ export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
               <X className="w-5 h-5" />
             </button>
           </div>
-          <div className="w-full h-20">
-            <iframe src={podcastFile.url} className="w-full h-full rounded" allow="autoplay" />
+          <div className="space-y-3">
+            <audio
+              ref={audioRef}
+              src={podcastFile.url}
+              className="w-full"
+              onEnded={() => setIsPlaying(false)}
+              controls
+            />
+            
+            <div className="flex flex-wrap items-center justify-between gap-3 bg-card p-3 rounded-lg border border-border">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => skipTime(-10)}
+                  className="bg-primary/10 hover:bg-primary/20 text-primary p-2 rounded-lg transition-colors"
+                  title="Voltar 10s"
+                >
+                  <SkipBack className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={togglePlayPause}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground p-2 rounded-lg transition-colors"
+                  title={isPlaying ? 'Pausar' : 'Reproduzir'}
+                >
+                  {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                </button>
+                <button
+                  onClick={() => skipTime(10)}
+                  className="bg-primary/10 hover:bg-primary/20 text-primary p-2 rounded-lg transition-colors"
+                  title="Avançar 10s"
+                >
+                  <SkipForward className="w-4 h-4" />
+                </button>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-muted-foreground">Velocidade:</span>
+                {speeds.map((speed) => (
+                  <button
+                    key={speed}
+                    onClick={() => handleSpeedChange(speed)}
+                    className={`px-2 py-1 rounded text-xs font-bold transition-all ${
+                      playbackSpeed === speed
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted hover:bg-muted/80 text-foreground'
+                    }`}
+                  >
+                    {speed}x
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}
