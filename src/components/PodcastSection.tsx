@@ -146,14 +146,22 @@ export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
               onEnded={() => setIsPlaying(false)}
+              crossOrigin="anonymous"
               className="hidden"
             />
             
             <audio
               src={podcastFile.url}
               controls
+              crossOrigin="anonymous"
               className="w-full rounded-lg"
             />
+            
+            <div className="bg-accent/10 border border-accent/20 rounded-lg p-3 mt-2">
+              <p className="text-xs text-muted-foreground">
+                ℹ️ <strong>Nota:</strong> Se o áudio não carregar no preview, publique o site - o Google Drive pode bloquear streaming em ambientes de preview por questões de segurança.
+              </p>
+            </div>
             
             <div className="flex flex-wrap items-center justify-between gap-3 bg-card p-3 rounded-lg border border-border">
               <div className="flex items-center gap-2">
