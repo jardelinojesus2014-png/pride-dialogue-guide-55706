@@ -142,9 +142,16 @@ export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
             <audio
               ref={audioRef}
               src={podcastFile.url}
-              className="w-full"
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
               onEnded={() => setIsPlaying(false)}
+              className="hidden"
+            />
+            
+            <audio
+              src={podcastFile.url}
               controls
+              className="w-full rounded-lg"
             />
             
             <div className="flex flex-wrap items-center justify-between gap-3 bg-card p-3 rounded-lg border border-border">
