@@ -26,20 +26,19 @@ export const ScriptSections = ({ darkMode }: ScriptSectionsProps) => {
     }));
   };
 
-  const handleToggleCheck = (itemId: string) => {
-    const [sectionId, itemIdOnly] = itemId.split('-');
-    toggleCheck(sectionId, itemIdOnly);
+  const handleToggleCheck = (sectionId: string, itemId: string) => {
+    toggleCheck(sectionId, itemId);
   };
 
-  const handleNoteChange = (itemId: string, value: string) => {
-    const [sectionId, itemIdOnly] = itemId.split('-');
-    saveNote(sectionId, itemIdOnly, value);
+  const handleNoteChange = (sectionId: string, itemId: string, value: string) => {
+    saveNote(sectionId, itemId, value);
   };
 
-  const toggleNotes = (itemId: string) => {
+  const toggleNotes = (sectionId: string, itemId: string) => {
+    const key = `${sectionId}-${itemId}`;
     setShowNotes((prev) => ({
       ...prev,
-      [itemId]: !prev[itemId],
+      [key]: !prev[key],
     }));
   };
 

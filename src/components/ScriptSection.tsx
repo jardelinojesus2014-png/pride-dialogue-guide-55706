@@ -8,11 +8,11 @@ interface ScriptSectionProps {
   isExpanded: boolean;
   onToggle: () => void;
   checkedItems: Record<string, boolean>;
-  onToggleCheck: (item: string) => void;
+  onToggleCheck: (sectionId: string, itemId: string) => void;
   notes: Record<string, string>;
-  onNoteChange: (itemId: string, value: string) => void;
+  onNoteChange: (sectionId: string, itemId: string, value: string) => void;
   showNotes: Record<string, boolean>;
-  onToggleNotes: (itemId: string) => void;
+  onToggleNotes: (sectionId: string, itemId: string) => void;
   audioFile?: { url: string; name: string };
   playingAudio: string | null;
   onToggleAudioPlay: (itemId: string) => void;
@@ -128,19 +128,22 @@ export const ScriptSection = ({
 
       {isExpanded && (
         <div className="p-5 space-y-4">
-          {section.items.map((item) => (
-            <ScriptItem
-              key={item.id}
-              item={item}
-              darkMode={darkMode}
-              isChecked={checkedItems[item.id] || false}
-              onToggleCheck={() => onToggleCheck(item.id)}
-              note={notes[item.id] || ''}
-              onNoteChange={(value) => onNoteChange(item.id, value)}
-              showNote={showNotes[item.id] || false}
-              onToggleNote={() => onToggleNotes(item.id)}
-            />
-          ))}
+          {section.items.map((item) => {
+            const key = `${section.id}-${item.id}`;
+            return (
+              <ScriptItem
+                key={item.id}
+                item={item}
+                darkMode={darkMode}
+                isChecked={checkedItems[key] || false}
+                onToggleCheck={() => onToggleCheck(section.id, item.id)}
+                note={notes[key] || ''}
+                onNoteChange={(value) => onNoteChange(section.id, item.id, value)}
+                showNote={showNotes[key] || false}
+                onToggleNote={() => onToggleNotes(section.id, item.id)}
+              />
+            );
+          })}
         </div>
       )}
     </div>
