@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-import { Upload, X, Play, Pause, SkipBack, SkipForward, Trash2, Plus } from 'lucide-react';
+import { useState } from 'react';
+import { Trash2, Plus } from 'lucide-react';
 import { usePodcastLinks } from '@/hooks/usePodcastLinks';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { Button } from './ui/button';
@@ -33,10 +33,6 @@ export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
   const [title, setTitle] = useState('');
   const [driveLink, setDriveLink] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [currentPodcast, setCurrentPodcast] = useState<string | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [playbackSpeed, setPlaybackSpeed] = useState(1);
-  const audioRef = useRef<HTMLAudioElement>(null);
 
   const handleAddPodcast = async () => {
     if (!title.trim() || !driveLink.trim()) {
@@ -59,36 +55,6 @@ export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
     setShowAddDialog(false);
   };
 
-  const togglePlayPause = (podcastUrl: string) => {
-    if (currentPodcast !== podcastUrl) {
-      setCurrentPodcast(podcastUrl);
-      setIsPlaying(false);
-    }
-    
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
-
-  const handleSpeedChange = (speed: number) => {
-    setPlaybackSpeed(speed);
-    if (audioRef.current) {
-      audioRef.current.playbackRate = speed;
-    }
-  };
-
-  const skipTime = (seconds: number) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime += seconds;
-    }
-  };
-
-  const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
   if (loading || adminLoading) {
     return <div>Carregando...</div>;
@@ -153,69 +119,12 @@ export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
                     </Button>
                   )}
                 </div>
-                <div className="space-y-3">
-                  <audio
-                    ref={currentPodcast === podcast.url ? audioRef : undefined}
-                    src={podcast.url}
-                    onPlay={() => setIsPlaying(true)}
-                    onPause={() => setIsPlaying(false)}
-                    onEnded={() => setIsPlaying(false)}
-                    className="hidden"
-                  />
-                  
-                  <audio
-                    src={podcast.url}
-                    controls
-                    className="w-full rounded-lg"
-                  />
-                  
-                  <div className="flex flex-wrap items-center justify-between gap-3 bg-card p-3 rounded-lg border border-border">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => skipTime(-10)}
-                        className="bg-primary/10 hover:bg-primary/20 text-primary p-2 rounded-lg transition-colors"
-                        title="Voltar 10s"
-                      >
-                        <SkipBack className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => togglePlayPause(podcast.url)}
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground p-2 rounded-lg transition-colors"
-                        title={isPlaying && currentPodcast === podcast.url ? 'Pausar' : 'Reproduzir'}
-                      >
-                        {isPlaying && currentPodcast === podcast.url ? (
-                          <Pause className="w-4 h-4" />
-                        ) : (
-                          <Play className="w-4 h-4" />
-                        )}
-                      </button>
-                      <button
-                        onClick={() => skipTime(10)}
-                        className="bg-primary/10 hover:bg-primary/20 text-primary p-2 rounded-lg transition-colors"
-                        title="Avançar 10s"
-                      >
-                        <SkipForward className="w-4 h-4" />
-                      </button>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-muted-foreground">Velocidade:</span>
-                      {speeds.map((speed) => (
-                        <button
-                          key={speed}
-                          onClick={() => handleSpeedChange(speed)}
-                          className={`px-2 py-1 rounded text-xs font-bold transition-all ${
-                            playbackSpeed === speed
-                              ? 'bg-primary text-primary-foreground'
-                              : 'bg-muted hover:bg-muted/80 text-foreground'
-                          }`}
-                        >
-                          {speed}x
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                <audio
+                  src={podcast.url}
+                  controls
+                  controlsList="nodownload"
+                  className="w-full rounded-lg"
+                />
               </div>
             ))}
           </div>
