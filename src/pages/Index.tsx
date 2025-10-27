@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Moon, Sun, FileDown } from 'lucide-react';
+import { Moon, Sun, FileDown, LogOut } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import { GoldenRule } from '@/components/GoldenRule';
 import { ScriptSections } from '@/components/ScriptSections';
 import { DosDonts } from '@/components/DosDonts';
@@ -9,6 +10,7 @@ import { MotivationalPopup } from '@/components/MotivationalPopup';
 import logoPride from '@/assets/Logo_Pride.png';
 
 const Index = () => {
+  const { signOut, user } = useAuth();
   const [darkMode, setDarkMode] = useState(false);
   const [showMotivationalPopup, setShowMotivationalPopup] = useState(false);
 
@@ -52,6 +54,14 @@ const Index = () => {
                   className="bg-primary/10 hover:bg-primary/20 text-accent font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
                 >
                   {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                </button>
+                <button
+                  onClick={() => signOut()}
+                  className="bg-destructive hover:bg-destructive/90 text-destructive-foreground font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
+                  title="Sair"
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span className="hidden sm:inline">Sair</span>
                 </button>
               </div>
             </div>

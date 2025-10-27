@@ -2,15 +2,18 @@ import { useState } from 'react';
 import { ChevronUp } from 'lucide-react';
 import { ScriptSection } from './ScriptSection';
 import { sectionsData } from '@/data/sectionsData';
+import { useScriptNotes } from '@/hooks/useScriptNotes';
+import { useScriptCheckedItems } from '@/hooks/useScriptCheckedItems';
 
 interface ScriptSectionsProps {
   darkMode: boolean;
 }
 
 export const ScriptSections = ({ darkMode }: ScriptSectionsProps) => {
+  const { notes, saveNote, loading: notesLoading } = useScriptNotes();
+  const { checkedItems, toggleCheck, loading: checkedLoading } = useScriptCheckedItems();
+  
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
-  const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
-  const [notes, setNotes] = useState<Record<string, string>>({});
   const [showNotes, setShowNotes] = useState<Record<string, boolean>>({});
   const [audioFiles, setAudioFiles] = useState<Record<string, { url: string; name: string }>>({});
   const [playingAudio, setPlayingAudio] = useState<string | null>(null);
@@ -23,18 +26,14 @@ export const ScriptSections = ({ darkMode }: ScriptSectionsProps) => {
     }));
   };
 
-  const toggleCheck = (item: string) => {
-    setCheckedItems((prev) => ({
-      ...prev,
-      [item]: !prev[item],
-    }));
+  const handleToggleCheck = (itemId: string) => {
+    const [sectionId, itemIdOnly] = itemId.split('-');
+    toggleCheck(sectionId, itemIdOnly);
   };
 
   const handleNoteChange = (itemId: string, value: string) => {
-    setNotes((prev) => ({
-      ...prev,
-      [itemId]: value,
-    }));
+    const [sectionId, itemIdOnly] = itemId.split('-');
+    saveNote(sectionId, itemIdOnly, value);
   };
 
   const toggleNotes = (itemId: string) => {
@@ -64,6 +63,14 @@ export const ScriptSections = ({ darkMode }: ScriptSectionsProps) => {
 
   const hasExpandedSections = Object.values(expandedSections).some((val) => val === true);
 
+  if (notesLoading || checkedLoading) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="space-y-4 mb-8">
@@ -75,7 +82,7 @@ export const ScriptSections = ({ darkMode }: ScriptSectionsProps) => {
             isExpanded={expandedSections[section.id] || false}
             onToggle={() => toggleSection(section.id)}
             checkedItems={checkedItems}
-            onToggleCheck={toggleCheck}
+            onToggleCheck={handleToggleCheck}
             notes={notes}
             onNoteChange={handleNoteChange}
             showNotes={showNotes}
