@@ -4,10 +4,20 @@ import { useAuth } from '@/hooks/useAuth';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Users, FileText, CheckSquare, Music, Play, Pause } from 'lucide-react';
+import { ArrowLeft, Users, FileText, Music, Filter, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserAudioFile } from '@/hooks/useUserAudioFiles';
+import { UserManagement } from '@/components/UserManagement';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface UserNote {
   id: string;
@@ -19,18 +29,16 @@ interface UserNote {
   profiles?: { email: string };
 }
 
-interface UserCheckedItem {
-  id: string;
-  user_id: string;
-  section_id: string;
-  item_id: string;
-  is_checked: boolean;
-  created_at: string;
+interface AdminAudioFile extends UserAudioFile {
   profiles?: { email: string };
 }
 
-interface AdminAudioFile extends UserAudioFile {
-  profiles?: { email: string };
+interface UserProfile {
+  id: string;
+  email: string;
+  created_at: string;
+  last_sign_in_at: string | null;
+  role: 'admin' | 'user';
 }
 
 const Admin = () => {
@@ -38,10 +46,16 @@ const Admin = () => {
   const { user } = useAuth();
   const { isAdmin, loading: adminLoading } = useIsAdmin();
   const [notes, setNotes] = useState<UserNote[]>([]);
-  const [checkedItems, setCheckedItems] = useState<UserCheckedItem[]>([]);
   const [audioFiles, setAudioFiles] = useState<AdminAudioFile[]>([]);
-  const [playingAudioId, setPlayingAudioId] = useState<string | null>(null);
+  const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Estados de filtro
+  const [showFilters, setShowFilters] = useState(false);
+  const [filterUser, setFilterUser] = useState<string>('all');
+  const [filterStartDate, setFilterStartDate] = useState<string>('');
+  const [filterEndDate, setFilterEndDate] = useState<string>('');
+  const [filterSearch, setFilterSearch] = useState<string>('');
 
   useEffect(() => {
     if (!adminLoading && !isAdmin) {
@@ -57,14 +71,9 @@ const Admin = () => {
 
   const loadData = async () => {
     try {
-      // Load notes, checked items, and audio files
-      const [notesResult, checkedItemsResult, audioFilesResult, profilesResult] = await Promise.all([
+      const [notesResult, audioFilesResult, profilesResult, rolesResult] = await Promise.all([
         supabase
           .from('script_notes')
-          .select('*')
-          .order('created_at', { ascending: false }),
-        supabase
-          .from('script_checked_items')
           .select('*')
           .order('created_at', { ascending: false }),
         supabase
@@ -73,40 +82,46 @@ const Admin = () => {
           .order('created_at', { ascending: false }),
         supabase
           .from('profiles')
-          .select('id, email')
+          .select('id, email, created_at, last_sign_in_at')
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('user_roles')
+          .select('user_id, role')
       ]);
 
       if (notesResult.error) throw notesResult.error;
-      if (checkedItemsResult.error) throw checkedItemsResult.error;
       if (audioFilesResult.error) throw audioFilesResult.error;
       if (profilesResult.error) throw profilesResult.error;
+      if (rolesResult.error) throw rolesResult.error;
 
-      // Create a map of user_id to email
+      // Create maps
       const profilesMap = new Map(
         profilesResult.data?.map(p => [p.id, p.email]) || []
       );
 
-      // Enrich notes with email
+      const rolesMap = new Map(
+        rolesResult.data?.filter(r => r.role === 'admin').map(r => [r.user_id, 'admin']) || []
+      );
+
+      // Enrich data
       const enrichedNotes = notesResult.data?.map(note => ({
         ...note,
         profiles: { email: profilesMap.get(note.user_id) || 'Email não encontrado' }
       })) || [];
 
-      // Enrich checked items with email
-      const enrichedCheckedItems = checkedItemsResult.data?.map(item => ({
-        ...item,
-        profiles: { email: profilesMap.get(item.user_id) || 'Email não encontrado' }
-      })) || [];
-
-      // Enrich audio files with email
       const enrichedAudioFiles = audioFilesResult.data?.map(audio => ({
         ...audio,
         profiles: { email: profilesMap.get(audio.user_id) || 'Email não encontrado' }
       })) || [];
 
+      const enrichedUsers = profilesResult.data?.map(profile => ({
+        ...profile,
+        role: rolesMap.get(profile.id) || 'user'
+      })) as UserProfile[] || [];
+
       setNotes(enrichedNotes);
-      setCheckedItems(enrichedCheckedItems);
       setAudioFiles(enrichedAudioFiles);
+      setUsers(enrichedUsers);
     } catch (error) {
       console.error('Error loading admin data:', error);
     } finally {
@@ -114,25 +129,50 @@ const Admin = () => {
     }
   };
 
-  const toggleAudioPlay = (audioFile: AdminAudioFile) => {
-    const audio = new Audio(audioFile.file_url);
-    
-    if (playingAudioId === audioFile.id) {
-      audio.pause();
-      setPlayingAudioId(null);
-    } else {
-      audio.play();
-      setPlayingAudioId(audioFile.id);
-      audio.onended = () => setPlayingAudioId(null);
-    }
+  const clearFilters = () => {
+    setFilterUser('all');
+    setFilterStartDate('');
+    setFilterEndDate('');
+    setFilterSearch('');
   };
 
-  const formatDuration = (seconds: number | null) => {
-    if (!seconds) return '--:--';
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  const filterData = <T extends { user_id?: string; created_at: string; note?: string; title?: string }>(
+    data: T[]
+  ): T[] => {
+    return data.filter(item => {
+      // Filtro por usuário
+      if (filterUser !== 'all' && item.user_id !== filterUser) {
+        return false;
+      }
+
+      // Filtro por data
+      if (filterStartDate) {
+        const itemDate = new Date(item.created_at);
+        const startDate = new Date(filterStartDate);
+        if (itemDate < startDate) return false;
+      }
+
+      if (filterEndDate) {
+        const itemDate = new Date(item.created_at);
+        const endDate = new Date(filterEndDate);
+        endDate.setHours(23, 59, 59);
+        if (itemDate > endDate) return false;
+      }
+
+      // Filtro por texto
+      if (filterSearch) {
+        const searchLower = filterSearch.toLowerCase();
+        const noteText = (item as any).note?.toLowerCase() || '';
+        const titleText = (item as any).title?.toLowerCase() || '';
+        return noteText.includes(searchLower) || titleText.includes(searchLower);
+      }
+
+      return true;
+    });
   };
+
+  const filteredNotes = filterData(notes);
+  const filteredAudioFiles = filterData(audioFiles);
 
   if (adminLoading || loading) {
     return (
@@ -149,10 +189,6 @@ const Admin = () => {
     return null;
   }
 
-  const uniqueUsers = Array.from(
-    new Set([...notes.map(n => n.user_id), ...checkedItems.map(c => c.user_id)])
-  );
-
   return (
     <div className="min-h-screen bg-gradient-subtle p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
@@ -164,14 +200,14 @@ const Admin = () => {
           <h1 className="text-3xl font-black text-foreground">Painel Administrativo</h1>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total de Usuários</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{uniqueUsers.length}</div>
+              <div className="text-2xl font-bold">{users.length}</div>
             </CardContent>
           </Card>
 
@@ -182,18 +218,6 @@ const Admin = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{notes.length}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Itens Marcados</CardTitle>
-              <CheckSquare className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {checkedItems.filter(item => item.is_checked).length}
-              </div>
             </CardContent>
           </Card>
 
@@ -210,22 +234,95 @@ const Admin = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Dados dos Usuários</CardTitle>
-            <CardDescription>Visualize todas as anotações e itens marcados</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Gerenciamento</CardTitle>
+                <CardDescription>Gerencie usuários e visualize dados</CardDescription>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                Filtros
+              </Button>
+            </div>
+
+            {showFilters && (
+              <div className="mt-4 p-4 bg-muted/50 rounded-lg space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label>Usuário</Label>
+                    <Select value={filterUser} onValueChange={setFilterUser}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos</SelectItem>
+                        {users.map(user => (
+                          <SelectItem key={user.id} value={user.id}>
+                            {user.email}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label>Buscar</Label>
+                    <Input
+                      placeholder="Buscar em anotações e títulos..."
+                      value={filterSearch}
+                      onChange={(e) => setFilterSearch(e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Data Inicial</Label>
+                    <Input
+                      type="date"
+                      value={filterStartDate}
+                      onChange={(e) => setFilterStartDate(e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Data Final</Label>
+                    <Input
+                      type="date"
+                      value={filterEndDate}
+                      onChange={(e) => setFilterEndDate(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <Button variant="ghost" size="sm" onClick={clearFilters}>
+                  <X className="w-4 h-4 mr-2" />
+                  Limpar Filtros
+                </Button>
+              </div>
+            )}
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="notes">
+            <Tabs defaultValue="users">
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="notes">Anotações</TabsTrigger>
-                <TabsTrigger value="checked">Itens Marcados</TabsTrigger>
-                <TabsTrigger value="audio">Áudios</TabsTrigger>
+                <TabsTrigger value="users">Usuários</TabsTrigger>
+                <TabsTrigger value="notes">Anotações ({filteredNotes.length})</TabsTrigger>
+                <TabsTrigger value="audio">Áudios ({filteredAudioFiles.length})</TabsTrigger>
               </TabsList>
 
+              <TabsContent value="users" className="space-y-4">
+                <UserManagement users={users} onUserUpdated={loadData} />
+              </TabsContent>
+
               <TabsContent value="notes" className="space-y-4">
-                {notes.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">Nenhuma anotação encontrada</p>
+                {filteredNotes.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">
+                    Nenhuma anotação encontrada
+                  </p>
                 ) : (
-                  notes.map((note) => (
+                  filteredNotes.map((note) => (
                     <Card key={note.id}>
                       <CardHeader>
                         <CardTitle className="text-sm font-medium">
@@ -246,37 +343,13 @@ const Admin = () => {
                 )}
               </TabsContent>
 
-              <TabsContent value="checked" className="space-y-4">
-                {checkedItems.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">Nenhum item marcado encontrado</p>
-                ) : (
-                  checkedItems
-                    .filter(item => item.is_checked)
-                    .map((item) => (
-                      <Card key={item.id}>
-                        <CardHeader>
-                          <CardTitle className="text-sm font-medium">
-                            {item.profiles?.email || 'Email não encontrado'}
-                          </CardTitle>
-                          <CardDescription>
-                            Seção: {item.section_id} | Item: {item.item_id}
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(item.created_at).toLocaleString('pt-BR')}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    ))
-                )}
-              </TabsContent>
-
               <TabsContent value="audio" className="space-y-4">
-                {audioFiles.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">Nenhum áudio encontrado</p>
+                {filteredAudioFiles.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">
+                    Nenhum áudio encontrado
+                  </p>
                 ) : (
-                  audioFiles.map((audio) => (
+                  filteredAudioFiles.map((audio) => (
                     <Card key={audio.id}>
                       <CardHeader>
                         <div className="flex items-start justify-between">
@@ -291,33 +364,16 @@ const Admin = () => {
                               Seção: {audio.section_id}
                             </CardDescription>
                           </div>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => toggleAudioPlay(audio)}
-                          >
-                            {playingAudioId === audio.id ? (
-                              <Pause className="w-4 h-4" />
-                            ) : (
-                              <Play className="w-4 h-4" />
-                            )}
-                          </Button>
                         </div>
                       </CardHeader>
                       <CardContent>
                         <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                          <span>Duração: {formatDuration(audio.duration_seconds)}</span>
-                          <span>•</span>
                           <span>{new Date(audio.created_at).toLocaleString('pt-BR')}</span>
                         </div>
-                        <a 
-                          href={audio.file_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-xs text-accent hover:underline mt-2 inline-block"
-                        >
-                          Abrir arquivo
-                        </a>
+                        <audio controls className="w-full mt-3">
+                          <source src={audio.file_url} type="audio/mpeg" />
+                          Seu navegador não suporta o elemento de áudio.
+                        </audio>
                       </CardContent>
                     </Card>
                   ))
