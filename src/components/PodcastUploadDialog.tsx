@@ -70,56 +70,33 @@ export const PodcastUploadDialog = ({
 
     setIsUploading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      // Convert Google Drive link to direct download/preview URL
+      let processedUrl = driveLink.trim();
       
-      if (!session) {
-        toast({
-          title: 'Erro',
-          description: 'Você precisa estar autenticado',
-          variant: 'destructive',
-        });
-        return;
-      }
-
-      const { data, error } = await supabase.functions.invoke('download-from-drive', {
-        body: {
-          driveLink: driveLink.trim(),
-          title: title.trim(),
-          type: 'podcast',
-        },
-      });
-
-      if (error) {
-        console.error('Error:', error);
-        toast({
-          title: 'Erro ao importar do Google Drive',
-          description: error.message || 'Verifique se o link é público e permite download',
-          variant: 'destructive',
-        });
-        return;
-      }
-
-      if (!data?.success) {
-        toast({
-          title: 'Erro ao importar',
-          description: data?.error || 'Erro desconhecido',
-          variant: 'destructive',
-        });
-        return;
+      if (processedUrl.includes('drive.google.com/file/d/')) {
+        const fileId = processedUrl.match(/\/d\/([^/]+)/)?.[1];
+        if (fileId) {
+          // Use preview format for audio playback
+          processedUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+        }
       }
 
       toast({
-        title: 'Podcast importado com sucesso!',
-        description: `"${title}" foi adicionado.`,
+        title: 'Podcast adicionado com sucesso!',
+        description: `"${title}" foi vinculado.`,
       });
 
+      // Just pass the URL directly - no download needed
+      const blob = new Blob([processedUrl], { type: 'text/plain' });
+      await onUpload(title, blob);
+      
       resetForm();
       onOpenChange(false);
     } catch (error: any) {
-      console.error('Error uploading from Drive:', error);
+      console.error('Error adding Drive link:', error);
       toast({
-        title: 'Erro ao importar do Google Drive',
-        description: error.message || 'Verifique o link e as permissões.',
+        title: 'Erro ao adicionar link',
+        description: error.message || 'Verifique o link.',
         variant: 'destructive',
       });
     } finally {

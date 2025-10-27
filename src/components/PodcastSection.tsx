@@ -1,9 +1,10 @@
 import { useState, useRef } from 'react';
 import { Upload, X, Play, Pause, SkipBack, SkipForward, Trash2, Plus } from 'lucide-react';
-import { usePodcasts } from '@/hooks/usePodcasts';
+import { usePodcastLinks } from '@/hooks/usePodcastLinks';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
-import { PodcastUploadDialog } from './PodcastUploadDialog';
 import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,23 +15,48 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from './ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from './ui/dialog';
 
 interface PodcastSectionProps {
   darkMode: boolean;
 }
 
 export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
-  const { podcasts, loading, uploadPodcast, deletePodcast } = usePodcasts();
+  const { podcastLinks, loading, addPodcastLink, deletePodcastLink } = usePodcastLinks();
   const { isAdmin, loading: adminLoading } = useIsAdmin();
-  const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [title, setTitle] = useState('');
+  const [driveLink, setDriveLink] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [currentPodcast, setCurrentPodcast] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const handleUpload = async (title: string, audioBlob: Blob, durationSeconds?: number) => {
-    await uploadPodcast(title, audioBlob, durationSeconds);
+  const handleAddPodcast = async () => {
+    if (!title.trim() || !driveLink.trim()) {
+      alert('Por favor, preencha o título e o link do Google Drive');
+      return;
+    }
+
+    let processedUrl = driveLink.trim();
+    
+    if (processedUrl.includes('drive.google.com/file/d/')) {
+      const fileId = processedUrl.match(/\/d\/([^/]+)/)?.[1];
+      if (fileId) {
+        processedUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+      }
+    }
+
+    await addPodcastLink(title.trim(), processedUrl);
+    setTitle('');
+    setDriveLink('');
+    setShowAddDialog(false);
   };
 
   const togglePlayPause = (podcastUrl: string) => {
@@ -84,14 +110,14 @@ export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
             </div>
           </div>
           {isAdmin && (
-            <Button onClick={() => setShowUploadDialog(true)} className="gap-2">
+            <Button onClick={() => setShowAddDialog(true)} className="gap-2">
               <Plus className="w-4 h-4" />
               Adicionar Podcast
             </Button>
           )}
         </div>
 
-        {podcasts.length === 0 ? (
+        {podcastLinks.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <p>Nenhum podcast disponível ainda.</p>
             {isAdmin && (
@@ -100,7 +126,7 @@ export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
           </div>
         ) : (
           <div className="space-y-4">
-            {podcasts.map((podcast) => (
+            {podcastLinks.map((podcast) => (
               <div key={podcast.id} className="bg-muted rounded-lg p-4 shadow-md">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
@@ -110,7 +136,7 @@ export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
                       </svg>
                     </div>
                     <div>
-                      <p className="font-bold text-primary">{podcast.title}</p>
+                      <p className="font-bold text-primary">{podcast.name}</p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(podcast.created_at).toLocaleDateString('pt-BR')}
                       </p>
@@ -129,8 +155,8 @@ export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
                 </div>
                 <div className="space-y-3">
                   <audio
-                    ref={currentPodcast === podcast.file_url ? audioRef : undefined}
-                    src={podcast.file_url}
+                    ref={currentPodcast === podcast.url ? audioRef : undefined}
+                    src={podcast.url}
                     onPlay={() => setIsPlaying(true)}
                     onPause={() => setIsPlaying(false)}
                     onEnded={() => setIsPlaying(false)}
@@ -138,7 +164,7 @@ export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
                   />
                   
                   <audio
-                    src={podcast.file_url}
+                    src={podcast.url}
                     controls
                     className="w-full rounded-lg"
                   />
@@ -153,11 +179,11 @@ export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
                         <SkipBack className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => togglePlayPause(podcast.file_url)}
+                        onClick={() => togglePlayPause(podcast.url)}
                         className="bg-primary hover:bg-primary/90 text-primary-foreground p-2 rounded-lg transition-colors"
-                        title={isPlaying && currentPodcast === podcast.file_url ? 'Pausar' : 'Reproduzir'}
+                        title={isPlaying && currentPodcast === podcast.url ? 'Pausar' : 'Reproduzir'}
                       >
-                        {isPlaying && currentPodcast === podcast.file_url ? (
+                        {isPlaying && currentPodcast === podcast.url ? (
                           <Pause className="w-4 h-4" />
                         ) : (
                           <Play className="w-4 h-4" />
@@ -196,18 +222,67 @@ export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
         )}
       </div>
 
-      <PodcastUploadDialog
-        open={showUploadDialog}
-        onOpenChange={setShowUploadDialog}
-        onUpload={handleUpload}
-      />
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Adicionar Podcast do Google Drive</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="podcast-title">Título do Podcast *</Label>
+              <Input
+                id="podcast-title"
+                placeholder="Ex: Guia do Roteiro Pride"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="drive-link">Link do Google Drive *</Label>
+              <Input
+                id="drive-link"
+                placeholder="https://drive.google.com/file/d/..."
+                value={driveLink}
+                onChange={(e) => setDriveLink(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Certifique-se que o link é público
+              </p>
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                onClick={() => {
+                  setShowAddDialog(false);
+                  setTitle('');
+                  setDriveLink('');
+                }}
+                variant="outline"
+                className="flex-1"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleAddPodcast}
+                disabled={!title.trim() || !driveLink.trim()}
+                className="flex-1 gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Adicionar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir podcast?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação não pode ser desfeita. O arquivo de podcast será permanentemente removido.
+              Esta ação não pode ser desfeita. O podcast será permanentemente removido.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -215,7 +290,7 @@ export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
             <AlertDialogAction
               onClick={() => {
                 if (deleteId) {
-                  deletePodcast(deleteId);
+                  deletePodcastLink(deleteId);
                   setDeleteId(null);
                 }
               }}
