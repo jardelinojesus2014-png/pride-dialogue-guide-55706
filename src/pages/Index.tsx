@@ -9,6 +9,7 @@ import { DosDonts } from '@/components/DosDonts';
 import { AdminAudioSection } from '@/components/AdminAudioSection';
 import { VideoSection } from '@/components/VideoSection';
 import { MotivationalPopup } from '@/components/MotivationalPopup';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import logoPride from '@/assets/Logo_Pride.png';
 
 const Index = () => {
@@ -81,31 +82,63 @@ const Index = () => {
             </div>
           </header>
 
-          {/* Golden Rule */}
-          <GoldenRule darkMode={darkMode} />
+          {/* Tabs Navigation */}
+          <Tabs defaultValue="prospeccao" className="w-full">
+            <TabsList className="w-full grid grid-cols-2 mb-6 h-auto p-2 bg-gradient-hero rounded-lg">
+              <TabsTrigger 
+                value="prospeccao" 
+                className="text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all"
+              >
+                Roteiro de Prospecção SDR
+              </TabsTrigger>
+              <TabsTrigger 
+                value="fluxo" 
+                className="text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all"
+              >
+                Fluxo de Atendimento - Cadência de LEAD
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Script Sections */}
-          <ScriptSections darkMode={darkMode} />
+            <TabsContent value="prospeccao" className="mt-0">
+              {/* Golden Rule */}
+              <GoldenRule darkMode={darkMode} />
 
-          {/* Do's and Don'ts */}
-          <DosDonts darkMode={darkMode} />
+              {/* Script Sections */}
+              <ScriptSections darkMode={darkMode} />
 
-          {/* Admin Audio Section */}
-          <AdminAudioSection darkMode={darkMode} />
+              {/* Do's and Don'ts */}
+              <DosDonts darkMode={darkMode} />
 
-          {/* Video Section */}
-          <VideoSection darkMode={darkMode} />
+              {/* Admin Audio Section */}
+              <AdminAudioSection darkMode={darkMode} />
 
-          {/* Botão Motivacional - Complemento da última seção */}
-          <div className="mb-6 flex justify-center">
-            <button
-              onClick={() => setShowMotivationalPopup(true)}
-              className="bg-gradient-to-r from-orange-500 via-red-600 to-purple-700 hover:from-orange-600 hover:via-red-700 hover:to-purple-800 text-white font-black px-8 py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-sm sm:text-base animate-[pulse_3s_ease-in-out_infinite]"
-              title="Mensagem motivacional"
-            >
-              🔥 Clique aqui em caso de insegurança ou medo
-            </button>
-          </div>
+              {/* Video Section */}
+              <VideoSection darkMode={darkMode} />
+
+              {/* Botão Motivacional - Complemento da última seção */}
+              <div className="mb-6 flex justify-center">
+                <button
+                  onClick={() => setShowMotivationalPopup(true)}
+                  className="bg-gradient-to-r from-orange-500 via-red-600 to-purple-700 hover:from-orange-600 hover:via-red-700 hover:to-purple-800 text-white font-black px-8 py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-sm sm:text-base animate-[pulse_3s_ease-in-out_infinite]"
+                  title="Mensagem motivacional"
+                >
+                  🔥 Clique aqui em caso de insegurança ou medo
+                </button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="fluxo" className="mt-0">
+              {/* Placeholder para Fluxo de Atendimento */}
+              <div className="bg-card rounded-lg shadow-xl p-6 sm:p-8 mb-6">
+                <h2 className="text-2xl sm:text-3xl font-black text-primary mb-4">
+                  Fluxo de Atendimento - Cadência de LEAD
+                </h2>
+                <p className="text-muted-foreground">
+                  Conteúdo em desenvolvimento...
+                </p>
+              </div>
+            </TabsContent>
+          </Tabs>
 
           {/* Footer */}
           <footer className="text-center py-6 text-muted-foreground">
