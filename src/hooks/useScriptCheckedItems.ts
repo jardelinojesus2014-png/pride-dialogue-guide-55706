@@ -45,10 +45,11 @@ export const useScriptCheckedItems = () => {
     const key = `${sectionId}-${itemId}`;
     const newValue = !checkedItems[key];
     
+    console.log('🔄 Toggle check:', { sectionId, itemId, newValue, userId: user.id });
     setCheckedItems((prev) => ({ ...prev, [key]: newValue }));
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('script_checked_items')
         .upsert({
           user_id: user.id,
@@ -57,14 +58,26 @@ export const useScriptCheckedItems = () => {
           is_checked: newValue,
         }, {
           onConflict: 'user_id,section_id,item_id'
-        });
+        })
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Supabase error:', error);
+        throw error;
+      }
+      
+      console.log('✅ Toggle successful:', data);
     } catch (error: any) {
-      console.error('Error toggling check:', error);
+      console.error('❌ Error toggling check:', error);
+      console.error('Error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
       toast({
         title: 'Erro ao marcar item',
-        description: 'Não foi possível salvar a marcação.',
+        description: error.message || 'Não foi possível salvar a marcação.',
         variant: 'destructive',
       });
       // Revert on error

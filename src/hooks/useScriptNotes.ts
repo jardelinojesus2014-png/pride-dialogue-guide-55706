@@ -43,10 +43,11 @@ export const useScriptNotes = () => {
     if (!user) return;
 
     const key = `${sectionId}-${itemId}`;
+    console.log('📝 Save note:', { sectionId, itemId, noteLength: note.length, userId: user.id });
     setNotes((prev) => ({ ...prev, [key]: note }));
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('script_notes')
         .upsert({
           user_id: user.id,
@@ -55,14 +56,26 @@ export const useScriptNotes = () => {
           note: note,
         }, {
           onConflict: 'user_id,section_id,item_id'
-        });
+        })
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Supabase error:', error);
+        throw error;
+      }
+      
+      console.log('✅ Note saved:', data);
     } catch (error: any) {
-      console.error('Error saving note:', error);
+      console.error('❌ Error saving note:', error);
+      console.error('Error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
       toast({
         title: 'Erro ao salvar anotação',
-        description: 'Não foi possível salvar a anotação.',
+        description: error.message || 'Não foi possível salvar a anotação.',
         variant: 'destructive',
       });
     }
