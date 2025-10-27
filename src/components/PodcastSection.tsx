@@ -45,8 +45,8 @@ export const PodcastSection = ({ darkMode }: PodcastSectionProps) => {
     if (processedUrl.includes('drive.google.com/file/d/')) {
       const fileId = processedUrl.match(/\/d\/([^/]+)/)?.[1];
       if (fileId) {
-        // Usar formato que permite streaming
-        processedUrl = `https://drive.google.com/uc?export=open&id=${fileId}`;
+        // Usar formato de preview do Google Drive para streaming
+        processedUrl = `https://drive.google.com/uc?id=${fileId}&export=download`;
       }
     }
 
