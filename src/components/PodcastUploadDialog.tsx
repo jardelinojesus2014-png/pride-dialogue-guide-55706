@@ -20,9 +20,8 @@ export const PodcastUploadDialog = ({
 }: PodcastUploadDialogProps) => {
   const [title, setTitle] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [driveLink, setDriveLink] = useState('');
   const [isUploading, setIsUploading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'record' | 'upload' | 'drive'>('record');
+  const [activeTab, setActiveTab] = useState<'record' | 'upload'>('record');
 
   const handleRecordingComplete = async (audioBlob: Blob, durationSeconds: number) => {
     if (!title.trim()) {
@@ -60,40 +59,9 @@ export const PodcastUploadDialog = ({
     }
   };
 
-  const handleDriveLinkUpload = async () => {
-    if (!title.trim() || !driveLink.trim()) {
-      alert('Por favor, preencha o título e o link do Google Drive');
-      return;
-    }
-
-    setIsUploading(true);
-    try {
-      let processedUrl = driveLink.trim();
-      if (processedUrl.includes('drive.google.com/file/d/')) {
-        const fileId = processedUrl.match(/\/d\/([^/]+)/)?.[1];
-        if (fileId) {
-          processedUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-        }
-      }
-
-      const response = await fetch(processedUrl);
-      const blob = await response.blob();
-      
-      await onUpload(title, blob);
-      resetForm();
-      onOpenChange(false);
-    } catch (error) {
-      console.error('Error uploading from Drive:', error);
-      alert('Erro ao baixar arquivo do Google Drive. Verifique o link e as permissões.');
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
   const resetForm = () => {
     setTitle('');
     setSelectedFile(null);
-    setDriveLink('');
     setActiveTab('record');
   };
 
@@ -123,11 +91,10 @@ export const PodcastUploadDialog = ({
             />
           </div>
 
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'record' | 'upload' | 'drive')}>
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="record">Gravar</TabsTrigger>
-              <TabsTrigger value="upload">Upload PC</TabsTrigger>
-              <TabsTrigger value="drive">Google Drive</TabsTrigger>
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'record' | 'upload')}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="record">Gravar Áudio</TabsTrigger>
+              <TabsTrigger value="upload">Fazer Upload</TabsTrigger>
             </TabsList>
 
             <TabsContent value="record" className="mt-4">
@@ -152,6 +119,9 @@ export const PodcastUploadDialog = ({
                     Arquivo: {selectedFile.name}
                   </p>
                 )}
+                <p className="text-xs text-muted-foreground">
+                  Dica: Para arquivos do Google Drive, baixe-os primeiro e depois faça upload aqui
+                </p>
               </div>
 
               <div className="flex gap-2">
@@ -172,45 +142,6 @@ export const PodcastUploadDialog = ({
                     <>
                       <Upload className="w-4 h-4" />
                       Fazer Upload
-                    </>
-                  )}
-                </Button>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="drive" className="mt-4 space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="drive-link">Link do Google Drive</Label>
-                <Input
-                  id="drive-link"
-                  placeholder="https://drive.google.com/file/d/..."
-                  value={driveLink}
-                  onChange={(e) => setDriveLink(e.target.value)}
-                  disabled={isUploading}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Certifique-se que o link é público e permite download
-                </p>
-              </div>
-
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => handleOpenChange(false)}
-                  variant="outline"
-                  className="flex-1"
-                  disabled={isUploading}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  onClick={handleDriveLinkUpload}
-                  disabled={!title.trim() || !driveLink.trim() || isUploading}
-                  className="flex-1 gap-2"
-                >
-                  {isUploading ? 'Enviando...' : (
-                    <>
-                      <Upload className="w-4 h-4" />
-                      Importar
                     </>
                   )}
                 </Button>

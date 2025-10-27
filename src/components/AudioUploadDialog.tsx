@@ -124,6 +124,9 @@ export const AudioUploadDialog = ({
                     Arquivo selecionado: {selectedFile.name}
                   </p>
                 )}
+                <p className="text-xs text-muted-foreground">
+                  Dica: Para arquivos do Google Drive, baixe-os primeiro e depois faça upload aqui
+                </p>
               </div>
 
               <div className="flex gap-2">
