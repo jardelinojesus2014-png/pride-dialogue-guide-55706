@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { Moon, Sun, FileDown, LogOut } from 'lucide-react';
+import { Moon, Sun, FileDown, LogOut, Shield } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { useNavigate } from 'react-router-dom';
 import { GoldenRule } from '@/components/GoldenRule';
 import { ScriptSections } from '@/components/ScriptSections';
 import { DosDonts } from '@/components/DosDonts';
@@ -11,6 +13,8 @@ import logoPride from '@/assets/Logo_Pride.png';
 
 const Index = () => {
   const { signOut, user } = useAuth();
+  const { isAdmin } = useIsAdmin();
+  const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
   const [showMotivationalPopup, setShowMotivationalPopup] = useState(false);
 
@@ -42,6 +46,16 @@ const Index = () => {
                 </div>
               </div>
               <div className="flex gap-3">
+                {isAdmin && (
+                  <button
+                    onClick={() => navigate('/admin')}
+                    className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
+                    title="Painel Admin"
+                  >
+                    <Shield className="w-5 h-5" />
+                    <span className="hidden sm:inline">Admin</span>
+                  </button>
+                )}
                 <button
                   onClick={exportToPrint}
                   className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"

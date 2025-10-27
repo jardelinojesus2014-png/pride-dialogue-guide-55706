@@ -4,7 +4,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from '@/hooks/use-toast';
+import { z } from 'zod';
 import logoPride from '@/assets/Logo_Pride.png';
+
+// Validation schemas
+const emailSchema = z.string()
+  .email({ message: 'Email inválido' })
+  .refine(
+    (email) => email.endsWith('@pridecorretora.com.br'),
+    { message: 'Apenas emails @pridecorretora.com.br são permitidos' }
+  );
+
+const passwordSchema = z.string()
+  .min(6, { message: 'A senha deve ter no mínimo 6 caracteres' });
 
 const Auth = () => {
   const { signIn, signUp } = useAuth();
@@ -16,6 +29,29 @@ const Auth = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate email
+    const emailValidation = emailSchema.safeParse(loginEmail);
+    if (!emailValidation.success) {
+      toast({
+        title: 'Erro de validação',
+        description: emailValidation.error.errors[0].message,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Validate password
+    const passwordValidation = passwordSchema.safeParse(loginPassword);
+    if (!passwordValidation.success) {
+      toast({
+        title: 'Erro de validação',
+        description: passwordValidation.error.errors[0].message,
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       await signIn(loginEmail, loginPassword);
@@ -26,6 +62,29 @@ const Auth = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate email
+    const emailValidation = emailSchema.safeParse(signupEmail);
+    if (!emailValidation.success) {
+      toast({
+        title: 'Erro de validação',
+        description: emailValidation.error.errors[0].message,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Validate password
+    const passwordValidation = passwordSchema.safeParse(signupPassword);
+    if (!passwordValidation.success) {
+      toast({
+        title: 'Erro de validação',
+        description: passwordValidation.error.errors[0].message,
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       await signUp(signupEmail, signupPassword);
@@ -57,11 +116,12 @@ const Auth = () => {
                   <Input
                     id="login-email"
                     type="email"
-                    placeholder="seu@email.com"
+                    placeholder="seu@pridecorretora.com.br"
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
                     required
                   />
+                  <p className="text-xs text-muted-foreground">Apenas emails @pridecorretora.com.br</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="login-password">Senha</Label>
@@ -87,11 +147,12 @@ const Auth = () => {
                   <Input
                     id="signup-email"
                     type="email"
-                    placeholder="seu@email.com"
+                    placeholder="seu@pridecorretora.com.br"
                     value={signupEmail}
                     onChange={(e) => setSignupEmail(e.target.value)}
                     required
                   />
+                  <p className="text-xs text-muted-foreground">Apenas emails @pridecorretora.com.br</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-password">Senha</Label>
