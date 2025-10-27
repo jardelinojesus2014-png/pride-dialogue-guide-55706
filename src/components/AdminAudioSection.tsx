@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { Trash2, Upload, Link as LinkIcon, Play, Pause } from 'lucide-react';
+import { Trash2, Play, Pause, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { toast } from '@/hooks/use-toast';
+import { AdminAudioUploadDialog } from '@/components/AdminAudioUploadDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,13 +31,11 @@ export const AdminAudioSection = ({ darkMode }: AdminAudioSectionProps) => {
   const { isAdmin, loading: adminLoading } = useIsAdmin();
   const [audios, setAudios] = useState<Audio[]>([]);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
-  const [title, setTitle] = useState('');
-  const [file, setFile] = useState<File | null>(null);
-  const [driveLink, setDriveLink] = useState('');
-  const [uploadMode, setUploadMode] = useState<'file' | 'link'>('file');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [playingId, setPlayingId] = useState<string | null>(null);
+  const [currentTimes, setCurrentTimes] = useState<{ [key: string]: number }>({});
+  const [playbackRates, setPlaybackRates] = useState<{ [key: string]: number }>({});
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const audioRefs = useRef<{ [key: string]: HTMLAudioElement }>({});
 
   useEffect(() => {
@@ -61,136 +60,6 @@ export const AdminAudioSection = ({ darkMode }: AdminAudioSectionProps) => {
       });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleFileUpload = async () => {
-    if (!title.trim()) {
-      toast({
-        title: 'Título obrigatório',
-        description: 'Por favor, insira um título para o áudio.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (!file) {
-      toast({
-        title: 'Arquivo necessário',
-        description: 'Por favor, selecione um arquivo de áudio.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    setUploading(true);
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('audio-files')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('audio-files')
-        .getPublicUrl(filePath);
-
-      const { data: userData } = await supabase.auth.getUser();
-
-      const { error: insertError } = await supabase
-        .from('podcasts')
-        .insert({
-          title: title.trim(),
-          file_path: filePath,
-          file_url: publicUrl,
-          created_by: userData.user?.id,
-        });
-
-      if (insertError) throw insertError;
-
-      toast({
-        title: 'Áudio enviado',
-        description: 'O áudio foi enviado com sucesso.',
-      });
-
-      setTitle('');
-      setFile(null);
-      loadAudios();
-    } catch (error) {
-      console.error('Error uploading audio:', error);
-      toast({
-        title: 'Erro no upload',
-        description: 'Não foi possível enviar o áudio.',
-        variant: 'destructive',
-      });
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleDriveLinkUpload = async () => {
-    if (!title.trim()) {
-      toast({
-        title: 'Título obrigatório',
-        description: 'Por favor, insira um título para o áudio.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (!driveLink.trim()) {
-      toast({
-        title: 'Link necessário',
-        description: 'Por favor, insira um link do Google Drive.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    setUploading(true);
-    try {
-      const fileIdMatch = driveLink.match(/\/d\/([^/]+)/);
-      if (!fileIdMatch) {
-        throw new Error('Link do Google Drive inválido');
-      }
-
-      const fileId = fileIdMatch[1];
-      const directUrl = `https://drive.google.com/uc?id=${fileId}&export=download`;
-
-      const { data: userData } = await supabase.auth.getUser();
-
-      const { error: insertError } = await supabase
-        .from('podcasts')
-        .insert({
-          title: title.trim(),
-          file_path: driveLink,
-          file_url: directUrl,
-          created_by: userData.user?.id,
-        });
-
-      if (insertError) throw insertError;
-
-      toast({
-        title: 'Áudio adicionado',
-        description: 'O link do áudio foi adicionado com sucesso.',
-      });
-
-      setTitle('');
-      setDriveLink('');
-      loadAudios();
-    } catch (error) {
-      console.error('Error adding drive link:', error);
-      toast({
-        title: 'Erro ao adicionar link',
-        description: 'Não foi possível adicionar o link do áudio.',
-        variant: 'destructive',
-      });
-    } finally {
-      setUploading(false);
     }
   };
 
@@ -233,6 +102,38 @@ export const AdminAudioSection = ({ darkMode }: AdminAudioSectionProps) => {
     }
   };
 
+  const handleTimeUpdate = (audioId: string, currentTime: number) => {
+    setCurrentTimes(prev => ({ ...prev, [audioId]: currentTime }));
+  };
+
+  const handleSeek = (audioId: string, newTime: number) => {
+    const audioElement = audioRefs.current[audioId];
+    if (audioElement) {
+      audioElement.currentTime = newTime;
+      setCurrentTimes(prev => ({ ...prev, [audioId]: newTime }));
+    }
+  };
+
+  const changePlaybackRate = (audioId: string) => {
+    const currentRate = playbackRates[audioId] || 1;
+    const rates = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+    const currentIndex = rates.indexOf(currentRate);
+    const nextRate = rates[(currentIndex + 1) % rates.length];
+    
+    const audioElement = audioRefs.current[audioId];
+    if (audioElement) {
+      audioElement.playbackRate = nextRate;
+      setPlaybackRates(prev => ({ ...prev, [audioId]: nextRate }));
+    }
+  };
+
+  const formatTime = (seconds: number) => {
+    if (!seconds || isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('pt-BR', {
       day: '2-digit',
@@ -241,13 +142,6 @@ export const AdminAudioSection = ({ darkMode }: AdminAudioSectionProps) => {
       hour: '2-digit',
       minute: '2-digit',
     });
-  };
-
-  const formatDuration = (seconds: number | null) => {
-    if (!seconds) return '--:--';
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   if (adminLoading || loading) {
@@ -263,138 +157,123 @@ export const AdminAudioSection = ({ darkMode }: AdminAudioSectionProps) => {
 
   return (
     <section className="bg-card rounded-lg shadow-xl p-6 sm:p-8 mb-6">
-      <h2 className="text-2xl sm:text-3xl font-black text-primary mb-4">
-        🎵 Áudios de Treinamento
-      </h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl sm:text-3xl font-black text-primary">
+          🎵 Áudios de Treinamento
+        </h2>
+        {isAdmin && (
+          <button
+            onClick={() => setUploadDialogOpen(true)}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-6 py-3 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
+          >
+            <Upload className="w-5 h-5" />
+            Adicionar Áudio
+          </button>
+        )}
+      </div>
 
-      {isAdmin && (
-        <div className="mb-6 p-4 bg-accent/10 rounded-lg border border-accent/20">
-          <h3 className="text-lg font-bold text-accent mb-3">Adicionar Novo Áudio</h3>
-          
-          <div className="mb-4">
-            <label className="block text-sm font-semibold text-foreground mb-2">
-              Título do Áudio *
-            </label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Digite o título do áudio"
-              className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground"
-            />
-          </div>
-
-          <div className="flex gap-2 mb-4">
-            <button
-              onClick={() => setUploadMode('file')}
-              className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all ${
-                uploadMode === 'file'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
-              }`}
-            >
-              <Upload className="w-4 h-4 inline mr-2" />
-              Upload de Arquivo
-            </button>
-            <button
-              onClick={() => setUploadMode('link')}
-              className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all ${
-                uploadMode === 'link'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
-              }`}
-            >
-              <LinkIcon className="w-4 h-4 inline mr-2" />
-              Link do Google Drive
-            </button>
-          </div>
-
-          {uploadMode === 'file' ? (
-            <div className="space-y-3">
-              <input
-                type="file"
-                accept="audio/*"
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
-                className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground"
-              />
-              <button
-                onClick={handleFileUpload}
-                disabled={uploading || !title.trim() || !file}
-                className="w-full bg-accent hover:bg-accent/90 disabled:opacity-50 text-accent-foreground font-bold px-6 py-3 rounded-lg transition-all"
-              >
-                {uploading ? 'Enviando...' : 'Enviar Áudio'}
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <input
-                type="text"
-                value={driveLink}
-                onChange={(e) => setDriveLink(e.target.value)}
-                placeholder="Cole o link do Google Drive aqui"
-                className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground"
-              />
-              <button
-                onClick={handleDriveLinkUpload}
-                disabled={uploading || !title.trim() || !driveLink.trim()}
-                className="w-full bg-accent hover:bg-accent/90 disabled:opacity-50 text-accent-foreground font-bold px-6 py-3 rounded-lg transition-all"
-              >
-                {uploading ? 'Adicionando...' : 'Adicionar Link'}
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      <div className="space-y-3">
+      <div className="space-y-4">
         {audios.length === 0 ? (
           <p className="text-muted-foreground text-center py-8">
             Nenhum áudio disponível no momento.
           </p>
         ) : (
-          audios.map((audio) => (
-            <div
-              key={audio.id}
-              className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
-            >
-              <button
-                onClick={() => togglePlay(audio)}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground p-2 rounded-full transition-all"
+          audios.map((audio) => {
+            const currentTime = currentTimes[audio.id] || 0;
+            const duration = audio.duration_seconds || 0;
+            const playbackRate = playbackRates[audio.id] || 1;
+            
+            return (
+              <div
+                key={audio.id}
+                className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
               >
-                {playingId === audio.id ? (
-                  <Pause className="w-5 h-5" />
-                ) : (
-                  <Play className="w-5 h-5" />
-                )}
-              </button>
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <h4 className="font-bold text-foreground text-lg">{audio.title}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {formatDate(audio.created_at)}
+                    </p>
+                  </div>
+                  {isAdmin && (
+                    <button
+                      onClick={() => setDeleteId(audio.id)}
+                      className="bg-destructive hover:bg-destructive/90 text-destructive-foreground p-2 rounded-lg transition-all ml-3"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  )}
+                </div>
 
-              <audio
-                ref={(el) => {
-                  if (el) audioRefs.current[audio.id] = el;
-                }}
-                src={audio.file_url}
-                onEnded={() => setPlayingId(null)}
-              />
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => togglePlay(audio)}
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground p-3 rounded-full transition-all"
+                    >
+                      {playingId === audio.id ? (
+                        <Pause className="w-5 h-5" />
+                      ) : (
+                        <Play className="w-5 h-5" />
+                      )}
+                    </button>
 
-              <div className="flex-1">
-                <h4 className="font-bold text-foreground">{audio.title}</h4>
-                <p className="text-sm text-muted-foreground">
-                  {formatDate(audio.created_at)} • {formatDuration(audio.duration_seconds)}
-                </p>
+                    <div className="flex-1">
+                      <input
+                        type="range"
+                        min="0"
+                        max={duration || 100}
+                        value={currentTime}
+                        onChange={(e) => handleSeek(audio.id, Number(e.target.value))}
+                        className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                      />
+                      <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                        <span>{formatTime(currentTime)}</span>
+                        <span>{formatTime(duration)}</span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => changePlaybackRate(audio.id)}
+                      className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-3 py-2 rounded-lg font-semibold text-sm transition-all min-w-[60px]"
+                    >
+                      {playbackRate}x
+                    </button>
+                  </div>
+
+                  <audio
+                    ref={(el) => {
+                      if (el) {
+                        audioRefs.current[audio.id] = el;
+                        el.playbackRate = playbackRate;
+                      }
+                    }}
+                    src={audio.file_url}
+                    onTimeUpdate={(e) => handleTimeUpdate(audio.id, e.currentTarget.currentTime)}
+                    onEnded={() => setPlayingId(null)}
+                    onLoadedMetadata={(e) => {
+                      if (!audio.duration_seconds) {
+                        const duration = Math.floor(e.currentTarget.duration);
+                        supabase
+                          .from('podcasts')
+                          .update({ duration_seconds: duration })
+                          .eq('id', audio.id)
+                          .then(() => loadAudios());
+                      }
+                    }}
+                  />
+                </div>
               </div>
-
-              {isAdmin && (
-                <button
-                  onClick={() => setDeleteId(audio.id)}
-                  className="bg-destructive hover:bg-destructive/90 text-destructive-foreground p-2 rounded-lg transition-all"
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              )}
-            </div>
-          ))
+            );
+          })
         )}
       </div>
+
+      <AdminAudioUploadDialog
+        open={uploadDialogOpen}
+        onOpenChange={setUploadDialogOpen}
+        onUploadComplete={loadAudios}
+      />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
