@@ -41,6 +41,39 @@ export type Database = {
         }
         Relationships: []
       }
+      podcasts: {
+        Row: {
+          created_at: string
+          created_by: string
+          duration_seconds: number | null
+          file_path: string
+          file_url: string
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          duration_seconds?: number | null
+          file_path: string
+          file_url: string
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          duration_seconds?: number | null
+          file_path?: string
+          file_url?: string
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
