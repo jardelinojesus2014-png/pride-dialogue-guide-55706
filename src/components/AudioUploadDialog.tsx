@@ -6,6 +6,8 @@ import { Label } from './ui/label';
 import { Button } from './ui/button';
 import { AudioRecorder } from './AudioRecorder';
 import { Upload } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 interface AudioUploadDialogProps {
   open: boolean;
@@ -22,8 +24,9 @@ export const AudioUploadDialog = ({
 }: AudioUploadDialogProps) => {
   const [title, setTitle] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [driveLink, setDriveLink] = useState('');
   const [isUploading, setIsUploading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'record' | 'upload'>('record');
+  const [activeTab, setActiveTab] = useState<'record' | 'upload' | 'drive'>('record');
 
   const handleRecordingComplete = async (audioBlob: Blob, durationSeconds: number) => {
     if (!title.trim()) {
@@ -61,9 +64,76 @@ export const AudioUploadDialog = ({
     }
   };
 
+  const handleDriveLinkUpload = async () => {
+    if (!title.trim() || !driveLink.trim()) {
+      alert('Por favor, preencha o título e o link do Google Drive');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          title: 'Erro',
+          description: 'Você precisa estar autenticado',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('download-from-drive', {
+        body: {
+          driveLink: driveLink.trim(),
+          title: title.trim(),
+          type: 'audio',
+          sectionId,
+        },
+      });
+
+      if (error) {
+        console.error('Error:', error);
+        toast({
+          title: 'Erro ao importar do Google Drive',
+          description: error.message || 'Verifique se o link é público e permite download',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      if (!data?.success) {
+        toast({
+          title: 'Erro ao importar',
+          description: data?.error || 'Erro desconhecido',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      toast({
+        title: 'Áudio importado com sucesso!',
+        description: `"${title}" foi adicionado.`,
+      });
+
+      resetForm();
+      onOpenChange(false);
+    } catch (error: any) {
+      console.error('Error uploading from Drive:', error);
+      toast({
+        title: 'Erro ao importar do Google Drive',
+        description: error.message || 'Verifique o link e as permissões.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const resetForm = () => {
     setTitle('');
     setSelectedFile(null);
+    setDriveLink('');
     setActiveTab('record');
   };
 
@@ -93,10 +163,11 @@ export const AudioUploadDialog = ({
             />
           </div>
 
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'record' | 'upload')}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="record">Gravar Áudio</TabsTrigger>
-              <TabsTrigger value="upload">Fazer Upload</TabsTrigger>
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'record' | 'upload' | 'drive')}>
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="record">Gravar</TabsTrigger>
+              <TabsTrigger value="upload">Upload PC</TabsTrigger>
+              <TabsTrigger value="drive">Google Drive</TabsTrigger>
             </TabsList>
 
             <TabsContent value="record" className="mt-4">
@@ -124,9 +195,6 @@ export const AudioUploadDialog = ({
                     Arquivo selecionado: {selectedFile.name}
                   </p>
                 )}
-                <p className="text-xs text-muted-foreground">
-                  Dica: Para arquivos do Google Drive, baixe-os primeiro e depois faça upload aqui
-                </p>
               </div>
 
               <div className="flex gap-2">
@@ -149,6 +217,45 @@ export const AudioUploadDialog = ({
                     <>
                       <Upload className="w-4 h-4" />
                       Fazer Upload
+                    </>
+                  )}
+                </Button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="drive" className="mt-4 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="drive-link-audio">Link do Google Drive</Label>
+                <Input
+                  id="drive-link-audio"
+                  placeholder="https://drive.google.com/file/d/..."
+                  value={driveLink}
+                  onChange={(e) => setDriveLink(e.target.value)}
+                  disabled={isUploading}
+                />
+                <p className="text-xs text-muted-foreground">
+                  O arquivo será baixado do Google Drive e salvo automaticamente
+                </p>
+              </div>
+
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => handleOpenChange(false)}
+                  variant="outline"
+                  className="flex-1"
+                  disabled={isUploading}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={handleDriveLinkUpload}
+                  disabled={!title.trim() || !driveLink.trim() || isUploading}
+                  className="flex-1 gap-2"
+                >
+                  {isUploading ? 'Importando...' : (
+                    <>
+                      <Upload className="w-4 h-4" />
+                      Importar do Drive
                     </>
                   )}
                 </Button>
