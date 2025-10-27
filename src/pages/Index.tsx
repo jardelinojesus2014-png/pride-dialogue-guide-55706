@@ -8,6 +8,8 @@ import { ScriptSections } from '@/components/ScriptSections';
 import { DosDonts } from '@/components/DosDonts';
 import { AdminAudioSection } from '@/components/AdminAudioSection';
 import { VideoSection } from '@/components/VideoSection';
+import { FluxoAudioSection } from '@/components/FluxoAudioSection';
+import { FluxoVideoSection } from '@/components/FluxoVideoSection';
 import { MotivationalPopup } from '@/components/MotivationalPopup';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import logoPride from '@/assets/Logo_Pride.png';
@@ -128,15 +130,11 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="fluxo" className="mt-0">
-              {/* Placeholder para Fluxo de Atendimento */}
-              <div className="bg-card rounded-lg shadow-xl p-6 sm:p-8 mb-6">
-                <h2 className="text-2xl sm:text-3xl font-black text-primary mb-4">
-                  Fluxo de Atendimento - Cadência de LEAD
-                </h2>
-                <p className="text-muted-foreground">
-                  Conteúdo em desenvolvimento...
-                </p>
-              </div>
+              {/* Fluxo Audio Section */}
+              <FluxoAudioSection darkMode={darkMode} />
+
+              {/* Fluxo Video Section */}
+              <FluxoVideoSection darkMode={darkMode} />
             </TabsContent>
           </Tabs>
 
