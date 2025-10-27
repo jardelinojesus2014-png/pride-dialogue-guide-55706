@@ -4,9 +4,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Users, FileText, CheckSquare } from 'lucide-react';
+import { ArrowLeft, Users, FileText, CheckSquare, Music, Play, Pause } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { UserAudioFile } from '@/hooks/useUserAudioFiles';
 
 interface UserNote {
   id: string;
@@ -28,12 +29,18 @@ interface UserCheckedItem {
   profiles?: { email: string };
 }
 
+interface AdminAudioFile extends UserAudioFile {
+  profiles?: { email: string };
+}
+
 const Admin = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isAdmin, loading: adminLoading } = useIsAdmin();
   const [notes, setNotes] = useState<UserNote[]>([]);
   const [checkedItems, setCheckedItems] = useState<UserCheckedItem[]>([]);
+  const [audioFiles, setAudioFiles] = useState<AdminAudioFile[]>([]);
+  const [playingAudioId, setPlayingAudioId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -50,8 +57,8 @@ const Admin = () => {
 
   const loadData = async () => {
     try {
-      // Load notes and checked items
-      const [notesResult, checkedItemsResult, profilesResult] = await Promise.all([
+      // Load notes, checked items, and audio files
+      const [notesResult, checkedItemsResult, audioFilesResult, profilesResult] = await Promise.all([
         supabase
           .from('script_notes')
           .select('*')
@@ -61,12 +68,17 @@ const Admin = () => {
           .select('*')
           .order('created_at', { ascending: false }),
         supabase
+          .from('user_audio_files')
+          .select('*')
+          .order('created_at', { ascending: false }),
+        supabase
           .from('profiles')
           .select('id, email')
       ]);
 
       if (notesResult.error) throw notesResult.error;
       if (checkedItemsResult.error) throw checkedItemsResult.error;
+      if (audioFilesResult.error) throw audioFilesResult.error;
       if (profilesResult.error) throw profilesResult.error;
 
       // Create a map of user_id to email
@@ -86,13 +98,40 @@ const Admin = () => {
         profiles: { email: profilesMap.get(item.user_id) || 'Email não encontrado' }
       })) || [];
 
+      // Enrich audio files with email
+      const enrichedAudioFiles = audioFilesResult.data?.map(audio => ({
+        ...audio,
+        profiles: { email: profilesMap.get(audio.user_id) || 'Email não encontrado' }
+      })) || [];
+
       setNotes(enrichedNotes);
       setCheckedItems(enrichedCheckedItems);
+      setAudioFiles(enrichedAudioFiles);
     } catch (error) {
       console.error('Error loading admin data:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleAudioPlay = (audioFile: AdminAudioFile) => {
+    const audio = new Audio(audioFile.file_url);
+    
+    if (playingAudioId === audioFile.id) {
+      audio.pause();
+      setPlayingAudioId(null);
+    } else {
+      audio.play();
+      setPlayingAudioId(audioFile.id);
+      audio.onended = () => setPlayingAudioId(null);
+    }
+  };
+
+  const formatDuration = (seconds: number | null) => {
+    if (!seconds) return '--:--';
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   if (adminLoading || loading) {
@@ -125,7 +164,7 @@ const Admin = () => {
           <h1 className="text-3xl font-black text-foreground">Painel Administrativo</h1>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total de Usuários</CardTitle>
@@ -157,6 +196,16 @@ const Admin = () => {
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Áudios Gravados</CardTitle>
+              <Music className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{audioFiles.length}</div>
+            </CardContent>
+          </Card>
         </div>
 
         <Card>
@@ -166,9 +215,10 @@ const Admin = () => {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="notes">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="notes">Anotações</TabsTrigger>
                 <TabsTrigger value="checked">Itens Marcados</TabsTrigger>
+                <TabsTrigger value="audio">Áudios</TabsTrigger>
               </TabsList>
 
               <TabsContent value="notes" className="space-y-4">
@@ -219,6 +269,58 @@ const Admin = () => {
                         </CardContent>
                       </Card>
                     ))
+                )}
+              </TabsContent>
+
+              <TabsContent value="audio" className="space-y-4">
+                {audioFiles.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">Nenhum áudio encontrado</p>
+                ) : (
+                  audioFiles.map((audio) => (
+                    <Card key={audio.id}>
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <CardTitle className="text-sm font-medium">
+                              {audio.title}
+                            </CardTitle>
+                            <CardDescription>
+                              {audio.profiles?.email || 'Email não encontrado'}
+                            </CardDescription>
+                            <CardDescription className="text-xs mt-1">
+                              Seção: {audio.section_id}
+                            </CardDescription>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => toggleAudioPlay(audio)}
+                          >
+                            {playingAudioId === audio.id ? (
+                              <Pause className="w-4 h-4" />
+                            ) : (
+                              <Play className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <span>Duração: {formatDuration(audio.duration_seconds)}</span>
+                          <span>•</span>
+                          <span>{new Date(audio.created_at).toLocaleString('pt-BR')}</span>
+                        </div>
+                        <a 
+                          href={audio.file_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-xs text-accent hover:underline mt-2 inline-block"
+                        >
+                          Abrir arquivo
+                        </a>
+                      </CardContent>
+                    </Card>
+                  ))
                 )}
               </TabsContent>
             </Tabs>
