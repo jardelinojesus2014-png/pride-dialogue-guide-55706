@@ -65,7 +65,7 @@ export const VideoSection = ({ darkMode }: VideoSectionProps) => {
             </svg>
           </div>
           <div>
-            <h2 className="text-xl font-black text-primary">🎥 Vídeos de Treinamento</h2>
+            <h2 className="text-2xl sm:text-3xl font-black text-primary">🎥 Vídeos de Treinamento</h2>
             <p className="text-sm text-muted-foreground">
               Adicione vídeos com exemplos e simulações do roteiro
             </p>
