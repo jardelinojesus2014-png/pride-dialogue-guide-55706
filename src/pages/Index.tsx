@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import { GoldenRule } from '@/components/GoldenRule';
 import { ScriptSections } from '@/components/ScriptSections';
 import { DosDonts } from '@/components/DosDonts';
-import { PodcastSection } from '@/components/PodcastSection';
 import { VideoSection } from '@/components/VideoSection';
 import { MotivationalPopup } from '@/components/MotivationalPopup';
 import logoPride from '@/assets/Logo_Pride.png';
@@ -89,9 +88,6 @@ const Index = () => {
 
           {/* Do's and Don'ts */}
           <DosDonts darkMode={darkMode} />
-
-          {/* Podcast Section */}
-          <PodcastSection darkMode={darkMode} />
 
           {/* Video Section */}
           <VideoSection darkMode={darkMode} />
