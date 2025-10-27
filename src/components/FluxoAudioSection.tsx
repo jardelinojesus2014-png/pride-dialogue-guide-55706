@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { toast } from '@/hooks/use-toast';
 import { Button } from './ui/button';
-import { AudioUploadDialog } from './AudioUploadDialog';
+import { FluxoAudioUploadDialog } from './FluxoAudioUploadDialog';
 
 interface FluxoAudioFile {
   id: string;
@@ -220,12 +220,10 @@ export const FluxoAudioSection = ({ darkMode }: FluxoAudioSectionProps) => {
       )}
 
       {uploadDialogOpen && (
-        <AudioUploadDialog
+        <FluxoAudioUploadDialog
           open={uploadDialogOpen}
           onOpenChange={setUploadDialogOpen}
           onUploadSuccess={loadAudioFiles}
-          bucket="fluxo_audio_files"
-          table="fluxo_audio_files"
         />
       )}
     </section>

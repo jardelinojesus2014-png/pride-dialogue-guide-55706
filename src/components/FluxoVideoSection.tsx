@@ -3,7 +3,7 @@ import { Trash2, Video, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { toast } from '@/hooks/use-toast';
-import { PodcastUploadDialog } from './PodcastUploadDialog';
+import { FluxoVideoUploadDialog } from './FluxoVideoUploadDialog';
 
 interface FluxoVideo {
   id: string;
@@ -161,12 +161,10 @@ export const FluxoVideoSection = ({ darkMode }: FluxoVideoSectionProps) => {
       )}
 
       {uploadDialogOpen && (
-        <PodcastUploadDialog
+        <FluxoVideoUploadDialog
           open={uploadDialogOpen}
           onOpenChange={setUploadDialogOpen}
           onUploadSuccess={loadVideos}
-          bucket="fluxo_videos"
-          table="fluxo_videos"
         />
       )}
     </section>
