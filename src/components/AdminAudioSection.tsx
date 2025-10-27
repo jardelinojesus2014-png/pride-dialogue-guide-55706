@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Trash2, Play, Pause, Upload } from 'lucide-react';
+import { Trash2, Play, Pause, Upload, Music } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { toast } from '@/hooks/use-toast';
@@ -158,9 +158,14 @@ export const AdminAudioSection = ({ darkMode }: AdminAudioSectionProps) => {
   return (
     <section className="bg-card rounded-lg shadow-xl p-6 sm:p-8 mb-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl sm:text-3xl font-black text-primary">
-          🎵 Áudios de Treinamento
-        </h2>
+        <div className="flex items-center gap-3">
+          <div className="bg-primary rounded-full p-3 shadow-lg">
+            <Music className="w-6 h-6 text-primary-foreground" />
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-black text-primary">
+            Áudios de Treinamento
+          </h2>
+        </div>
         {isAdmin && (
           <button
             onClick={() => setUploadDialogOpen(true)}
