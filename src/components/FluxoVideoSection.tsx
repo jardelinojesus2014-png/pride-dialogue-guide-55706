@@ -3,6 +3,7 @@ import { Upload, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { toast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 
 interface FluxoVideo {
   id: string;
@@ -20,6 +21,9 @@ export const FluxoVideoSection = ({ darkMode }: FluxoVideoSectionProps) => {
   const [videos, setVideos] = useState<FluxoVideo[]>([]);
   const [showVideoForm, setShowVideoForm] = useState(false);
   const [currentVideo, setCurrentVideo] = useState({ url: '', title: '', description: '' });
+  const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'link' | 'upload'>('link');
   const { isAdmin } = useIsAdmin();
 
   useEffect(() => {
@@ -49,8 +53,9 @@ export const FluxoVideoSection = ({ darkMode }: FluxoVideoSectionProps) => {
     setShowVideoForm(true);
   };
 
-  const saveVideo = async () => {
+  const saveVideoLink = async () => {
     if (currentVideo.url.trim() && currentVideo.title.trim() && currentVideo.description.trim()) {
+      setIsUploading(true);
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error('Usuário não autenticado');
@@ -92,9 +97,70 @@ export const FluxoVideoSection = ({ darkMode }: FluxoVideoSectionProps) => {
           description: error.message,
           variant: 'destructive',
         });
+      } finally {
+        setIsUploading(false);
       }
     } else {
       alert('Por favor, preencha o link, título e descrição do vídeo!');
+    }
+  };
+
+  const uploadVideoFile = async () => {
+    if (!currentVideo.title.trim() || !currentVideo.description.trim() || !selectedVideo) {
+      alert('Por favor, preencha título, descrição e selecione um arquivo de vídeo!');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Usuário não autenticado');
+
+      // Upload video
+      const videoExt = selectedVideo.name.split('.').pop();
+      const videoFileName = `${Date.now()}_video.${videoExt}`;
+
+      const { error: videoUploadError } = await supabase.storage
+        .from('fluxo_videos')
+        .upload(videoFileName, selectedVideo);
+
+      if (videoUploadError) throw videoUploadError;
+
+      const { data: videoUrlData } = supabase.storage
+        .from('fluxo_videos')
+        .getPublicUrl(videoFileName);
+
+      // Insert into database
+      const { error: dbError } = await supabase
+        .from('fluxo_videos')
+        .insert({
+          title: currentVideo.title.trim(),
+          description: currentVideo.description.trim(),
+          video_url: videoUrlData.publicUrl,
+          thumbnail_url: '', // Not needed
+          created_by: user.id,
+        });
+
+      if (dbError) throw dbError;
+
+      toast({
+        title: 'Vídeo enviado com sucesso!',
+        description: `"${currentVideo.title}" foi adicionado.`,
+      });
+
+      setCurrentVideo({ url: '', title: '', description: '' });
+      setSelectedVideo(null);
+      setShowVideoForm(false);
+      loadVideos();
+    } catch (error: any) {
+      console.error('Error uploading video:', error);
+      toast({
+        title: 'Erro ao enviar vídeo',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -127,7 +193,9 @@ export const FluxoVideoSection = ({ darkMode }: FluxoVideoSectionProps) => {
 
   const cancelVideo = () => {
     setCurrentVideo({ url: '', title: '', description: '' });
+    setSelectedVideo(null);
     setShowVideoForm(false);
+    setActiveTab('link');
   };
 
   return (
@@ -167,47 +235,108 @@ export const FluxoVideoSection = ({ darkMode }: FluxoVideoSectionProps) => {
             </button>
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-semibold mb-2 text-foreground">Link do Vídeo *</label>
-              <input
-                type="text"
-                value={currentVideo.url}
-                onChange={(e) => setCurrentVideo({ ...currentVideo, url: e.target.value })}
-                placeholder="https://drive.google.com/... ou https://youtube.com/..."
-                className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
-              />
-            </div>
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'link' | 'upload')}>
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="link">Link do Vídeo</TabsTrigger>
+              <TabsTrigger value="upload">Upload do PC</TabsTrigger>
+            </TabsList>
 
-            <div>
-              <label className="block text-sm font-semibold mb-2 text-foreground">Título do Vídeo *</label>
-              <input
-                type="text"
-                value={currentVideo.title}
-                onChange={(e) => setCurrentVideo({ ...currentVideo, title: e.target.value })}
-                placeholder="Ex: Simulação da Etapa de Follow-up"
-                className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
-              />
-            </div>
+            <TabsContent value="link" className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-foreground">Link do Vídeo *</label>
+                <input
+                  type="text"
+                  value={currentVideo.url}
+                  onChange={(e) => setCurrentVideo({ ...currentVideo, url: e.target.value })}
+                  placeholder="https://drive.google.com/... ou https://youtube.com/..."
+                  className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
+                  disabled={isUploading}
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-semibold mb-2 text-foreground">Descrição *</label>
-              <textarea
-                value={currentVideo.description}
-                onChange={(e) => setCurrentVideo({ ...currentVideo, description: e.target.value })}
-                placeholder="Descreva brevemente o conteúdo deste vídeo..."
-                className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
-                rows={3}
-              />
-            </div>
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-foreground">Título do Vídeo *</label>
+                <input
+                  type="text"
+                  value={currentVideo.title}
+                  onChange={(e) => setCurrentVideo({ ...currentVideo, title: e.target.value })}
+                  placeholder="Ex: Simulação da Etapa de Follow-up"
+                  className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
+                  disabled={isUploading}
+                />
+              </div>
 
-            <button
-              onClick={saveVideo}
-              className="w-full bg-gradient-hero hover:opacity-90 text-accent font-bold py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg"
-            >
-              ✓ Salvar Vídeo
-            </button>
-          </div>
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-foreground">Descrição *</label>
+                <textarea
+                  value={currentVideo.description}
+                  onChange={(e) => setCurrentVideo({ ...currentVideo, description: e.target.value })}
+                  placeholder="Descreva brevemente o conteúdo deste vídeo..."
+                  className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
+                  rows={3}
+                  disabled={isUploading}
+                />
+              </div>
+
+              <button
+                onClick={saveVideoLink}
+                disabled={isUploading}
+                className="w-full bg-gradient-hero hover:opacity-90 text-accent font-bold py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg disabled:opacity-50"
+              >
+                {isUploading ? 'Salvando...' : '✓ Salvar Vídeo'}
+              </button>
+            </TabsContent>
+
+            <TabsContent value="upload" className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-foreground">Título do Vídeo *</label>
+                <input
+                  type="text"
+                  value={currentVideo.title}
+                  onChange={(e) => setCurrentVideo({ ...currentVideo, title: e.target.value })}
+                  placeholder="Ex: Simulação da Etapa de Follow-up"
+                  className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
+                  disabled={isUploading}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-foreground">Descrição *</label>
+                <textarea
+                  value={currentVideo.description}
+                  onChange={(e) => setCurrentVideo({ ...currentVideo, description: e.target.value })}
+                  placeholder="Descreva brevemente o conteúdo deste vídeo..."
+                  className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
+                  rows={3}
+                  disabled={isUploading}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-foreground">Arquivo de Vídeo *</label>
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={(e) => setSelectedVideo(e.target.files?.[0] || null)}
+                  className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
+                  disabled={isUploading}
+                />
+                {selectedVideo && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Vídeo selecionado: {selectedVideo.name}
+                  </p>
+                )}
+              </div>
+
+              <button
+                onClick={uploadVideoFile}
+                disabled={isUploading}
+                className="w-full bg-gradient-hero hover:opacity-90 text-accent font-bold py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg disabled:opacity-50"
+              >
+                {isUploading ? 'Enviando...' : '✓ Fazer Upload'}
+              </button>
+            </TabsContent>
+          </Tabs>
         </div>
       )}
 
