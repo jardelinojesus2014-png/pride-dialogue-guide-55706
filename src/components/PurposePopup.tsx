@@ -96,21 +96,23 @@ export const PurposePopup = ({ onClose }: PurposePopupProps) => {
                   
                   <div className="flex items-start gap-3">
                     <span className="text-2xl">🎯</span>
-                    <p className="text-lg md:text-xl text-white/90 italic flex-1">
-                      Em que você precisa evoluir? ou seja... o que você{' '}
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-500 font-black not-italic">
-                        PRECISA
-                      </span>{' '}
-                      fazer{' '}
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-purple-500 font-black not-italic">
-                        HOJE
-                      </span>{' '}
-                      pra conseguir (ou se aproximar mais) de{' '}
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-orange-500 font-black not-italic">
-                        CONQUISTAR
-                      </span>{' '}
-                      seu propósito/ sonhos/ objetivos?
-                    </p>
+                    <div className="flex-1 bg-gradient-to-r from-orange-500/20 via-red-500/20 to-purple-500/20 rounded-xl p-4 border-2 border-orange-500/50">
+                      <p className="text-xl md:text-2xl text-white font-bold leading-relaxed">
+                        Em que você precisa evoluir? ou seja... o que você{' '}
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-500 font-black text-2xl md:text-3xl">
+                          PRECISA
+                        </span>{' '}
+                        fazer{' '}
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-purple-500 font-black text-2xl md:text-3xl">
+                          HOJE
+                        </span>{' '}
+                        pra conseguir (ou se aproximar mais) de{' '}
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-orange-500 font-black text-2xl md:text-3xl">
+                          CONQUISTAR
+                        </span>{' '}
+                        seu propósito/ sonhos/ objetivos?
+                      </p>
+                    </div>
                   </div>
                 </div>
 
