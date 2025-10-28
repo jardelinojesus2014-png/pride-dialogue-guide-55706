@@ -80,6 +80,75 @@ export type Database = {
         }
         Relationships: []
       }
+      google_review_settings: {
+        Row: {
+          average_rating: number
+          created_at: string
+          created_by: string | null
+          id: string
+          review_link: string
+          total_reviews: number
+          updated_at: string
+        }
+        Insert: {
+          average_rating?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          review_link: string
+          total_reviews?: number
+          updated_at?: string
+        }
+        Update: {
+          average_rating?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          review_link?: string
+          total_reviews?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      google_reviews: {
+        Row: {
+          comment: string
+          created_at: string
+          created_by: string | null
+          display_order: number
+          id: string
+          rating: number
+          review_date: string
+          reviewer_name: string
+          reviewer_photo_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          comment: string
+          created_at?: string
+          created_by?: string | null
+          display_order?: number
+          id?: string
+          rating: number
+          review_date: string
+          reviewer_name: string
+          reviewer_photo_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          comment?: string
+          created_at?: string
+          created_by?: string | null
+          display_order?: number
+          id?: string
+          rating?: number
+          review_date?: string
+          reviewer_name?: string
+          reviewer_photo_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       institutional_videos: {
         Row: {
           created_at: string
