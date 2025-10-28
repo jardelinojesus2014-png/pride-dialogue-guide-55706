@@ -108,7 +108,7 @@ const Index = () => {
 
           {/* Tabs Navigation */}
           <Tabs defaultValue="prospeccao" className="w-full">
-            <TabsList className="w-full grid grid-cols-3 mb-6 h-auto p-2 bg-gradient-hero rounded-lg">
+            <TabsList className="w-full grid grid-cols-4 mb-6 h-auto p-2 bg-gradient-hero rounded-lg">
               <TabsTrigger 
                 value="prospeccao" 
                 className="text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all"
@@ -128,6 +128,12 @@ const Index = () => {
                 <img src={logoPrideGold} alt="Pride" className="w-8 h-8 object-contain" />
                 <span className="hidden sm:inline">Conheça a Pride Corretora</span>
                 <span className="sm:hidden">Pride</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="avaliacoes" 
+                className="text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all"
+              >
+                Avaliações
               </TabsTrigger>
             </TabsList>
 
@@ -291,6 +297,20 @@ const Index = () => {
                 >
                   🔥 Se está desmotivado - CLIQUE AQUI
                 </button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="avaliacoes" className="mt-0">
+              <div className="bg-card rounded-lg shadow-xl p-12 text-center border-2 border-border">
+                <div className="inline-block bg-gradient-to-r from-orange-500 to-red-600 rounded-full p-6 mb-6 shadow-2xl">
+                  <svg className="w-20 h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                  </svg>
+                </div>
+                <h2 className="text-4xl font-black text-primary mb-4">🚧 Em Construção</h2>
+                <p className="text-xl text-muted-foreground">
+                  Esta seção está sendo desenvolvida e estará disponível em breve!
+                </p>
               </div>
             </TabsContent>
           </Tabs>
