@@ -131,7 +131,7 @@ const Index = () => {
               </TabsTrigger>
               <TabsTrigger 
                 value="avaliacoes" 
-                className="text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all"
+                className="text-sm sm:text-base font-black py-2 px-3 data-[state=active]:bg-accent data-[state=active]:text-primary data-[state=inactive]:text-accent/70 rounded-lg transition-all"
               >
                 Avaliações
               </TabsTrigger>
