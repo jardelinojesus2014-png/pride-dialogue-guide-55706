@@ -129,9 +129,7 @@ const Index = () => {
                 value="pride" 
                 className="flex-1 text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all flex items-center justify-center gap-2"
               >
-                <div className="bg-primary p-1 rounded-md">
-                  <img src={logoPrideGold} alt="Pride" className="w-6 h-6 object-contain" />
-                </div>
+                <img src={logoPrideGold} alt="Pride" className="w-8 h-8 object-contain" />
                 <span className="hidden sm:inline">Conheça a Pride Corretora</span>
                 <span className="sm:hidden">Pride</span>
               </TabsTrigger>
