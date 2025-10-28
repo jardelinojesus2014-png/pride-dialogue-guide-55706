@@ -348,13 +348,23 @@ export const FluxoVideoSection = ({ darkMode }: FluxoVideoSectionProps) => {
               className="bg-muted rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
             >
               <div className="relative aspect-video bg-black">
-                <iframe
-                  src={video.video_url}
-                  className="w-full h-full absolute top-0 left-0"
-                  allow="autoplay"
-                  allowFullScreen
-                  title={video.title}
-                />
+                {video.video_url.includes('drive.google.com') || video.video_url.includes('youtube.com') || video.video_url.includes('youtu.be') ? (
+                  <iframe
+                    src={video.video_url}
+                    className="w-full h-full absolute top-0 left-0"
+                    allowFullScreen
+                    title={video.title}
+                  />
+                ) : (
+                  <video
+                    controls
+                    className="w-full h-full absolute top-0 left-0"
+                    preload="metadata"
+                  >
+                    <source src={video.video_url} type="video/mp4" />
+                    Seu navegador não suporta a reprodução de vídeos.
+                  </video>
+                )}
               </div>
               <div className="p-4">
                 <div className="flex items-start justify-between mb-2">
