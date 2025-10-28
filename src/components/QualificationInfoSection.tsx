@@ -97,14 +97,13 @@ export const QualificationInfoSection = ({ darkMode }: QualificationInfoSectionP
                 <div className="relative">
                   <div className="bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-950/20 dark:to-green-950/20 border-2 border-blue-400 dark:border-blue-600 rounded-lg p-3">
                     <div className="flex items-start gap-3">
+                      {/* User Note Section - ícone discreto antes do conteúdo */}
+                      <UserNoteSection itemId={item.id} />
+                      
                       {item.spin_type && <SpinBadge type={item.spin_type} />}
                       <span className="text-primary font-bold text-lg">•</span>
                       <div className="flex-1 space-y-2">
-                        <div className="flex items-center gap-2">
-                          {/* User Note Section - ícone discreto alinhado com o título */}
-                          <UserNoteSection itemId={item.id} />
-                          <span className="font-bold text-foreground">{item.content}</span>
-                        </div>
+                        <span className="font-bold text-foreground">{item.content}</span>
                         
                         {item.descriptions && item.descriptions.map((desc, idx) => (
                           <div key={idx} className="bg-primary/10 border border-primary/20 rounded-lg p-3 text-sm">
