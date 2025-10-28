@@ -28,7 +28,7 @@ export const GoogleReviewsSection = ({ darkMode }: GoogleReviewsSectionProps) =>
         {/* Google Reviews iframe */}
         <div className="w-full rounded-2xl overflow-hidden shadow-2xl bg-white" style={{ height: '500px' }}>
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d14630.445698271637!2d-43.1729!3d-22.9068!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDU0JzI0LjUiUyA0M8KwMTAnMjIuNCJX!5e0!3m2!1spt-BR!2sbr!4v1234567890123!5m2!1spt-BR!2sbr"
+            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=Pride+Corretora+de+Seguros+Rio+de+Janeiro&zoom=15&language=pt-BR"
             width="100%"
             height="100%"
             style={{ border: 0 }}
