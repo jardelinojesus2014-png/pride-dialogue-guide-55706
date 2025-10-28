@@ -17,6 +17,7 @@ import { MissionVisionValuesSection } from '@/components/MissionVisionValuesSect
 import { WebsiteSection } from '@/components/WebsiteSection';
 import { GoogleReviewsSection } from '@/components/GoogleReviewsSection';
 import { MotivationalPopup } from '@/components/MotivationalPopup';
+import { PurposePopup } from '@/components/PurposePopup';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import logoPride from '@/assets/Logo_Pride.png';
@@ -29,6 +30,7 @@ const Index = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [userViewMode, setUserViewMode] = useState(false);
   const [showMotivationalPopup, setShowMotivationalPopup] = useState(false);
+  const [showPurposePopup, setShowPurposePopup] = useState(false);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -204,6 +206,17 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="fluxo" className="mt-0">
+              {/* Botão Motivacional - Antes de todas as seções */}
+              <div className="mb-6 flex justify-center">
+                <button
+                  onClick={() => setShowPurposePopup(true)}
+                  className="bg-gradient-to-r from-red-600 via-purple-600 to-orange-600 hover:from-red-700 hover:via-purple-700 hover:to-orange-700 text-white font-black px-10 py-5 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-lg sm:text-xl animate-[pulse_4s_ease-in-out_infinite]"
+                  title="Encontre seu propósito"
+                >
+                  💭 Se está desmotivado - CLIQUE AQUI
+                </button>
+              </div>
+
               <Accordion type="multiple" className="w-full space-y-4">
                 <AccordionItem value="qualification" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
@@ -256,6 +269,7 @@ const Index = () => {
 
           {/* Popup Motivacional */}
           {showMotivationalPopup && <MotivationalPopup onClose={() => setShowMotivationalPopup(false)} />}
+          {showPurposePopup && <PurposePopup onClose={() => setShowPurposePopup(false)} />}
         </div>
       </div>
     </div>
