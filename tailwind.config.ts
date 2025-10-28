@@ -87,6 +87,10 @@ export default {
           "0%": { transform: "translateX(-200%)" },
           "100%": { transform: "translateX(200%)" },
         },
+        breathe: {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.2)" },
+        },
       },
         "accordion-up": {
           from: {
@@ -143,6 +147,7 @@ export default {
         "slide-down": "slide-down 0.6s ease-out",
         "slide-up": "slide-up 0.8s ease-out",
         shimmer: "shimmer 3s ease-in-out infinite",
+        breathe: "breathe 2s ease-in-out infinite",
       },
     },
   },

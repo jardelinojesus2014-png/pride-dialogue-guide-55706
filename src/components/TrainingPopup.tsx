@@ -100,23 +100,17 @@ export const TrainingPopup = ({ onClose }: TrainingPopupProps) => {
         <div className="text-center space-y-8 animate-fade-in">
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-green-500 via-purple-600 to-orange-500 rounded-2xl blur-2xl opacity-60 animate-pulse" />
-            <div className="relative bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-10 border-2 border-white/20">
-              <h3 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-purple-500 to-orange-500 mb-8">
+            <div className="relative bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-16 border-2 border-white/20">
+              <h3 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-purple-500 to-orange-500 mb-12">
                 O segredo é:
               </h3>
-              <div className="space-y-6">
-                {[...Array(5)].map((_, index) => (
-                  <p
-                    key={index}
-                    className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-purple-500 to-orange-500 animate-pulse"
-                    style={{
-                      animationDelay: `${index * 0.2}s`,
-                      animationDuration: '1.5s'
-                    }}
-                  >
-                    TREINE{'.'.repeat(index + 1)}
-                  </p>
-                ))}
+              <div className="flex items-center justify-center min-h-[200px]">
+                <p className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-purple-500 to-orange-500 animate-[pulse_1.5s_ease-in-out_infinite]"
+                   style={{
+                     animation: 'breathe 2s ease-in-out infinite'
+                   }}>
+                  TREINE
+                </p>
               </div>
             </div>
           </div>
