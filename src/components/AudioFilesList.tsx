@@ -2,6 +2,7 @@ import { Play, Pause, Trash2, Clock } from 'lucide-react';
 import { Button } from './ui/button';
 import { UserAudioFile } from '@/hooks/useUserAudioFiles';
 import { useState, useRef } from 'react';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +23,7 @@ export const AudioFilesList = ({ audioFiles, onDelete }: AudioFilesListProps) =>
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const audioRefs = useRef<{ [key: string]: HTMLAudioElement }>({});
+  const isAdmin = useIsAdmin();
 
   const togglePlay = (audioFile: UserAudioFile) => {
     const audio = audioRefs.current[audioFile.id];
@@ -110,14 +112,16 @@ export const AudioFilesList = ({ audioFiles, onDelete }: AudioFilesListProps) =>
               </div>
             </div>
 
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => setDeleteId(audioFile.id)}
-              className="flex-shrink-0 text-destructive hover:text-destructive"
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
+            {isAdmin && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setDeleteId(audioFile.id)}
+                className="flex-shrink-0 text-destructive hover:text-destructive"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            )}
           </div>
         ))}
       </div>
