@@ -293,8 +293,8 @@ export const PdfSection = ({ darkMode, userViewMode }: PdfSectionProps) => {
           {pdfFiles.map((pdf) => (
             <Card key={pdf.id} className="bg-gradient-subtle border-2 border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg overflow-hidden">
               <div className="flex flex-col h-full">
-                {/* PDF Preview */}
-                <div className="bg-gray-100 dark:bg-gray-800 h-48 flex items-center justify-center overflow-hidden relative">
+                {/* PDF Preview/Thumbnail */}
+                <div className="bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5 h-48 flex items-center justify-center overflow-hidden relative border-b-4 border-primary/30">
                   {pdf.thumbnail_url ? (
                     <img
                       src={pdf.thumbnail_url}
@@ -302,17 +302,13 @@ export const PdfSection = ({ darkMode, userViewMode }: PdfSectionProps) => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <iframe
-                      src={`${pdf.file_url}#toolbar=0&navpanes=0&scrollbar=0&page=1&view=FitH`}
-                      className="w-full h-full pointer-events-none"
-                      title={`Preview ${pdf.title}`}
-                    />
+                    <div className="flex flex-col items-center gap-3">
+                      <FileText className="w-20 h-20 text-primary/60" strokeWidth={1.5} />
+                      <span className="text-xs font-bold text-primary/70 uppercase tracking-wider">
+                        Documento PDF
+                      </span>
+                    </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end justify-center pb-2">
-                    <span className="text-white text-xs font-bold bg-black/70 px-2 py-1 rounded">
-                      Prévia
-                    </span>
-                  </div>
                 </div>
 
                 {/* Content */}
