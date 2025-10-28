@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
+import { Button } from './ui/button';
 import { Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -33,45 +33,46 @@ export const FluxoVideoUploadDialog = ({
 
     setIsUploading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        throw new Error('Usuário não autenticado');
-      }
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Usuário não autenticado');
 
-      // Upload video
-      const videoPath = `${session.user.id}/${Date.now()}_${selectedVideo.name}`;
-      const { data: videoData, error: videoError } = await supabase.storage
+      // Upload vídeo
+      const videoExt = selectedVideo.name.split('.').pop();
+      const videoFileName = `${Date.now()}_video.${videoExt}`;
+
+      const { error: videoUploadError } = await supabase.storage
         .from('fluxo_videos')
-        .upload(videoPath, selectedVideo);
+        .upload(videoFileName, selectedVideo);
 
-      if (videoError) throw videoError;
+      if (videoUploadError) throw videoUploadError;
+
+      const { data: videoUrlData } = supabase.storage
+        .from('fluxo_videos')
+        .getPublicUrl(videoFileName);
 
       // Upload thumbnail
-      const thumbnailPath = `${session.user.id}/${Date.now()}_${selectedThumbnail.name}`;
-      const { data: thumbnailData, error: thumbnailError } = await supabase.storage
+      const thumbExt = selectedThumbnail.name.split('.').pop();
+      const thumbFileName = `${Date.now()}_thumb.${thumbExt}`;
+
+      const { error: thumbUploadError } = await supabase.storage
         .from('fluxo_videos')
-        .upload(thumbnailPath, selectedThumbnail);
+        .upload(thumbFileName, selectedThumbnail);
 
-      if (thumbnailError) throw thumbnailError;
+      if (thumbUploadError) throw thumbUploadError;
 
-      // Get public URLs
-      const { data: { publicUrl: videoUrl } } = supabase.storage
+      const { data: thumbUrlData } = supabase.storage
         .from('fluxo_videos')
-        .getPublicUrl(videoData.path);
+        .getPublicUrl(thumbFileName);
 
-      const { data: { publicUrl: thumbnailUrl } } = supabase.storage
-        .from('fluxo_videos')
-        .getPublicUrl(thumbnailData.path);
-
-      // Insert into database
+      // Insert no banco
       const { error: dbError } = await supabase
         .from('fluxo_videos')
         .insert({
           title: title.trim(),
           description: description.trim(),
-          video_url: videoUrl,
-          thumbnail_url: thumbnailUrl,
-          created_by: session.user.id,
+          video_url: videoUrlData.publicUrl,
+          thumbnail_url: thumbUrlData.publicUrl,
+          created_by: user.id,
         });
 
       if (dbError) throw dbError;
@@ -82,8 +83,8 @@ export const FluxoVideoUploadDialog = ({
       });
 
       resetForm();
-      onUploadSuccess();
       onOpenChange(false);
+      onUploadSuccess();
     } catch (error: any) {
       console.error('Error uploading video:', error);
       toast({
@@ -114,15 +115,15 @@ export const FluxoVideoUploadDialog = ({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Adicionar Vídeo - Fluxo de Atendimento</DialogTitle>
+          <DialogTitle>Adicionar Vídeo</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="video-title">Título do Vídeo *</Label>
+            <Label htmlFor="fluxo-video-title">Título do Vídeo *</Label>
             <Input
-              id="video-title"
-              placeholder="Ex: Guia Completo do Fluxo"
+              id="fluxo-video-title"
+              placeholder="Ex: Exemplo de Follow-up"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               disabled={isUploading}
@@ -130,10 +131,10 @@ export const FluxoVideoUploadDialog = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="video-description">Descrição</Label>
+            <Label htmlFor="fluxo-video-desc">Descrição</Label>
             <Textarea
-              id="video-description"
-              placeholder="Descreva o conteúdo do vídeo..."
+              id="fluxo-video-desc"
+              placeholder="Descrição do vídeo..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               disabled={isUploading}
@@ -142,9 +143,9 @@ export const FluxoVideoUploadDialog = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="video-file">Arquivo de Vídeo *</Label>
+            <Label htmlFor="fluxo-video-file">Arquivo de Vídeo *</Label>
             <Input
-              id="video-file"
+              id="fluxo-video-file"
               type="file"
               accept="video/*"
               onChange={(e) => setSelectedVideo(e.target.files?.[0] || null)}
@@ -158,9 +159,9 @@ export const FluxoVideoUploadDialog = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="thumbnail-file">Miniatura (Thumbnail) *</Label>
+            <Label htmlFor="fluxo-video-thumb">Thumbnail (Miniatura) *</Label>
             <Input
-              id="thumbnail-file"
+              id="fluxo-video-thumb"
               type="file"
               accept="image/*"
               onChange={(e) => setSelectedThumbnail(e.target.files?.[0] || null)}
@@ -168,12 +169,12 @@ export const FluxoVideoUploadDialog = ({
             />
             {selectedThumbnail && (
               <p className="text-sm text-muted-foreground">
-                Miniatura: {selectedThumbnail.name}
+                Imagem: {selectedThumbnail.name}
               </p>
             )}
           </div>
 
-          <div className="flex gap-2 pt-4">
+          <div className="flex gap-2">
             <Button
               onClick={() => handleOpenChange(false)}
               variant="outline"
