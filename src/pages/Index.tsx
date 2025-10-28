@@ -140,7 +140,7 @@ const Index = () => {
               <GoldenRule darkMode={darkMode} />
 
               {/* Script Sections */}
-              <ScriptSections darkMode={darkMode} />
+              <ScriptSections darkMode={darkMode} userViewMode={userViewMode} />
 
               {/* Do's and Don'ts */}
               <DosDonts darkMode={darkMode} />
