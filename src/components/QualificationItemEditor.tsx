@@ -4,6 +4,8 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Label } from './ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { SpinBadge } from './SpinBadge';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import type { QualificationItem } from '@/hooks/useQualificationItems';
@@ -32,6 +34,7 @@ export const QualificationItemEditor = ({
   const [description, setDescription] = useState(item.description || '');
   const [tip, setTip] = useState(item.tip || '');
   const [videoUrl, setVideoUrl] = useState(item.video_url || '');
+  const [spinType, setSpinType] = useState<'S' | 'P' | 'none'>(item.spin_type || 'none');
   const [isUploading, setIsUploading] = useState(false);
   const [fileName, setFileName] = useState(item.file_name || '');
   const [fileUrl, setFileUrl] = useState(item.file_url || '');
@@ -79,6 +82,7 @@ export const QualificationItemEditor = ({
       video_url: videoUrl || null,
       file_url: fileUrl || null,
       file_name: fileName || null,
+      spin_type: spinType === 'none' ? null : spinType,
     });
     setIsEditing(false);
   };
@@ -90,6 +94,7 @@ export const QualificationItemEditor = ({
     setVideoUrl(item.video_url || '');
     setFileUrl(item.file_url || '');
     setFileName(item.file_name || '');
+    setSpinType(item.spin_type || 'none');
     setIsEditing(false);
   };
 
@@ -97,7 +102,8 @@ export const QualificationItemEditor = ({
     return (
       <div className="bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-950/20 dark:to-green-950/20 border-2 border-blue-400 dark:border-blue-600 rounded-lg p-4 flex items-center justify-between gap-4 group hover:shadow-lg transition-all">
         <div className="flex-1">
-          <div className="flex items-start gap-2">
+          <div className="flex items-start gap-3">
+            {item.spin_type && <SpinBadge type={item.spin_type} />}
             <span className="text-primary font-bold text-lg">•</span>
             <div className="flex-1">
               <span className="text-foreground font-bold">{item.content}</span>
@@ -117,12 +123,8 @@ export const QualificationItemEditor = ({
               )}
               
               {item.video_url && (
-                <div className="mt-2">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                    <Video className="w-4 h-4" />
-                    <span>Vídeo anexado</span>
-                  </div>
-                  <div className="aspect-video rounded-lg overflow-hidden bg-black">
+                <div className="mt-3">
+                  <div className="w-64 aspect-video rounded-lg overflow-hidden bg-black shadow-lg">
                     <iframe
                       src={item.video_url}
                       className="w-full h-full"
@@ -196,6 +198,30 @@ export const QualificationItemEditor = ({
           onChange={(e) => setContent(e.target.value)}
           placeholder="Ex: Nome da Empresa/ Cliente"
         />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor={`spin-${item.id}`}>SPIN - Tipo de Pergunta</Label>
+        <Select value={spinType} onValueChange={(value: 'S' | 'P' | 'none') => setSpinType(value)}>
+          <SelectTrigger id={`spin-${item.id}`}>
+            <SelectValue placeholder="Selecione o tipo" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">Nenhum</SelectItem>
+            <SelectItem value="S">
+              <div className="flex items-center gap-2">
+                <SpinBadge type="S" />
+                <span>Situação</span>
+              </div>
+            </SelectItem>
+            <SelectItem value="P">
+              <div className="flex items-center gap-2">
+                <SpinBadge type="P" />
+                <span>Problema</span>
+              </div>
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="space-y-2">

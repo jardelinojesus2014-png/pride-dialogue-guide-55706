@@ -3,6 +3,7 @@ import { Info, Edit, Plus } from 'lucide-react';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { Button } from './ui/button';
 import { QualificationItemEditor } from './QualificationItemEditor';
+import { SpinBadge } from './SpinBadge';
 import {
   useQualificationItems,
   useUpdateQualificationItem,
@@ -54,22 +55,11 @@ export const QualificationInfoSection = ({ darkMode }: QualificationInfoSectionP
       return <p className="text-muted-foreground">Carregando...</p>;
     }
 
-    const hasContactHeader = categoryItems.some(
-      (item) => item.category === 'qualificacao_contato'
-    );
-
     return (
       <div className="space-y-3 text-foreground">
         {categoryItems.map((item, index) => {
-          const isFirstContact = hasContactHeader && item.category === 'qualificacao_contato' && index === categoryItems.findIndex((i) => i.category === 'qualificacao_contato');
-          
           return (
             <div key={item.id}>
-              {isFirstContact && (
-                <div className="mt-4 mb-2 font-bold text-accent">
-                  Informações do contato:
-                </div>
-              )}
               {isEditMode && isAdmin ? (
                 <QualificationItemEditor
                   item={item}
@@ -81,9 +71,10 @@ export const QualificationInfoSection = ({ darkMode }: QualificationInfoSectionP
                   canMoveDown={index < categoryItems.length - 1}
                 />
               ) : (
-                <div className={isFirstContact ? 'ml-4' : ''}>
+                <div>
                   <div className="bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-950/20 dark:to-green-950/20 border-2 border-blue-400 dark:border-blue-600 rounded-lg p-3">
-                    <div className="flex items-start gap-2">
+                    <div className="flex items-start gap-3">
+                      {item.spin_type && <SpinBadge type={item.spin_type} />}
                       <span className="text-primary font-bold text-lg">•</span>
                       <div className="flex-1">
                         <span className="font-bold text-foreground">{item.content}</span>
@@ -100,8 +91,8 @@ export const QualificationInfoSection = ({ darkMode }: QualificationInfoSectionP
                           </div>
                         )}
                         {item.video_url && (
-                          <div className="mt-2">
-                            <div className="aspect-video rounded-lg overflow-hidden bg-black">
+                          <div className="mt-3">
+                            <div className="w-64 aspect-video rounded-lg overflow-hidden bg-black shadow-lg">
                               <iframe
                                 src={item.video_url}
                                 className="w-full h-full"

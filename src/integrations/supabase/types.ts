@@ -174,6 +174,7 @@ export type Database = {
           file_name: string | null
           file_url: string | null
           id: string
+          spin_type: string | null
           tip: string | null
           updated_at: string
           video_url: string | null
@@ -187,6 +188,7 @@ export type Database = {
           file_name?: string | null
           file_url?: string | null
           id?: string
+          spin_type?: string | null
           tip?: string | null
           updated_at?: string
           video_url?: string | null
@@ -200,6 +202,7 @@ export type Database = {
           file_name?: string | null
           file_url?: string | null
           id?: string
+          spin_type?: string | null
           tip?: string | null
           updated_at?: string
           video_url?: string | null
