@@ -44,12 +44,12 @@ export const UserNoteSection = ({ itemId }: UserNoteSectionProps) => {
   };
 
   return (
-    <div className="flex-1">
+    <div className="mt-2">
       <button
         onClick={handleToggle}
         className={`${
           showNote || userNote ? 'bg-yellow-100 dark:bg-yellow-900/30' : 'bg-muted hover:bg-muted/80'
-        } p-2 rounded-lg transition-all duration-300 group relative flex-shrink-0`}
+        } p-2 rounded-lg transition-all duration-300 group relative`}
         title="Nota pessoal"
       >
         <StickyNote
@@ -63,13 +63,13 @@ export const UserNoteSection = ({ itemId }: UserNoteSectionProps) => {
       </button>
 
       {showNote && (
-        <div className="absolute top-full left-0 right-0 mt-2 z-20 bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-400 dark:border-yellow-600 rounded-lg p-4 shadow-lg space-y-2">
+        <div className="mt-3 space-y-2">
           <Textarea
             value={noteText}
             onChange={(e) => setNoteText(e.target.value)}
             placeholder="Adicione suas observações pessoais aqui..."
             rows={3}
-            className="w-full p-3 rounded-lg border-2 border-yellow-400 dark:border-yellow-600 bg-white dark:bg-gray-900 focus:border-yellow-500 focus:outline-none transition-colors text-sm text-foreground"
+            className="w-full p-3 rounded-lg border-2 border-yellow-400 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-900/20 focus:border-yellow-500 focus:outline-none transition-colors text-sm text-foreground"
           />
           <div className="flex gap-2">
             <Button size="sm" onClick={handleSave} disabled={!noteText.trim()} className="bg-yellow-500 hover:bg-yellow-600 text-white">
@@ -86,15 +86,6 @@ export const UserNoteSection = ({ itemId }: UserNoteSectionProps) => {
               Fechar
             </Button>
           </div>
-        </div>
-      )}
-
-      {/* Exibir nota salva no mesmo estilo das dicas */}
-      {userNote && !showNote && (
-        <div className="bg-yellow-50/50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-600 p-4 rounded text-sm mt-3">
-          <p className="text-foreground">
-            <span className="inline-block">📝</span> <strong>Nota pessoal:</strong> {userNote.note}
-          </p>
         </div>
       )}
     </div>

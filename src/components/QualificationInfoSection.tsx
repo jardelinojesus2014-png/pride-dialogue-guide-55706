@@ -94,12 +94,9 @@ export const QualificationInfoSection = ({ darkMode }: QualificationInfoSectionP
                   canMoveDown={index < categoryItems.length - 1}
                 />
               ) : (
-                <div className="relative">
+                <div>
                   <div className="bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-950/20 dark:to-green-950/20 border-2 border-blue-400 dark:border-blue-600 rounded-lg p-3">
                     <div className="flex items-start gap-3">
-                      {/* User Note Section - ícone discreto antes do conteúdo */}
-                      <UserNoteSection itemId={item.id} />
-                      
                       {item.spin_type && <SpinBadge type={item.spin_type} />}
                       <span className="text-primary font-bold text-lg">•</span>
                       <div className="flex-1 space-y-2">
@@ -156,6 +153,9 @@ export const QualificationInfoSection = ({ darkMode }: QualificationInfoSectionP
                       </div>
                     </div>
                   </div>
+                  
+                  {/* User Note Section */}
+                  <UserNoteSection itemId={item.id} />
                 </div>
               )}
             </div>
