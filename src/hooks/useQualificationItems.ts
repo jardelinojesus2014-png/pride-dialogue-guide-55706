@@ -12,6 +12,7 @@ export interface QualificationItem {
   file_url?: string | null;
   file_name?: string | null;
   spin_type?: 'S' | 'P' | null;
+  examples?: string[] | null;
   display_order: number;
   created_at: string;
   updated_at: string;
@@ -47,6 +48,7 @@ export const useUpdateQualificationItem = () => {
           file_url: item.file_url,
           file_name: item.file_name,
           spin_type: item.spin_type,
+          examples: item.examples,
           display_order: item.display_order,
         })
         .eq('id', item.id);

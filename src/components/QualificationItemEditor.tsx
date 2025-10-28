@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Trash2, Save, X, ChevronUp, ChevronDown, Upload, Link as LinkIcon, File, Video, ExternalLink } from 'lucide-react';
+import { Trash2, Save, X, ChevronUp, ChevronDown, Upload, Link as LinkIcon, File, Video, ExternalLink, Plus } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
@@ -38,6 +38,8 @@ export const QualificationItemEditor = ({
   const [isUploading, setIsUploading] = useState(false);
   const [fileName, setFileName] = useState(item.file_name || '');
   const [fileUrl, setFileUrl] = useState(item.file_url || '');
+  const [examples, setExamples] = useState<string[]>(item.examples || []);
+  const [newExample, setNewExample] = useState('');
 
   const convertYouTubeUrl = (url: string): string => {
     if (!url) return '';
@@ -102,8 +104,20 @@ export const QualificationItemEditor = ({
       file_url: fileUrl || null,
       file_name: fileName || null,
       spin_type: spinType === 'none' ? null : spinType,
+      examples: examples.length > 0 ? examples : null,
     });
     setIsEditing(false);
+  };
+
+  const handleAddExample = () => {
+    if (newExample.trim()) {
+      setExamples([...examples, newExample.trim()]);
+      setNewExample('');
+    }
+  };
+
+  const handleRemoveExample = (index: number) => {
+    setExamples(examples.filter((_, i) => i !== index));
   };
 
   const handleCancel = () => {
@@ -114,6 +128,8 @@ export const QualificationItemEditor = ({
     setFileUrl(item.file_url || '');
     setFileName(item.file_name || '');
     setSpinType(item.spin_type || 'none');
+    setExamples(item.examples || []);
+    setNewExample('');
     setIsEditing(false);
   };
 
@@ -138,6 +154,16 @@ export const QualificationItemEditor = ({
                   <p className="text-foreground">
                     💡 <strong>Dica:</strong> {item.tip}
                   </p>
+                </div>
+              )}
+              
+              {item.examples && item.examples.length > 0 && (
+                <div className="mt-2 space-y-2">
+                  {item.examples.map((example, idx) => (
+                    <div key={idx} className="bg-purple-50 dark:bg-purple-950/20 border border-purple-300 dark:border-purple-700 rounded-lg p-3 text-sm text-foreground">
+                      ✨ <strong>Exemplo:</strong> {example}
+                    </div>
+                  ))}
                 </div>
               )}
               
@@ -267,6 +293,48 @@ export const QualificationItemEditor = ({
           placeholder="Adicione uma dica opcional que aparecerá com destaque..."
           rows={2}
         />
+      </div>
+
+      <div className="space-y-2">
+        <Label>
+          ✨ Exemplos (caixinha roxa)
+        </Label>
+        <div className="space-y-2">
+          {examples.map((example, index) => (
+            <div key={index} className="flex items-start gap-2 bg-purple-50 dark:bg-purple-950/20 border border-purple-300 dark:border-purple-700 rounded-lg p-3">
+              <span className="flex-1 text-sm">{example}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleRemoveExample(index)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+          <div className="flex gap-2">
+            <Input
+              value={newExample}
+              onChange={(e) => setNewExample(e.target.value)}
+              placeholder="Digite um exemplo e clique em Adicionar"
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddExample();
+                }
+              }}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleAddExample}
+              disabled={!newExample.trim()}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Adicionar
+            </Button>
+          </div>
+        </div>
       </div>
 
       <div className="space-y-2">

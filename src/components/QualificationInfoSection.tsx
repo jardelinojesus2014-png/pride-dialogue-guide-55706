@@ -53,6 +53,7 @@ export const QualificationInfoSection = ({ darkMode }: QualificationInfoSectionP
       file_url: null,
       file_name: null,
       spin_type: null,
+      examples: null,
     });
     setIsAddingNew(false);
   };
@@ -109,6 +110,15 @@ export const QualificationInfoSection = ({ darkMode }: QualificationInfoSectionP
                             <p className="text-foreground">
                               💡 <strong>Dica:</strong> {item.tip}
                             </p>
+                          </div>
+                        )}
+                        {item.examples && item.examples.length > 0 && (
+                          <div className="mt-2 space-y-2">
+                            {item.examples.map((example, idx) => (
+                              <div key={idx} className="bg-purple-50 dark:bg-purple-950/20 border border-purple-300 dark:border-purple-700 rounded-lg p-3 text-sm text-foreground">
+                                ✨ <strong>Exemplo:</strong> {example}
+                              </div>
+                            ))}
                           </div>
                         )}
                         {item.video_url && (
