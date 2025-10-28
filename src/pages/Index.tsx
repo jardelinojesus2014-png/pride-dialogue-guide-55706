@@ -133,9 +133,6 @@ const Index = () => {
               {/* Admin Audio Section */}
               <AdminAudioSection darkMode={darkMode} />
 
-              {/* Fluxo Audio Section */}
-              <FluxoAudioSection darkMode={darkMode} />
-
               {/* Fluxo Video Section */}
               <FluxoVideoSection darkMode={darkMode} />
             </TabsContent>
