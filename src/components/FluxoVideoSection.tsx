@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Trash2, Video, Upload } from 'lucide-react';
+import { Upload, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { toast } from '@/hooks/use-toast';
-import { FluxoVideoUploadDialog } from './FluxoVideoUploadDialog';
 
 interface FluxoVideo {
   id: string;
   title: string;
   description: string;
-  thumbnail_url: string;
   video_url: string;
   created_at: string;
 }
@@ -20,7 +18,8 @@ interface FluxoVideoSectionProps {
 
 export const FluxoVideoSection = ({ darkMode }: FluxoVideoSectionProps) => {
   const [videos, setVideos] = useState<FluxoVideo[]>([]);
-  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [showVideoForm, setShowVideoForm] = useState(false);
+  const [currentVideo, setCurrentVideo] = useState({ url: '', title: '', description: '' });
   const { isAdmin } = useIsAdmin();
 
   useEffect(() => {
@@ -46,26 +45,69 @@ export const FluxoVideoSection = ({ darkMode }: FluxoVideoSectionProps) => {
     }
   };
 
-  const handleDeleteVideo = async (id: string, videoUrl: string, thumbnailUrl: string) => {
+  const handleVideoLinkAdd = () => {
+    setShowVideoForm(true);
+  };
+
+  const saveVideo = async () => {
+    if (currentVideo.url.trim() && currentVideo.title.trim() && currentVideo.description.trim()) {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Usuário não autenticado');
+
+        let embedUrl = currentVideo.url.trim();
+        
+        // Convert Google Drive links to embed format
+        if (embedUrl.includes('drive.google.com')) {
+          const fileIdMatch = embedUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+          if (fileIdMatch) {
+            embedUrl = `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
+          }
+        }
+
+        const { error } = await supabase
+          .from('fluxo_videos')
+          .insert({
+            title: currentVideo.title.trim(),
+            description: currentVideo.description.trim(),
+            video_url: embedUrl,
+            thumbnail_url: '', // Not needed for iframe
+            created_by: user.id,
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: 'Vídeo adicionado com sucesso!',
+          description: `"${currentVideo.title}" foi adicionado.`,
+        });
+
+        setCurrentVideo({ url: '', title: '', description: '' });
+        setShowVideoForm(false);
+        loadVideos();
+      } catch (error: any) {
+        console.error('Error saving video:', error);
+        toast({
+          title: 'Erro ao adicionar vídeo',
+          description: error.message,
+          variant: 'destructive',
+        });
+      }
+    } else {
+      alert('Por favor, preencha o link, título e descrição do vídeo!');
+    }
+  };
+
+  const deleteVideo = async (id: string) => {
     if (!confirm('Tem certeza que deseja excluir este vídeo?')) return;
 
     try {
-      const videoFileName = videoUrl.split('/').pop();
-      const thumbnailFileName = thumbnailUrl.split('/').pop();
-
-      if (videoFileName) {
-        await supabase.storage.from('fluxo_videos').remove([videoFileName]);
-      }
-      if (thumbnailFileName) {
-        await supabase.storage.from('fluxo_videos').remove([thumbnailFileName]);
-      }
-
-      const { error: dbError } = await supabase
+      const { error } = await supabase
         .from('fluxo_videos')
         .delete()
         .eq('id', id);
 
-      if (dbError) throw dbError;
+      if (error) throw error;
 
       toast({
         title: 'Vídeo excluído',
@@ -83,90 +125,134 @@ export const FluxoVideoSection = ({ darkMode }: FluxoVideoSectionProps) => {
     }
   };
 
+  const cancelVideo = () => {
+    setCurrentVideo({ url: '', title: '', description: '' });
+    setShowVideoForm(false);
+  };
+
   return (
-    <section className="bg-card rounded-lg shadow-xl p-6 sm:p-8 mb-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-card rounded-xl shadow-lg p-6 mb-8 border-2 border-border">
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
         <div className="flex items-center gap-3">
-          <div className="bg-primary rounded-full p-3 shadow-lg">
-            <Video className="w-6 h-6 text-primary-foreground" />
+          <div className="bg-gradient-hero rounded-full p-3 shadow-lg">
+            <svg className="w-6 h-6 text-accent" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+            </svg>
           </div>
           <div>
-            <h2 className="text-2xl sm:text-3xl font-black text-primary">
-              Vídeos de Treinamento
-            </h2>
-            <p className="text-sm text-muted-foreground mt-1">
+            <h2 className="text-2xl sm:text-3xl font-black text-primary">🎥 Vídeos de Treinamento</h2>
+            <p className="text-sm text-muted-foreground">
               Adicione vídeos com exemplos e simulações do roteiro
             </p>
           </div>
         </div>
+
         {isAdmin && (
           <button
-            onClick={() => setUploadDialogOpen(true)}
+            onClick={handleVideoLinkAdd}
             className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
           >
             <Upload className="w-5 h-5" />
-            <span className="hidden sm:inline">Adicionar Vídeo</span>
+            Adicionar Vídeo
           </button>
         )}
       </div>
 
-      {videos.length === 0 ? (
-        <p className="text-center text-muted-foreground py-8">
-          Nenhum vídeo disponível ainda.
-        </p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {showVideoForm && (
+        <div className="bg-muted border-2 border-border rounded-lg p-6 mb-6 shadow-xl">
+          <div className="flex items-start justify-between mb-4">
+            <h3 className="text-lg font-bold text-primary">📝 Informações do Vídeo (obrigatório)</h3>
+            <button onClick={cancelVideo} className="text-destructive hover:text-destructive/80 transition-colors">
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-foreground">Link do Vídeo *</label>
+              <input
+                type="text"
+                value={currentVideo.url}
+                onChange={(e) => setCurrentVideo({ ...currentVideo, url: e.target.value })}
+                placeholder="https://drive.google.com/... ou https://youtube.com/..."
+                className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-foreground">Título do Vídeo *</label>
+              <input
+                type="text"
+                value={currentVideo.title}
+                onChange={(e) => setCurrentVideo({ ...currentVideo, title: e.target.value })}
+                placeholder="Ex: Simulação da Etapa de Follow-up"
+                className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-foreground">Descrição *</label>
+              <textarea
+                value={currentVideo.description}
+                onChange={(e) => setCurrentVideo({ ...currentVideo, description: e.target.value })}
+                placeholder="Descreva brevemente o conteúdo deste vídeo..."
+                className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
+                rows={3}
+              />
+            </div>
+
+            <button
+              onClick={saveVideo}
+              className="w-full bg-gradient-hero hover:opacity-90 text-accent font-bold py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg"
+            >
+              ✓ Salvar Vídeo
+            </button>
+          </div>
+        </div>
+      )}
+
+      {videos.length > 0 ? (
+        <div className="grid sm:grid-cols-2 gap-6">
           {videos.map((video) => (
             <div
               key={video.id}
-              className="bg-muted/50 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300"
+              className="bg-muted rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
             >
-              <div className="relative">
-                <img
-                  src={video.thumbnail_url}
-                  alt={video.title}
-                  className="w-full h-48 object-cover"
+              <div className="relative aspect-video bg-black">
+                <iframe
+                  src={video.video_url}
+                  className="w-full h-full absolute top-0 left-0"
+                  allow="autoplay"
+                  allowFullScreen
+                  title={video.title}
                 />
-                <a
-                  href={video.video_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute inset-0 flex items-center justify-center bg-black/50 hover:bg-black/70 transition-all duration-300"
-                >
-                  <div className="bg-primary rounded-full p-4">
-                    <Video className="w-8 h-8 text-primary-foreground" />
-                  </div>
-                </a>
               </div>
               <div className="p-4">
-                <h3 className="font-bold text-lg text-foreground mb-2">
-                  {video.title}
-                </h3>
-                <p className="text-sm text-muted-foreground mb-3">
-                  {video.description}
-                </p>
-                {isAdmin && (
-                  <button
-                    onClick={() => handleDeleteVideo(video.id, video.video_url, video.thumbnail_url)}
-                    className="bg-destructive hover:bg-destructive/90 text-destructive-foreground px-3 py-2 rounded-lg flex items-center gap-2 text-sm transition-all duration-300 hover:scale-105"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    Excluir
-                  </button>
-                )}
+                <div className="flex items-start justify-between mb-2">
+                  <h4 className="font-bold text-primary">{video.title}</h4>
+                  {isAdmin && (
+                    <button
+                      onClick={() => deleteVideo(video.id)}
+                      className="text-destructive hover:text-destructive/80 transition-colors flex-shrink-0 ml-2"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground mb-2">{video.description}</p>
               </div>
             </div>
           ))}
         </div>
+      ) : (
+        <div className="text-center py-12 text-muted-foreground">
+          <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+          </svg>
+          <p className="font-semibold">Nenhum vídeo adicionado ainda</p>
+          <p className="text-sm mt-2">Clique em "Adicionar Vídeo" para começar</p>
+        </div>
       )}
-
-      {uploadDialogOpen && (
-        <FluxoVideoUploadDialog
-          open={uploadDialogOpen}
-          onOpenChange={setUploadDialogOpen}
-          onUploadSuccess={loadVideos}
-        />
-      )}
-    </section>
+    </div>
   );
 };
