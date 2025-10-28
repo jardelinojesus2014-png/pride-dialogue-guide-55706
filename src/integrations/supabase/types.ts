@@ -171,9 +171,12 @@ export type Database = {
           created_at: string
           description: string | null
           display_order: number
+          file_name: string | null
+          file_url: string | null
           id: string
           tip: string | null
           updated_at: string
+          video_url: string | null
         }
         Insert: {
           category: string
@@ -181,9 +184,12 @@ export type Database = {
           created_at?: string
           description?: string | null
           display_order?: number
+          file_name?: string | null
+          file_url?: string | null
           id?: string
           tip?: string | null
           updated_at?: string
+          video_url?: string | null
         }
         Update: {
           category?: string
@@ -191,9 +197,12 @@ export type Database = {
           created_at?: string
           description?: string | null
           display_order?: number
+          file_name?: string | null
+          file_url?: string | null
           id?: string
           tip?: string | null
           updated_at?: string
+          video_url?: string | null
         }
         Relationships: []
       }

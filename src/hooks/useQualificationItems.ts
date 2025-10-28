@@ -8,6 +8,9 @@ export interface QualificationItem {
   content: string;
   description?: string | null;
   tip?: string | null;
+  video_url?: string | null;
+  file_url?: string | null;
+  file_name?: string | null;
   display_order: number;
   created_at: string;
   updated_at: string;
@@ -39,6 +42,9 @@ export const useUpdateQualificationItem = () => {
           content: item.content,
           description: item.description,
           tip: item.tip,
+          video_url: item.video_url,
+          file_url: item.file_url,
+          file_name: item.file_name,
           display_order: item.display_order,
         })
         .eq('id', item.id);
