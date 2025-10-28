@@ -65,22 +65,13 @@ export const WebsiteSection = ({ darkMode }: WebsiteSectionProps) => {
                   sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
                   loading="lazy"
                 />
-                
-                {/* Overlay para redirecionar cliques */}
-                <a
-                  href={websiteUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute inset-0 cursor-pointer"
-                  aria-label="Visitar site"
-                />
               </div>
             </div>
           </div>
 
           <div className="text-center mt-6">
             <p className="text-sm text-muted-foreground">
-              ✨ Clique na prévia acima para acessar o site completo
+              ✨ Explore a prévia acima ou use o botão para acessar o site completo
             </p>
           </div>
         </div>
