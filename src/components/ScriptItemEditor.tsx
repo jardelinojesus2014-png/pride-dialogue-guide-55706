@@ -3,7 +3,7 @@ import { ChevronUp, ChevronDown, Trash2, Save, X, Plus } from 'lucide-react';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { Input } from './ui/input';
-import { ScriptItem } from '@/hooks/useScriptItems';
+import { ScriptItem, ResponseOption } from '@/hooks/useScriptItems';
 
 interface ScriptItemEditorProps {
   item: ScriptItem;
@@ -31,11 +31,14 @@ export const ScriptItemEditor = ({
   const [tips, setTips] = useState<string[]>(item.tips || []);
   const [warnings, setWarnings] = useState<string[]>(item.warnings || []);
   const [collect, setCollect] = useState<string[]>(item.collect || []);
+  const [responseOptions, setResponseOptions] = useState<ResponseOption[]>(item.response_options || []);
   
   const [newAlternative, setNewAlternative] = useState('');
   const [newTip, setNewTip] = useState('');
   const [newWarning, setNewWarning] = useState('');
   const [newCollect, setNewCollect] = useState('');
+  const [newClientResponse, setNewClientResponse] = useState('');
+  const [newSuggestedConduct, setNewSuggestedConduct] = useState('');
 
   const handleSave = () => {
     onUpdate({
@@ -46,6 +49,7 @@ export const ScriptItemEditor = ({
       tips: tips.length > 0 ? tips : null,
       warnings: warnings.length > 0 ? warnings : null,
       collect: collect.length > 0 ? collect : null,
+      response_options: responseOptions.length > 0 ? responseOptions : null,
     });
     setIsEditing(false);
   };
@@ -57,6 +61,7 @@ export const ScriptItemEditor = ({
     setTips(item.tips || []);
     setWarnings(item.warnings || []);
     setCollect(item.collect || []);
+    setResponseOptions(item.response_options || []);
     setIsEditing(false);
   };
 
@@ -102,6 +107,21 @@ export const ScriptItemEditor = ({
 
   const removeCollect = (index: number) => {
     setCollect(collect.filter((_, i) => i !== index));
+  };
+
+  const addResponseOption = () => {
+    if (newClientResponse.trim() && newSuggestedConduct.trim()) {
+      setResponseOptions([...responseOptions, {
+        client_response: newClientResponse.trim(),
+        suggested_conduct: newSuggestedConduct.trim(),
+      }]);
+      setNewClientResponse('');
+      setNewSuggestedConduct('');
+    }
+  };
+
+  const removeResponseOption = (index: number) => {
+    setResponseOptions(responseOptions.filter((_, i) => i !== index));
   };
 
   if (!isEditing) {
@@ -296,6 +316,80 @@ export const ScriptItemEditor = ({
           />
           <Button onClick={addCollect} size="sm" className="bg-green-500 hover:bg-green-600">
             <Plus className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Response Options */}
+      <div>
+        <label className="block text-sm font-semibold mb-2 text-purple-700 dark:text-purple-400">🔀 Opções de Resposta do Cliente</label>
+        {responseOptions.map((option, idx) => (
+          <div key={idx} className="bg-purple-50 dark:bg-purple-950/20 border-2 border-purple-400 dark:border-purple-600 rounded-lg p-3 mb-3">
+            <div className="space-y-2">
+              <div>
+                <label className="block text-xs font-semibold mb-1">Quando o cliente responder:</label>
+                <Textarea
+                  value={option.client_response}
+                  onChange={(e) => {
+                    const newOptions = [...responseOptions];
+                    newOptions[idx].client_response = e.target.value;
+                    setResponseOptions(newOptions);
+                  }}
+                  placeholder="Ex: Sim, tenho interesse"
+                  className="bg-white dark:bg-background"
+                  rows={2}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold mb-1">Sugestão de condução:</label>
+                <Textarea
+                  value={option.suggested_conduct}
+                  onChange={(e) => {
+                    const newOptions = [...responseOptions];
+                    newOptions[idx].suggested_conduct = e.target.value;
+                    setResponseOptions(newOptions);
+                  }}
+                  placeholder="Ex: Ótimo! Então vamos seguir para..."
+                  className="bg-white dark:bg-background"
+                  rows={2}
+                />
+              </div>
+              <Button onClick={() => removeResponseOption(idx)} size="sm" variant="destructive" className="w-full">
+                <X className="w-4 h-4 mr-2" />
+                Remover Opção
+              </Button>
+            </div>
+          </div>
+        ))}
+        <div className="bg-purple-50 dark:bg-purple-950/20 border-2 border-dashed border-purple-400 dark:border-purple-600 rounded-lg p-3 space-y-2">
+          <div>
+            <label className="block text-xs font-semibold mb-1">Quando o cliente responder:</label>
+            <Textarea
+              value={newClientResponse}
+              onChange={(e) => setNewClientResponse(e.target.value)}
+              placeholder="Ex: Sim, tenho interesse"
+              className="bg-white dark:bg-background"
+              rows={2}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold mb-1">Sugestão de condução:</label>
+            <Textarea
+              value={newSuggestedConduct}
+              onChange={(e) => setNewSuggestedConduct(e.target.value)}
+              placeholder="Ex: Ótimo! Então vamos seguir para..."
+              className="bg-white dark:bg-background"
+              rows={2}
+            />
+          </div>
+          <Button 
+            onClick={addResponseOption} 
+            size="sm" 
+            className="w-full bg-purple-500 hover:bg-purple-600"
+            disabled={!newClientResponse.trim() || !newSuggestedConduct.trim()}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Adicionar Opção
           </Button>
         </div>
       </div>

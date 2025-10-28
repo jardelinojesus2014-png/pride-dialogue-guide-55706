@@ -457,6 +457,7 @@ export type Database = {
           id: string
           item_id: string
           label: string
+          response_options: Json | null
           script: string
           section_id: string
           tips: string[] | null
@@ -471,6 +472,7 @@ export type Database = {
           id?: string
           item_id: string
           label: string
+          response_options?: Json | null
           script: string
           section_id: string
           tips?: string[] | null
@@ -485,6 +487,7 @@ export type Database = {
           id?: string
           item_id?: string
           label?: string
+          response_options?: Json | null
           script?: string
           section_id?: string
           tips?: string[] | null

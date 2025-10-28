@@ -2,6 +2,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from './use-toast';
 
+export interface ResponseOption {
+  client_response: string;
+  suggested_conduct: string;
+}
+
 export interface ScriptItem {
   id: string;
   section_id: string;
@@ -12,6 +17,7 @@ export interface ScriptItem {
   tips?: string[] | null;
   warnings?: string[] | null;
   collect?: string[] | null;
+  response_options?: ResponseOption[] | null;
   display_order: number;
 }
 
@@ -31,7 +37,12 @@ export const useScriptItems = (sectionId?: string) => {
       const { data, error } = await query;
       
       if (error) throw error;
-      return data as ScriptItem[];
+      
+      // Convert Json type to ResponseOption[]
+      return (data || []).map(item => ({
+        ...item,
+        response_options: item.response_options as unknown as ResponseOption[] | null,
+      })) as ScriptItem[];
     },
   });
 };
@@ -43,7 +54,10 @@ export const useUpdateScriptItem = () => {
     mutationFn: async (item: Partial<ScriptItem> & { id: string }) => {
       const { error } = await supabase
         .from('script_items')
-        .update(item)
+        .update({
+          ...item,
+          response_options: item.response_options as any,
+        })
         .eq('id', item.id);
       
       if (error) throw error;
@@ -101,7 +115,10 @@ export const useAddScriptItem = () => {
     mutationFn: async (item: Omit<ScriptItem, 'id'>) => {
       const { error } = await supabase
         .from('script_items')
-        .insert(item);
+        .insert({
+          ...item,
+          response_options: item.response_options as any,
+        });
       
       if (error) throw error;
     },

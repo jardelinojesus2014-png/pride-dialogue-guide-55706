@@ -1,5 +1,5 @@
 import { CheckCircle2, StickyNote } from 'lucide-react';
-import { ScriptItem as ScriptItemType } from '@/hooks/useScriptItems';
+import { ScriptItem as ScriptItemType, ResponseOption } from '@/hooks/useScriptItems';
 
 interface ScriptItemProps {
   item: ScriptItemType;
@@ -109,7 +109,7 @@ export const ScriptItem = ({
 
           {/* Informações a Coletar */}
           {item.collect && item.collect.length > 0 && (
-            <div className="bg-green-500/10 border border-green-500/30 p-3 rounded-lg text-sm">
+            <div className="bg-green-500/10 border border-green-500/30 p-3 rounded-lg text-sm mb-2">
               <p className="font-bold mb-2 flex items-center gap-2 text-green-700 dark:text-green-400">
                 <span>📋</span> Informações a Coletar:
               </p>
@@ -121,6 +121,25 @@ export const ScriptItem = ({
                   </li>
                 ))}
               </ul>
+            </div>
+          )}
+
+          {/* Opções de Resposta do Cliente */}
+          {item.response_options && item.response_options.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs italic text-muted-foreground pl-4 py-1 mb-2">
+                ⏸️ Aguardar cliente responder
+              </p>
+              {item.response_options.map((option, idx) => (
+                <div key={idx} className="bg-purple-50 dark:bg-purple-950/20 border-l-4 border-purple-500 dark:border-purple-600 rounded-r-lg p-3 text-sm">
+                  <p className="font-semibold text-purple-900 dark:text-purple-200 mb-2">
+                    🔀 Quando o cliente responder: <span className="font-normal italic">"{option.client_response}"</span>
+                  </p>
+                  <p className="text-foreground pl-4">
+                    <strong>→ Sugestão de condução:</strong> {option.suggested_conduct}
+                  </p>
+                </div>
+              ))}
             </div>
           )}
         </div>
