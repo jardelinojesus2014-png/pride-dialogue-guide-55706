@@ -17,37 +17,37 @@ export const WebsiteSection = ({ darkMode }: WebsiteSectionProps) => {
       <div className="absolute top-1/2 right-0 w-1 h-32 bg-gradient-to-b from-transparent via-yellow-500 to-transparent transform -translate-y-1/2" />
       
       <div className="relative z-10">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center gap-3 mb-4">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-xl">
-              <Globe className="w-8 h-8 text-white" />
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center justify-center gap-3 mb-3">
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg animate-pulse">
+              <Globe className="w-7 h-7 text-white" />
             </div>
           </div>
           
-          <h2 className="text-3xl sm:text-4xl font-black text-primary mb-3">
+          <h2 className="text-2xl sm:text-3xl font-black text-primary mb-2">
             Visite Nosso Site
           </h2>
-          <p className="text-foreground/80 text-lg mb-6 max-w-2xl mx-auto">
-            Conheça mais sobre nossos serviços, soluções e tudo que a Pride Corretora pode oferecer para você
+          <p className="text-foreground/70 text-sm sm:text-base mb-4 max-w-xl mx-auto">
+            Conheça mais sobre nossos serviços e soluções
           </p>
 
           <a
             href={websiteUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block"
+            className="inline-block mb-2"
           >
             <Button
               size="lg"
-              className="bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/90 hover:via-primary hover:to-primary text-white font-black px-8 py-6 text-lg shadow-2xl hover:shadow-primary/50 transition-all duration-300 hover:scale-105 border-2 border-yellow-500"
+              className="bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/90 hover:via-primary hover:to-primary text-white font-black px-6 py-4 text-base shadow-xl hover:shadow-primary/50 transition-all duration-300 hover:scale-105 border-2 border-yellow-500"
             >
-              <ExternalLink className="w-6 h-6 mr-3" />
+              <ExternalLink className="w-5 h-5 mr-2" />
               Acessar Site Oficial
-              <span className="ml-2 text-2xl">→</span>
+              <span className="ml-2 text-xl">→</span>
             </Button>
           </a>
 
-          <p className="text-sm text-muted-foreground mt-4">
+          <p className="text-xs text-muted-foreground">
             {websiteUrl}
           </p>
         </div>
