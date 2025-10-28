@@ -98,7 +98,7 @@ const Index = () => {
                 value="fluxo" 
                 className="text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all"
               >
-                Fluxo de Atendimento - Cadência de LEAD
+                Materiais Adicionais
               </TabsTrigger>
             </TabsList>
 
