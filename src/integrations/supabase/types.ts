@@ -589,6 +589,45 @@ export type Database = {
         }
         Relationships: []
       }
+      user_purpose_reflections: {
+        Row: {
+          created_at: string
+          id: string
+          improve_what: string | null
+          strengths: string | null
+          updated_at: string
+          user_id: string
+          what_control: string | null
+          what_today: string | null
+          why: string | null
+          why_here: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          improve_what?: string | null
+          strengths?: string | null
+          updated_at?: string
+          user_id: string
+          what_control?: string | null
+          what_today?: string | null
+          why?: string | null
+          why_here?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          improve_what?: string | null
+          strengths?: string | null
+          updated_at?: string
+          user_id?: string
+          what_control?: string | null
+          what_today?: string | null
+          why?: string | null
+          why_here?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

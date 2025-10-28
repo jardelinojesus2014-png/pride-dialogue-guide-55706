@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserAudioFile } from '@/hooks/useUserAudioFiles';
 import { UserManagement } from '@/components/UserManagement';
+import { PurposeReflectionsSection } from '@/components/PurposeReflectionsSection';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -306,14 +307,19 @@ const Admin = () => {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="users">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="users">Usuários</TabsTrigger>
+                <TabsTrigger value="reflections">Reflexões</TabsTrigger>
                 <TabsTrigger value="notes">Anotações ({filteredNotes.length})</TabsTrigger>
                 <TabsTrigger value="audio">Áudios ({filteredAudioFiles.length})</TabsTrigger>
               </TabsList>
 
               <TabsContent value="users" className="space-y-4">
                 <UserManagement users={users} onUserUpdated={loadData} />
+              </TabsContent>
+
+              <TabsContent value="reflections" className="space-y-4">
+                <PurposeReflectionsSection />
               </TabsContent>
 
               <TabsContent value="notes" className="space-y-4">
