@@ -20,6 +20,7 @@ import { UserPurposeAnswersSection } from '@/components/UserPurposeAnswersSectio
 import { ExportDialog } from '@/components/ExportDialog';
 import { MotivationalPopup } from '@/components/MotivationalPopup';
 import { PurposePopup } from '@/components/PurposePopup';
+import { TrainingPopup } from '@/components/TrainingPopup';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import logoPride from '@/assets/Logo_Pride.png';
@@ -33,6 +34,7 @@ const Index = () => {
   const [userViewMode, setUserViewMode] = useState(false);
   const [showMotivationalPopup, setShowMotivationalPopup] = useState(false);
   const [showPurposePopup, setShowPurposePopup] = useState(false);
+  const [showTrainingPopup, setShowTrainingPopup] = useState(false);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -205,6 +207,17 @@ const Index = () => {
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
+
+              {/* Botão Motivacional - Final da aba Pride */}
+              <div className="mt-6 mb-6 flex justify-center">
+                <button
+                  onClick={() => setShowTrainingPopup(true)}
+                  className="bg-gradient-to-r from-green-500 via-purple-600 to-orange-600 hover:from-green-600 hover:via-purple-700 hover:to-orange-700 text-white font-black px-8 py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-sm sm:text-base relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-200%] before:animate-[shimmer_3s_ease-in-out_infinite]"
+                  title="Mensagem de treino"
+                >
+                  🎯 Não sabe o que fazer? - CLIQUE AQUI
+                </button>
+              </div>
             </TabsContent>
 
             <TabsContent value="fluxo" className="mt-0">
@@ -281,6 +294,7 @@ const Index = () => {
           {/* Popup Motivacional */}
           {showMotivationalPopup && <MotivationalPopup onClose={() => setShowMotivationalPopup(false)} />}
           {showPurposePopup && <PurposePopup onClose={() => setShowPurposePopup(false)} />}
+          {showTrainingPopup && <TrainingPopup onClose={() => setShowTrainingPopup(false)} />}
         </div>
       </div>
     </div>
