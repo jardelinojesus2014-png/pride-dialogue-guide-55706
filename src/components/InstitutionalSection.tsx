@@ -232,13 +232,13 @@ export const InstitutionalSection = ({ darkMode, userViewMode = false }: Institu
         </div>
       ) : video ? (
         <div className="space-y-4">
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-2 border-primary rounded-lg p-6">
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-2 border-primary rounded-lg p-6">
             <h3 className="text-xl font-bold text-primary mb-2">{video.title}</h3>
             {video.description && (
               <p className="text-muted-foreground mb-4">{video.description}</p>
             )}
             
-            <div className="aspect-video rounded-lg overflow-hidden bg-black shadow-lg mb-4">
+            <div className="max-w-2xl mx-auto aspect-video rounded-lg overflow-hidden bg-black shadow-lg mb-4">
               <iframe
                 src={video.video_url}
                 className="w-full h-full"
