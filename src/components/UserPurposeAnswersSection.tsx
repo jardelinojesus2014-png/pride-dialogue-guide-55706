@@ -60,7 +60,7 @@ export const UserPurposeAnswersSection = ({ darkMode }: UserPurposeAnswersSectio
       </div>
 
       <div className="grid gap-6">
-        <Card className="p-6 bg-card/50 backdrop-blur border-2 border-primary/20">
+        <Card className="p-6 bg-gradient-to-br from-orange-50/50 to-red-50/50 dark:from-orange-950/20 dark:to-red-950/20 backdrop-blur border-2 border-orange-300/40 dark:border-orange-700/40">
           <label className="block text-foreground font-bold mb-2 text-lg">
             💭 Qual o seu porquê?
           </label>
@@ -72,7 +72,7 @@ export const UserPurposeAnswersSection = ({ darkMode }: UserPurposeAnswersSectio
           />
         </Card>
 
-        <Card className="p-6 bg-card/50 backdrop-blur border-2 border-primary/20">
+        <Card className="p-6 bg-gradient-to-br from-red-50/50 to-purple-50/50 dark:from-red-950/20 dark:to-purple-950/20 backdrop-blur border-2 border-red-300/40 dark:border-red-700/40">
           <label className="block text-foreground font-bold mb-2 text-lg">
             🤔 Por que aqui?
           </label>
@@ -84,7 +84,7 @@ export const UserPurposeAnswersSection = ({ darkMode }: UserPurposeAnswersSectio
           />
         </Card>
 
-        <Card className="p-6 bg-card/50 backdrop-blur border-2 border-primary/20">
+        <Card className="p-6 bg-gradient-to-br from-purple-50/50 to-orange-50/50 dark:from-purple-950/20 dark:to-orange-950/20 backdrop-blur border-2 border-purple-300/40 dark:border-purple-700/40">
           <label className="block text-foreground font-bold mb-2 text-lg">
             💡 O que está no seu controle?
           </label>
@@ -96,7 +96,7 @@ export const UserPurposeAnswersSection = ({ darkMode }: UserPurposeAnswersSectio
           />
         </Card>
 
-        <Card className="p-6 bg-card/50 backdrop-blur border-2 border-primary/20">
+        <Card className="p-6 bg-gradient-to-br from-orange-50/50 to-purple-50/50 dark:from-orange-950/20 dark:to-purple-950/20 backdrop-blur border-2 border-orange-300/40 dark:border-orange-700/40">
           <label className="block text-foreground font-bold mb-2 text-lg">
             📈 Em que você pode ser melhor?
           </label>
@@ -108,7 +108,7 @@ export const UserPurposeAnswersSection = ({ darkMode }: UserPurposeAnswersSectio
           />
         </Card>
 
-        <Card className="p-6 bg-card/50 backdrop-blur border-2 border-primary/20">
+        <Card className="p-6 bg-gradient-to-br from-red-50/50 to-orange-50/50 dark:from-red-950/20 dark:to-orange-950/20 backdrop-blur border-2 border-red-300/40 dark:border-red-700/40">
           <label className="block text-foreground font-bold mb-2 text-lg">
             ⭐ Seus pontos fortes
           </label>
@@ -120,7 +120,7 @@ export const UserPurposeAnswersSection = ({ darkMode }: UserPurposeAnswersSectio
           />
         </Card>
 
-        <Card className="p-6 bg-card/50 backdrop-blur border-2 border-primary/20">
+        <Card className="p-6 bg-gradient-to-br from-purple-50/50 to-red-50/50 dark:from-purple-950/20 dark:to-red-950/20 backdrop-blur border-2 border-purple-300/40 dark:border-purple-700/40">
           <label className="block text-foreground font-bold mb-2 text-lg">
             🎯 O que você precisa fazer HOJE?
           </label>
