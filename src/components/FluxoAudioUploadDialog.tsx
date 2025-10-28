@@ -161,7 +161,8 @@ export const FluxoAudioUploadDialog = ({
         return;
       }
 
-      const directUrl = `https://drive.google.com/uc?id=${fileId}&export=download`;
+      // Use the streaming format for better playback compatibility
+      const directUrl = `https://drive.google.com/uc?export=open&id=${fileId}`;
 
       const { data: userData } = await supabase.auth.getUser();
 
@@ -260,9 +261,9 @@ export const FluxoAudioUploadDialog = ({
               </label>
               <input
                 type="file"
-                accept=".mp3,.wav,.m4a,.ogg,.aac,.wma,.flac,audio/*"
+                accept="audio/*"
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
-                className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground"
+                className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-primary file:text-primary-foreground file:cursor-pointer hover:file:bg-primary/90"
                 disabled={uploading}
               />
               {file && (
