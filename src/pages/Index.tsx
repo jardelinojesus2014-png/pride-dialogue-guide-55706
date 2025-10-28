@@ -14,6 +14,7 @@ import { QualificationInfoSection } from '@/components/QualificationInfoSection'
 import { InstitutionalSection } from '@/components/InstitutionalSection';
 import { MissionVisionValuesSection } from '@/components/MissionVisionValuesSection';
 import { WebsiteSection } from '@/components/WebsiteSection';
+import { GoogleReviewsSection } from '@/components/GoogleReviewsSection';
 import { MotivationalPopup } from '@/components/MotivationalPopup';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import logoPride from '@/assets/Logo_Pride.png';
@@ -163,6 +164,9 @@ const Index = () => {
             <TabsContent value="pride" className="mt-0">
               {/* Website Section */}
               <WebsiteSection darkMode={darkMode} />
+
+              {/* Google Reviews Section */}
+              <GoogleReviewsSection darkMode={darkMode} />
 
               {/* Institutional Section */}
               <InstitutionalSection darkMode={darkMode} userViewMode={userViewMode} />
