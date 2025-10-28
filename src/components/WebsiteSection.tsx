@@ -56,25 +56,12 @@ export const WebsiteSection = ({ darkMode }: WebsiteSectionProps) => {
         <div className="max-w-5xl mx-auto mt-8">
           <div className="relative border-4 border-yellow-500 rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-primary/5 to-transparent p-2">
             <div className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden">
-              {/* Browser Chrome */}
-              <div className="bg-gray-200 dark:bg-gray-800 px-4 py-3 flex items-center gap-2 border-b border-gray-300 dark:border-gray-700">
-                <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                </div>
-                <div className="flex-1 mx-4 bg-white dark:bg-gray-700 rounded px-3 py-1 text-xs text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                  <Globe className="w-3 h-3" />
-                  <span className="truncate">{websiteUrl}</span>
-                </div>
-              </div>
-              
               {/* iframe Preview */}
               <div className="relative w-full bg-white" style={{ height: '500px' }}>
                 <iframe
                   src={websiteUrl}
                   title="Pride Corretora Website"
-                  className="w-full h-full border-0"
+                  className="w-full h-full border-0 rounded-lg"
                   sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
                   loading="lazy"
                 />
