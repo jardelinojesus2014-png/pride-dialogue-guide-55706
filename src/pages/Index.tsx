@@ -11,6 +11,7 @@ import { VideoSection } from '@/components/VideoSection';
 import { FluxoAudioSection } from '@/components/FluxoAudioSection';
 import { FluxoVideoSection } from '@/components/FluxoVideoSection';
 import { QualificationInfoSection } from '@/components/QualificationInfoSection';
+import { InstitutionalSection } from '@/components/InstitutionalSection';
 import { MotivationalPopup } from '@/components/MotivationalPopup';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import logoPride from '@/assets/Logo_Pride.png';
@@ -149,6 +150,9 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="fluxo" className="mt-0">
+              {/* Institutional Section */}
+              <InstitutionalSection darkMode={darkMode} userViewMode={userViewMode} />
+
               {/* Qualification Info Section */}
               <QualificationInfoSection darkMode={darkMode} userViewMode={userViewMode} />
 
