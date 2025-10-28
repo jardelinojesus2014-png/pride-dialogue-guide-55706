@@ -33,6 +33,7 @@ export const QualificationItemEditor = ({
   const [content, setContent] = useState(item.content);
   const [descriptions, setDescriptions] = useState<string[]>(item.descriptions || []);
   const [tips, setTips] = useState<string[]>(item.tips || []);
+  const [warnings, setWarnings] = useState<string[]>(item.warnings || []);
   const [videoUrls, setVideoUrls] = useState<string[]>(item.video_urls || []);
   const [fileUrls, setFileUrls] = useState<string[]>(item.file_urls || []);
   const [fileNames, setFileNames] = useState<string[]>(item.file_names || []);
@@ -41,6 +42,7 @@ export const QualificationItemEditor = ({
   
   const [newDescription, setNewDescription] = useState('');
   const [newTip, setNewTip] = useState('');
+  const [newWarning, setNewWarning] = useState('');
   const [newVideoUrl, setNewVideoUrl] = useState('');
   const [newExample, setNewExample] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -101,6 +103,7 @@ export const QualificationItemEditor = ({
       content,
       descriptions: descriptions.length > 0 ? descriptions : null,
       tips: tips.length > 0 ? tips : null,
+      warnings: warnings.length > 0 ? warnings : null,
       video_urls: processedVideoUrls.length > 0 ? processedVideoUrls : null,
       file_urls: fileUrls.length > 0 ? fileUrls : null,
       file_names: fileNames.length > 0 ? fileNames : null,
@@ -114,6 +117,7 @@ export const QualificationItemEditor = ({
     setContent(item.content);
     setDescriptions(item.descriptions || []);
     setTips(item.tips || []);
+    setWarnings(item.warnings || []);
     setVideoUrls(item.video_urls || []);
     setFileUrls(item.file_urls || []);
     setFileNames(item.file_names || []);
@@ -174,6 +178,14 @@ export const QualificationItemEditor = ({
                 <div key={idx} className="bg-accent/10 border-l-4 border-accent p-4 rounded text-sm mt-3 ml-[-8px] mr-[-8px] animate-pulse">
                   <p className="text-foreground">
                     <span className="inline-block animate-[pulse_2s_ease-in-out_infinite]">💡</span> <strong>Dica:</strong> {tip}
+                  </p>
+                </div>
+              ))}
+
+              {item.warnings && item.warnings.map((warning, idx) => (
+                <div key={idx} className="bg-red-50 dark:bg-red-950/20 border-l-4 border-red-500 p-4 rounded text-sm mt-3 ml-[-8px] mr-[-8px]">
+                  <p className="text-red-900 dark:text-red-100">
+                    <span className="inline-block">⚠️</span> <strong>Atenção/Cuidado:</strong> {warning}
                   </p>
                 </div>
               ))}
@@ -359,6 +371,40 @@ export const QualificationItemEditor = ({
             rows={2}
           />
           <Button onClick={() => newTip && (setTips([...tips, newTip]), setNewTip(''))}>
+            <Plus className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Warnings */}
+      <div className="space-y-2">
+        <Label className="text-red-600 dark:text-red-400">⚠️ Atenção/Cuidado (o que NÃO fazer)</Label>
+        {warnings.map((warning, idx) => (
+          <div key={idx} className="flex gap-2">
+            <Textarea
+              value={warning}
+              onChange={(e) => {
+                const newWarnings = [...warnings];
+                newWarnings[idx] = e.target.value;
+                setWarnings(newWarnings);
+              }}
+              rows={2}
+              className="border-red-300 dark:border-red-700"
+            />
+            <Button variant="ghost" size="sm" onClick={() => setWarnings(warnings.filter((_, i) => i !== idx))}>
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        ))}
+        <div className="flex gap-2">
+          <Textarea
+            value={newWarning}
+            onChange={(e) => setNewWarning(e.target.value)}
+            placeholder="Novo aviso/cuidado"
+            rows={2}
+            className="border-red-300 dark:border-red-700"
+          />
+          <Button onClick={() => newWarning && (setWarnings([...warnings, newWarning]), setNewWarning(''))} className="bg-red-600 hover:bg-red-700">
             <Plus className="w-4 h-4" />
           </Button>
         </div>
