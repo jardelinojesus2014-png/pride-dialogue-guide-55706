@@ -316,14 +316,14 @@ export const FluxoVideoSection = ({ darkMode }: FluxoVideoSectionProps) => {
                 <label className="block text-sm font-semibold mb-2 text-foreground">Arquivo de Vídeo *</label>
                 <input
                   type="file"
-                  accept="video/*"
+                  accept="video/mp4,video/webm,video/ogg,video/quicktime,video/x-msvideo,video/*"
                   onChange={(e) => setSelectedVideo(e.target.files?.[0] || null)}
                   className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
                   disabled={isUploading}
                 />
                 {selectedVideo && (
                   <p className="text-sm text-muted-foreground mt-2">
-                    Vídeo selecionado: {selectedVideo.name}
+                    Vídeo selecionado: {selectedVideo.name} ({(selectedVideo.size / (1024 * 1024)).toFixed(2)} MB)
                   </p>
                 )}
               </div>
