@@ -10,6 +10,7 @@ import { AdminAudioSection } from '@/components/AdminAudioSection';
 import { VideoSection } from '@/components/VideoSection';
 import { FluxoAudioSection } from '@/components/FluxoAudioSection';
 import { FluxoVideoSection } from '@/components/FluxoVideoSection';
+import { PdfSection } from '@/components/PdfSection';
 import { QualificationInfoSection } from '@/components/QualificationInfoSection';
 import { InstitutionalSection } from '@/components/InstitutionalSection';
 import { MissionVisionValuesSection } from '@/components/MissionVisionValuesSection';
@@ -228,6 +229,15 @@ const Index = () => {
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <FluxoVideoSection darkMode={darkMode} userViewMode={userViewMode} />
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="pdf" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors">
+                  <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
+                    <h2 className="text-xl font-black text-primary">📄 Materiais em PDF</h2>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-0 pb-0">
+                    <PdfSection darkMode={darkMode} userViewMode={userViewMode} />
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
