@@ -7,17 +7,15 @@ import { useScriptCheckedItems } from '@/hooks/useScriptCheckedItems';
 
 interface ScriptSectionsProps {
   darkMode: boolean;
+  userViewMode?: boolean;
 }
 
-export const ScriptSections = ({ darkMode }: ScriptSectionsProps) => {
+export const ScriptSections = ({ darkMode, userViewMode = false }: ScriptSectionsProps) => {
   const { notes, saveNote, loading: notesLoading } = useScriptNotes();
   const { checkedItems, toggleCheck, loading: checkedLoading } = useScriptCheckedItems();
   
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [showNotes, setShowNotes] = useState<Record<string, boolean>>({});
-  const [audioFiles, setAudioFiles] = useState<Record<string, { url: string; name: string }>>({});
-  const [playingAudio, setPlayingAudio] = useState<string | null>(null);
-  const [showAudioInput, setShowAudioInput] = useState<Record<string, boolean>>({});
 
   const toggleSection = (section: string) => {
     setExpandedSections((prev) => ({
@@ -40,20 +38,6 @@ export const ScriptSections = ({ darkMode }: ScriptSectionsProps) => {
       ...prev,
       [key]: !prev[key],
     }));
-  };
-
-  const toggleAudioPlay = (itemId: string) => {
-    setPlayingAudio(playingAudio === itemId ? null : itemId);
-  };
-
-  const handleAudioLinkSave = (sectionId: string, link: string) => {
-    if (link.trim()) {
-      setAudioFiles((prev) => ({
-        ...prev,
-        [sectionId]: { url: link.trim(), name: 'Áudio da etapa' },
-      }));
-      setShowAudioInput((prev) => ({ ...prev, [sectionId]: false }));
-    }
   };
 
   const closeAllSections = () => {
@@ -86,14 +70,7 @@ export const ScriptSections = ({ darkMode }: ScriptSectionsProps) => {
             onNoteChange={handleNoteChange}
             showNotes={showNotes}
             onToggleNotes={toggleNotes}
-            audioFile={audioFiles[section.id]}
-            playingAudio={playingAudio}
-            onToggleAudioPlay={toggleAudioPlay}
-            onAudioLinkSave={handleAudioLinkSave}
-            showAudioInput={showAudioInput[section.id] || false}
-            setShowAudioInput={(show) =>
-              setShowAudioInput((prev) => ({ ...prev, [section.id]: show }))
-            }
+            userViewMode={userViewMode}
           />
         ))}
       </div>

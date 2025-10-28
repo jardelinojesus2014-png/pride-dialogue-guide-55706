@@ -448,6 +448,51 @@ export type Database = {
         }
         Relationships: []
       }
+      script_items: {
+        Row: {
+          alternatives: string[] | null
+          collect: string[] | null
+          created_at: string
+          display_order: number
+          id: string
+          item_id: string
+          label: string
+          script: string
+          section_id: string
+          tips: string[] | null
+          updated_at: string
+          warnings: string[] | null
+        }
+        Insert: {
+          alternatives?: string[] | null
+          collect?: string[] | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          item_id: string
+          label: string
+          script: string
+          section_id: string
+          tips?: string[] | null
+          updated_at?: string
+          warnings?: string[] | null
+        }
+        Update: {
+          alternatives?: string[] | null
+          collect?: string[] | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          item_id?: string
+          label?: string
+          script?: string
+          section_id?: string
+          tips?: string[] | null
+          updated_at?: string
+          warnings?: string[] | null
+        }
+        Relationships: []
+      }
       script_notes: {
         Row: {
           created_at: string

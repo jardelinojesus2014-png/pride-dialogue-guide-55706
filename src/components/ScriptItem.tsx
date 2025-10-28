@@ -1,8 +1,8 @@
 import { CheckCircle2, StickyNote } from 'lucide-react';
-import { ScriptItemData } from '@/data/sectionsData';
+import { ScriptItem as ScriptItemType } from '@/hooks/useScriptItems';
 
 interface ScriptItemProps {
-  item: ScriptItemData;
+  item: ScriptItemType;
   darkMode: boolean;
   isChecked: boolean;
   onToggleCheck: () => void;
@@ -64,6 +64,7 @@ export const ScriptItem = ({
             </div>
           )}
 
+          {/* Script Principal */}
           <div className="bg-muted/50 p-4 rounded-lg border border-border mb-2">
             <div className="text-foreground leading-relaxed space-y-3">
               {item.script.split('(aguardar)').map((part, idx, arr) => (
@@ -79,22 +80,34 @@ export const ScriptItem = ({
             </div>
           </div>
 
-          {item.note && (
-            <div className="bg-blue-500/10 border-l-4 border-blue-500 p-3 rounded text-sm mb-2">
+          {/* Alternativas */}
+          {item.alternatives && item.alternatives.length > 0 && item.alternatives.map((alternative, idx) => (
+            <div key={idx} className="bg-blue-500/10 border-l-4 border-blue-500 p-3 rounded text-sm mb-2">
               <p className="text-foreground">
-                <strong>Alternativa:</strong> {item.note}
+                <strong>Alternativa:</strong> {alternative}
               </p>
             </div>
-          )}
+          ))}
 
-          {item.tip && (
-            <div className="bg-accent/10 border-l-4 border-accent p-3 rounded text-sm mb-2">
+          {/* Dicas */}
+          {item.tips && item.tips.length > 0 && item.tips.map((tip, idx) => (
+            <div key={idx} className="bg-accent/10 border-l-4 border-accent p-3 rounded text-sm mb-2">
               <p className="text-foreground">
-                💡 <strong>Dica:</strong> {item.tip}
+                💡 <strong>Dica:</strong> {tip}
               </p>
             </div>
-          )}
+          ))}
 
+          {/* Warnings */}
+          {item.warnings && item.warnings.length > 0 && item.warnings.map((warning, idx) => (
+            <div key={idx} className="bg-red-50 dark:bg-red-950/20 border-2 border-red-500 dark:border-red-600 rounded-lg p-3 text-sm mb-2 text-red-900 dark:text-red-200">
+              <p>
+                ⚠️ <strong>Atenção/Cuidado:</strong> {warning}
+              </p>
+            </div>
+          ))}
+
+          {/* Informações a Coletar */}
           {item.collect && item.collect.length > 0 && (
             <div className="bg-green-500/10 border border-green-500/30 p-3 rounded-lg text-sm">
               <p className="font-bold mb-2 flex items-center gap-2 text-green-700 dark:text-green-400">

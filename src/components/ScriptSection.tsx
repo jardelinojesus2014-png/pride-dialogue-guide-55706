@@ -1,16 +1,26 @@
-import { ChevronDown, ChevronRight, Upload, Play, Pause, X, Music } from 'lucide-react';
+import { ChevronDown, ChevronRight, Upload, Music, Edit, Plus, X } from 'lucide-react';
 import { useState } from 'react';
 import { ScriptItem } from './ScriptItem';
-import { Section } from '@/data/sectionsData';
+import { ScriptItemEditor } from './ScriptItemEditor';
 import { AudioUploadDialog } from './AudioUploadDialog';
 import { AudioFilesList } from './AudioFilesList';
 import { useUserAudioFiles } from '@/hooks/useUserAudioFiles';
+import { useScriptItems, useUpdateScriptItem, useDeleteScriptItem } from '@/hooks/useScriptItems';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { Button } from './ui/button';
+import { Input } from './ui/input';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from './ui/collapsible';
+
+interface Section {
+  id: string;
+  title: string;
+  subtitle: string;
+  colorClass: string;
+}
 
 interface ScriptSectionProps {
   section: Section;
@@ -23,12 +33,7 @@ interface ScriptSectionProps {
   onNoteChange: (sectionId: string, itemId: string, value: string) => void;
   showNotes: Record<string, boolean>;
   onToggleNotes: (sectionId: string, itemId: string) => void;
-  audioFile?: { url: string; name: string };
-  playingAudio: string | null;
-  onToggleAudioPlay: (itemId: string) => void;
-  onAudioLinkSave: (sectionId: string, link: string) => void;
-  showAudioInput: boolean;
-  setShowAudioInput: (show: boolean) => void;
+  userViewMode?: boolean;
 }
 
 export const ScriptSection = ({
@@ -42,19 +47,28 @@ export const ScriptSection = ({
   onNoteChange,
   showNotes,
   onToggleNotes,
-  audioFile,
-  playingAudio,
-  onToggleAudioPlay,
-  onAudioLinkSave,
-  showAudioInput,
-  setShowAudioInput,
+  userViewMode = false,
 }: ScriptSectionProps) => {
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [showAudioList, setShowAudioList] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const { audioFiles, uploadAudioFile, deleteAudioFile, loading } = useUserAudioFiles(section.id);
+  const { data: items = [], isLoading } = useScriptItems(section.id);
+  const updateItem = useUpdateScriptItem();
+  const deleteItem = useDeleteScriptItem();
+  const { isAdmin, loading: adminLoading } = useIsAdmin();
+  const effectiveIsAdmin = isAdmin && !userViewMode;
 
   const handleUpload = async (title: string, audioBlob: Blob, durationSeconds?: number) => {
     await uploadAudioFile(section.id, title, audioBlob, durationSeconds);
+  };
+
+  const handleMoveItem = (itemId: string, direction: 'up' | 'down') => {
+    const item = items.find((i) => i.id === itemId);
+    if (!item) return;
+
+    const newOrder = direction === 'up' ? item.display_order - 1.5 : item.display_order + 1.5;
+    updateItem.mutate({ id: itemId, display_order: newOrder });
   };
 
   return (
@@ -104,58 +118,20 @@ export const ScriptSection = ({
             </button>
           )}
 
-          {!showAudioInput ? (
+          {!adminLoading && effectiveIsAdmin && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setShowAudioInput(true);
+                setIsEditMode(!isEditMode);
               }}
-              className="bg-muted hover:bg-muted/80 p-2 rounded-lg transition-all duration-300 group relative"
-              title="Adicionar link de áudio externo"
+              className={`${
+                isEditMode ? 'bg-destructive text-destructive-foreground' : 'bg-muted'
+              } hover:opacity-80 p-2 rounded-lg transition-all duration-300 group relative`}
+              title={isEditMode ? 'Sair da edição' : 'Editar seção'}
             >
-              <Play className="w-4 h-4 text-muted-foreground" />
+              <Edit className="w-4 h-4" />
               <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10 shadow-lg">
-                Link externo
-              </span>
-            </button>
-          ) : (
-            <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-              <input
-                type="text"
-                placeholder="Cole o link do áudio..."
-                className="px-3 py-1.5 rounded-lg text-sm bg-card border-2 border-input focus:border-accent focus:outline-none text-foreground"
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    onAudioLinkSave(section.id, (e.target as HTMLInputElement).value);
-                  }
-                }}
-                autoFocus
-              />
-              <button
-                onClick={() => setShowAudioInput(false)}
-                className="text-destructive hover:text-destructive/80"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          )}
-
-          {audioFile && !showAudioInput && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleAudioPlay(section.id);
-              }}
-              className="bg-muted hover:bg-muted/80 p-2 rounded-lg transition-all duration-300 group relative"
-              title="Reproduzir áudio"
-            >
-              {playingAudio === section.id ? (
-                <Pause className="w-4 h-4 text-muted-foreground" />
-              ) : (
-                <Play className="w-4 h-4 text-muted-foreground" />
-              )}
-              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10 shadow-lg">
-                Áudio da etapa
+                {isEditMode ? 'Sair da Edição' : 'Editar Seção'}
               </span>
             </button>
           )}
@@ -167,17 +143,6 @@ export const ScriptSection = ({
           )}
         </div>
       </button>
-
-      {audioFile && playingAudio === section.id && isExpanded && (
-        <div className="px-5 pt-3">
-          <audio
-            src={audioFile.url}
-            controls
-            className="w-full"
-            onEnded={() => onToggleAudioPlay(section.id)}
-          />
-        </div>
-      )}
 
       {isExpanded && (
         <div className="p-5 space-y-4">
@@ -200,22 +165,39 @@ export const ScriptSection = ({
             </div>
           )}
 
-          {section.items.map((item) => {
-            const key = `${section.id}-${item.id}`;
-            return (
-              <ScriptItem
-                key={item.id}
-                item={item}
-                darkMode={darkMode}
-                isChecked={checkedItems[key] || false}
-                onToggleCheck={() => onToggleCheck(section.id, item.id)}
-                note={notes[key] || ''}
-                onNoteChange={(value) => onNoteChange(section.id, item.id, value)}
-                showNote={showNotes[key] || false}
-                onToggleNote={() => onToggleNotes(section.id, item.id)}
-              />
-            );
-          })}
+          {isLoading ? (
+            <p className="text-muted-foreground">Carregando...</p>
+          ) : (
+            <>
+              {items.map((item, index) => {
+                const key = `${section.id}-${item.item_id}`;
+                return isEditMode && effectiveIsAdmin ? (
+                  <ScriptItemEditor
+                    key={item.id}
+                    item={item}
+                    onUpdate={(updated) => updateItem.mutate(updated)}
+                    onDelete={(id) => deleteItem.mutate(id)}
+                    onMoveUp={() => handleMoveItem(item.id, 'up')}
+                    onMoveDown={() => handleMoveItem(item.id, 'down')}
+                    canMoveUp={index > 0}
+                    canMoveDown={index < items.length - 1}
+                  />
+                ) : (
+                  <ScriptItem
+                    key={item.id}
+                    item={item}
+                    darkMode={darkMode}
+                    isChecked={checkedItems[key] || false}
+                    onToggleCheck={() => onToggleCheck(section.id, item.item_id)}
+                    note={notes[key] || ''}
+                    onNoteChange={(value) => onNoteChange(section.id, item.item_id, value)}
+                    showNote={showNotes[key] || false}
+                    onToggleNote={() => onToggleNotes(section.id, item.item_id)}
+                  />
+                );
+              })}
+            </>
+          )}
         </div>
       )}
 
