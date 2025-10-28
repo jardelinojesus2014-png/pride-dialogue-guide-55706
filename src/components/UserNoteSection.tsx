@@ -44,7 +44,7 @@ export const UserNoteSection = ({ itemId }: UserNoteSectionProps) => {
   };
 
   return (
-    <>
+    <div className="flex-1">
       <button
         onClick={handleToggle}
         className={`${
@@ -88,6 +88,15 @@ export const UserNoteSection = ({ itemId }: UserNoteSectionProps) => {
           </div>
         </div>
       )}
-    </>
+
+      {/* Exibir nota salva no mesmo estilo das dicas */}
+      {userNote && !showNote && (
+        <div className="bg-yellow-50/50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-600 p-4 rounded text-sm mt-3">
+          <p className="text-foreground">
+            <span className="inline-block">📝</span> <strong>Nota pessoal:</strong> {userNote.note}
+          </p>
+        </div>
+      )}
+    </div>
   );
 };
