@@ -96,14 +96,9 @@ export const QualificationInfoSection = ({ darkMode, userViewMode = false }: Qua
                   canMoveDown={index < categoryItems.length - 1}
                 />
               ) : (
-                <div className="flex items-start gap-2">
-                  {/* Ícone de nota do usuário - fora do contorno */}
-                  <div className="mt-1">
-                    <UserNoteSection itemId={item.id} />
-                  </div>
-                  
+                <div className="space-y-2">
                   {/* Conteúdo do tópico */}
-                  <div className="flex-1 bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-950/20 dark:to-green-950/20 border-2 border-blue-400 dark:border-blue-600 rounded-lg p-3">
+                  <div className="bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-950/20 dark:to-green-950/20 border-2 border-blue-400 dark:border-blue-600 rounded-lg p-3">
                     <div className="flex items-start gap-3">
                       {item.spin_type && <SpinBadge type={item.spin_type} />}
                       <span className="text-primary font-bold text-lg">•</span>
@@ -119,6 +114,12 @@ export const QualificationInfoSection = ({ darkMode, userViewMode = false }: Qua
                         {item.examples && item.examples.map((example, idx) => (
                           <div key={idx} className="bg-purple-50 dark:bg-purple-950/20 border border-purple-300 dark:border-purple-700 rounded-lg p-3 text-sm text-foreground">
                             ✨ <strong>Exemplo:</strong> {example}
+                          </div>
+                        ))}
+                        
+                        {item.warnings && item.warnings.map((warning, idx) => (
+                          <div key={idx} className="bg-red-50 dark:bg-red-950/20 border-2 border-red-500 dark:border-red-600 rounded-lg p-3 text-sm text-red-900 dark:text-red-200">
+                            ⚠️ <strong>Atenção/Cuidado:</strong> {warning}
                           </div>
                         ))}
                         
@@ -161,6 +162,9 @@ export const QualificationInfoSection = ({ darkMode, userViewMode = false }: Qua
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Nota pessoal do usuário - embaixo do conteúdo */}
+                  <UserNoteSection itemId={item.id} />
                 </div>
               )}
             </div>
