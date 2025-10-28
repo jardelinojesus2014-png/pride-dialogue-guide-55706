@@ -73,76 +73,79 @@ export const ScriptSection = ({
 
   return (
     <div className="bg-card rounded-lg shadow-md overflow-hidden border-2 border-border hover:shadow-xl hover:border-accent transition-all duration-300">
-      <button
-        onClick={onToggle}
-        className={`w-full p-5 flex items-center justify-between ${section.colorClass} border-l-4 border-accent transition-all hover:opacity-90 hover:border-l-8`}
-      >
-        <div className="text-left flex-1">
-          <h2 className="text-base sm:text-lg font-bold text-primary">{section.title}</h2>
-          <p className="text-sm mt-1 text-muted-foreground">{section.subtitle}</p>
-        </div>
+      <div className="w-full">
+        <div
+          className={`w-full p-5 flex items-center justify-between ${section.colorClass} border-l-4 border-accent transition-all hover:opacity-90 hover:border-l-8 cursor-pointer`}
+        >
+          <div className="text-left flex-1" onClick={onToggle}>
+            <h2 className="text-base sm:text-lg font-bold text-primary">{section.title}</h2>
+            <p className="text-sm mt-1 text-muted-foreground">{section.subtitle}</p>
+          </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowUploadDialog(true);
-            }}
-            className="bg-muted hover:bg-muted/80 p-2 rounded-lg transition-all duration-300 group relative"
-            title="Gravar ou fazer upload de áudio"
-          >
-            <Upload className="w-4 h-4 text-muted-foreground" />
-            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10 shadow-lg">
-              Adicionar áudio
-            </span>
-          </button>
-
-          {audioFiles.length > 0 && (
+          <div className="flex items-center gap-3">
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setShowAudioList(!showAudioList);
+                setShowUploadDialog(true);
               }}
               className="bg-muted hover:bg-muted/80 p-2 rounded-lg transition-all duration-300 group relative"
-              title="Ver áudios salvos"
+              title="Gravar ou fazer upload de áudio"
             >
-              <Music className="w-4 h-4 text-muted-foreground" />
-              {audioFiles.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-xs w-4 h-4 rounded-full flex items-center justify-center">
-                  {audioFiles.length}
+              <Upload className="w-4 h-4 text-muted-foreground" />
+              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                Adicionar áudio
+              </span>
+            </button>
+
+            {audioFiles.length > 0 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowAudioList(!showAudioList);
+                }}
+                className="bg-muted hover:bg-muted/80 p-2 rounded-lg transition-all duration-300 group relative"
+                title="Ver áudios salvos"
+              >
+                <Music className="w-4 h-4 text-muted-foreground" />
+                {audioFiles.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-xs w-4 h-4 rounded-full flex items-center justify-center">
+                    {audioFiles.length}
+                  </span>
+                )}
+                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                  {audioFiles.length} áudio{audioFiles.length !== 1 ? 's' : ''}
                 </span>
+              </button>
+            )}
+
+            {!adminLoading && effectiveIsAdmin && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsEditMode(!isEditMode);
+                }}
+                className={`${
+                  isEditMode ? 'bg-destructive text-destructive-foreground' : 'bg-muted'
+                } hover:opacity-80 p-2 rounded-lg transition-all duration-300 group relative`}
+                title={isEditMode ? 'Sair da edição' : 'Editar seção'}
+              >
+                <Edit className="w-4 h-4" />
+                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                  {isEditMode ? 'Sair da Edição' : 'Editar Seção'}
+                </span>
+              </button>
+            )}
+
+            <div onClick={onToggle} className="cursor-pointer">
+              {isExpanded ? (
+                <ChevronDown className="w-5 h-5 text-primary flex-shrink-0" />
+              ) : (
+                <ChevronRight className="w-5 h-5 text-primary flex-shrink-0" />
               )}
-              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10 shadow-lg">
-                {audioFiles.length} áudio{audioFiles.length !== 1 ? 's' : ''}
-              </span>
-            </button>
-          )}
-
-          {!adminLoading && effectiveIsAdmin && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsEditMode(!isEditMode);
-              }}
-              className={`${
-                isEditMode ? 'bg-destructive text-destructive-foreground' : 'bg-muted'
-              } hover:opacity-80 p-2 rounded-lg transition-all duration-300 group relative`}
-              title={isEditMode ? 'Sair da edição' : 'Editar seção'}
-            >
-              <Edit className="w-4 h-4" />
-              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10 shadow-lg">
-                {isEditMode ? 'Sair da Edição' : 'Editar Seção'}
-              </span>
-            </button>
-          )}
-
-          {isExpanded ? (
-            <ChevronDown className="w-5 h-5 text-primary flex-shrink-0" />
-          ) : (
-            <ChevronRight className="w-5 h-5 text-primary flex-shrink-0" />
-          )}
+            </div>
+          </div>
         </div>
-      </button>
+      </div>
 
       {isExpanded && (
         <div className="p-5 space-y-4">
