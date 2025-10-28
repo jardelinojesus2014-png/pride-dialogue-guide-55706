@@ -16,6 +16,7 @@ import { MissionVisionValuesSection } from '@/components/MissionVisionValuesSect
 import { MotivationalPopup } from '@/components/MotivationalPopup';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import logoPride from '@/assets/Logo_Pride.png';
+import logoPrideGold from '@/assets/Logo_Pride-2.png';
 
 const Index = () => {
   const { signOut, user } = useAuth();
@@ -107,12 +108,20 @@ const Index = () => {
 
           {/* Tabs Navigation */}
           <Tabs defaultValue="prospeccao" className="w-full">
-            <TabsList className="w-full grid grid-cols-2 mb-6 h-auto p-2 bg-gradient-hero rounded-lg">
+            <TabsList className="w-full grid grid-cols-3 mb-6 h-auto p-2 bg-gradient-hero rounded-lg">
               <TabsTrigger 
                 value="prospeccao" 
                 className="text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all"
               >
                 Roteiro de Prospecção SDR
+              </TabsTrigger>
+              <TabsTrigger 
+                value="pride" 
+                className="text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all flex items-center justify-center gap-2"
+              >
+                <img src={logoPrideGold} alt="Pride" className="w-8 h-8 object-contain" />
+                <span className="hidden sm:inline">Conheça a Pride Corretora</span>
+                <span className="sm:hidden">Pride</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="fluxo" 
@@ -150,13 +159,15 @@ const Index = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="fluxo" className="mt-0">
+            <TabsContent value="pride" className="mt-0">
               {/* Institutional Section */}
               <InstitutionalSection darkMode={darkMode} userViewMode={userViewMode} />
 
               {/* Mission Vision Values Section */}
               <MissionVisionValuesSection darkMode={darkMode} userViewMode={userViewMode} />
+            </TabsContent>
 
+            <TabsContent value="fluxo" className="mt-0">
               {/* Qualification Info Section */}
               <QualificationInfoSection darkMode={darkMode} userViewMode={userViewMode} />
 
