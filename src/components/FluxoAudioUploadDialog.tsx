@@ -22,9 +22,9 @@ export const FluxoAudioUploadDialog = ({
   onUploadSuccess,
 }: FluxoAudioUploadDialogProps) => {
   const [uploading, setUploading] = useState(false);
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState<string>('');
   const [file, setFile] = useState<File | null>(null);
-  const [driveLink, setDriveLink] = useState('');
+  const [driveLink, setDriveLink] = useState<string>('');
   const [uploadMode, setUploadMode] = useState<'file' | 'link'>('file');
 
   const resetForm = () => {
@@ -136,12 +136,31 @@ export const FluxoAudioUploadDialog = ({
 
     setUploading(true);
     try {
-      const fileIdMatch = driveLink.match(/\/d\/([^/]+)/);
-      if (!fileIdMatch) {
-        throw new Error('Link do Google Drive inválido');
+      // Support multiple Google Drive URL formats
+      let fileId = '';
+      
+      // Try to match /d/ format
+      let fileIdMatch = driveLink.match(/\/d\/([^/?]+)/);
+      if (fileIdMatch) {
+        fileId = fileIdMatch[1];
+      } else {
+        // Try to match id= format
+        fileIdMatch = driveLink.match(/[?&]id=([^&]+)/);
+        if (fileIdMatch) {
+          fileId = fileIdMatch[1];
+        }
       }
 
-      const fileId = fileIdMatch[1];
+      if (!fileId) {
+        toast({
+          title: 'Link inválido',
+          description: 'Por favor, insira um link válido do Google Drive.',
+          variant: 'destructive',
+        });
+        setUploading(false);
+        return;
+      }
+
       const directUrl = `https://drive.google.com/uc?id=${fileId}&export=download`;
 
       const { data: userData } = await supabase.auth.getUser();
@@ -241,10 +260,16 @@ export const FluxoAudioUploadDialog = ({
               </label>
               <input
                 type="file"
-                accept="audio/*"
+                accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg,audio/aac,audio/m4a,audio/*"
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
                 className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground"
+                disabled={uploading}
               />
+              {file && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  Arquivo selecionado: {file.name} ({(file.size / (1024 * 1024)).toFixed(2)} MB)
+                </p>
+              )}
             </div>
           ) : (
             <div>
