@@ -108,22 +108,22 @@ const Index = () => {
 
           {/* Tabs Navigation */}
           <Tabs defaultValue="prospeccao" className="w-full">
-            <TabsList className="w-full grid grid-cols-4 mb-6 h-auto p-2 bg-gradient-hero rounded-lg">
+            <TabsList className="w-full flex mb-6 h-auto p-2 bg-gradient-hero rounded-lg gap-2">
               <TabsTrigger 
                 value="prospeccao" 
-                className="text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all"
+                className="flex-1 text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all"
               >
                 Roteiro de Prospecção SDR
               </TabsTrigger>
               <TabsTrigger 
                 value="fluxo" 
-                className="text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all"
+                className="flex-1 text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all"
               >
                 Materiais Adicionais
               </TabsTrigger>
               <TabsTrigger 
                 value="pride" 
-                className="text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all flex items-center justify-center gap-2"
+                className="flex-1 text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all flex items-center justify-center gap-2"
               >
                 <img src={logoPrideGold} alt="Pride" className="w-8 h-8 object-contain" />
                 <span className="hidden sm:inline">Conheça a Pride Corretora</span>
@@ -131,7 +131,7 @@ const Index = () => {
               </TabsTrigger>
               <TabsTrigger 
                 value="avaliacoes" 
-                className="text-sm sm:text-base font-black py-2 px-3 data-[state=active]:bg-accent data-[state=active]:text-primary data-[state=inactive]:text-accent/70 rounded-lg transition-all"
+                className="flex-[0.6] text-sm sm:text-base font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-primary data-[state=inactive]:text-accent/70 rounded-lg transition-all"
               >
                 Avaliações
               </TabsTrigger>
