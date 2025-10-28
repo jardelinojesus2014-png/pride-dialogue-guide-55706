@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Moon, Sun, LogOut, Shield, Eye, EyeOff } from 'lucide-react';
+import { Moon, Sun, LogOut, Shield, Eye, EyeOff, Star } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useNavigate } from 'react-router-dom';
@@ -131,8 +131,9 @@ const Index = () => {
               </TabsTrigger>
               <TabsTrigger 
                 value="avaliacoes" 
-                className="flex-[0.6] text-sm sm:text-base font-black py-3 bg-accent text-primary hover:bg-accent/90 data-[state=active]:bg-accent data-[state=active]:text-primary rounded-lg transition-all"
+                className="flex-none text-sm sm:text-base font-black py-3 px-4 bg-accent text-primary hover:bg-accent/90 data-[state=active]:bg-accent data-[state=active]:text-primary rounded-lg transition-all flex items-center gap-2"
               >
+                <Star className="w-5 h-5" />
                 Avaliações
               </TabsTrigger>
             </TabsList>
