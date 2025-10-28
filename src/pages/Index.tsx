@@ -225,7 +225,7 @@ const Index = () => {
 
                 <AccordionItem value="audio" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
-                    <h2 className="text-xl font-black text-primary">🎧 Áudios do Fluxo</h2>
+                    <h2 className="text-xl font-black text-primary">🎧 Áudios (Treinamentos)</h2>
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <FluxoAudioSection darkMode={darkMode} userViewMode={userViewMode} />
@@ -234,7 +234,7 @@ const Index = () => {
 
                 <AccordionItem value="video" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
-                    <h2 className="text-xl font-black text-primary">🎬 Vídeos do Fluxo</h2>
+                    <h2 className="text-xl font-black text-primary">🎬 Vídeos (Treinamentos)</h2>
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <FluxoVideoSection darkMode={darkMode} userViewMode={userViewMode} />
