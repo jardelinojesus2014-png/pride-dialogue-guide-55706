@@ -1,7 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { X, ArrowRight, ArrowLeft } from 'lucide-react';
-import { Textarea } from '@/components/ui/textarea';
-import { usePurposeReflections } from '@/hooks/usePurposeReflections';
 
 interface PurposePopupProps {
   onClose: () => void;
@@ -9,36 +7,6 @@ interface PurposePopupProps {
 
 export const PurposePopup = ({ onClose }: PurposePopupProps) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const { reflections, saveReflection, isSaving } = usePurposeReflections();
-  
-  const [answers, setAnswers] = useState({
-    why: '',
-    why_here: '',
-    what_control: '',
-    improve_what: '',
-    strengths: '',
-    what_today: '',
-  });
-
-  // Load existing reflections when component mounts
-  useEffect(() => {
-    if (reflections && reflections.length > 0) {
-      const latest = reflections[0];
-      setAnswers({
-        why: latest.why || '',
-        why_here: latest.why_here || '',
-        what_control: latest.what_control || '',
-        improve_what: latest.improve_what || '',
-        strengths: latest.strengths || '',
-        what_today: latest.what_today || '',
-      });
-    }
-  }, [reflections]);
-
-  const handleSaveAnswers = () => {
-    saveReflection(answers);
-    onClose();
-  };
 
   const steps = [
     // Etapa 0: Introdução
@@ -234,7 +202,7 @@ export const PurposePopup = ({ onClose }: PurposePopupProps) => {
         </div>
       ),
     },
-    // Etapa 7: Conclusão
+    // Etapa 7: Conclusão com botão para seção
     {
       type: 'conclusion',
       content: (
@@ -259,103 +227,24 @@ export const PurposePopup = ({ onClose }: PurposePopupProps) => {
           </p>
           
           <div className="bg-gradient-to-r from-orange-500/20 to-purple-500/20 rounded-xl p-8 border-2 border-orange-500/40 mt-8">
-            <p className="text-lg md:text-xl text-white/90 leading-relaxed">
+            <p className="text-lg md:text-xl text-white/90 leading-relaxed mb-6">
               Essas respostas estão dentro de você.
               <br />
               <span className="font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-red-500 to-purple-500">
                 Só você pode encontrá-las.
               </span>
             </p>
-          </div>
-        </div>
-      ),
-    },
-    // Etapa 8: Registro de Respostas
-    {
-      type: 'answers',
-      content: (
-        <div className="space-y-6 animate-fade-in">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-red-500 to-purple-500 mb-4">
-              Registre suas respostas
-            </h2>
-            <p className="text-white/70 text-lg">
-              Escreva suas reflexões. Elas ficarão salvas para você revisar quando quiser.
+            
+            <button
+              onClick={onClose}
+              className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-black px-8 py-4 rounded-full text-xl shadow-2xl transition-all duration-300 hover:scale-110 flex items-center gap-2 mx-auto"
+            >
+              Ir para Minhas Reflexões 📝
+            </button>
+            
+            <p className="text-white/60 text-sm mt-4">
+              Você pode registrar suas respostas na aba "Materiais Adicionais"
             </p>
-          </div>
-
-          <div className="space-y-6 max-h-[400px] overflow-y-auto pr-4">
-            <div>
-              <label className="block text-white font-bold mb-2 text-lg">
-                💭 Qual o seu porquê?
-              </label>
-              <Textarea
-                value={answers.why}
-                onChange={(e) => setAnswers({ ...answers, why: e.target.value })}
-                placeholder="Seu objetivo, seu propósito..."
-                className="min-h-[100px] bg-white/10 border-white/20 text-white placeholder:text-white/40"
-              />
-            </div>
-
-            <div>
-              <label className="block text-white font-bold mb-2 text-lg">
-                🤔 Por que aqui?
-              </label>
-              <Textarea
-                value={answers.why_here}
-                onChange={(e) => setAnswers({ ...answers, why_here: e.target.value })}
-                placeholder="Por que este lugar faz sentido para você?"
-                className="min-h-[100px] bg-white/10 border-white/20 text-white placeholder:text-white/40"
-              />
-            </div>
-
-            <div>
-              <label className="block text-white font-bold mb-2 text-lg">
-                💡 O que está no seu controle?
-              </label>
-              <Textarea
-                value={answers.what_control}
-                onChange={(e) => setAnswers({ ...answers, what_control: e.target.value })}
-                placeholder="O que você pode mudar e influenciar..."
-                className="min-h-[100px] bg-white/10 border-white/20 text-white placeholder:text-white/40"
-              />
-            </div>
-
-            <div>
-              <label className="block text-white font-bold mb-2 text-lg">
-                📈 Em que você pode ser melhor?
-              </label>
-              <Textarea
-                value={answers.improve_what}
-                onChange={(e) => setAnswers({ ...answers, improve_what: e.target.value })}
-                placeholder="Onde você quer evoluir..."
-                className="min-h-[100px] bg-white/10 border-white/20 text-white placeholder:text-white/40"
-              />
-            </div>
-
-            <div>
-              <label className="block text-white font-bold mb-2 text-lg">
-                ⭐ Seus pontos fortes
-              </label>
-              <Textarea
-                value={answers.strengths}
-                onChange={(e) => setAnswers({ ...answers, strengths: e.target.value })}
-                placeholder="Por que você? O que te torna único..."
-                className="min-h-[100px] bg-white/10 border-white/20 text-white placeholder:text-white/40"
-              />
-            </div>
-
-            <div>
-              <label className="block text-white font-bold mb-2 text-lg">
-                🎯 O que você precisa fazer HOJE?
-              </label>
-              <Textarea
-                value={answers.what_today}
-                onChange={(e) => setAnswers({ ...answers, what_today: e.target.value })}
-                placeholder="O que você PRECISA fazer HOJE para CONQUISTAR seus objetivos..."
-                className="min-h-[100px] bg-white/10 border-white/20 text-white placeholder:text-white/40"
-              />
-            </div>
           </div>
         </div>
       ),
@@ -460,23 +349,13 @@ export const PurposePopup = ({ onClose }: PurposePopupProps) => {
                 <span className="hidden sm:inline">Anterior</span>
               </button>
 
-              {isLastStep ? (
-                <button
-                  onClick={handleSaveAnswers}
-                  disabled={isSaving}
-                  className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-black px-10 py-4 rounded-full text-lg shadow-2xl transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSaving ? 'SALVANDO...' : 'SALVAR RESPOSTAS 🚀'}
-                </button>
-              ) : (
-                <button
-                  onClick={goNext}
-                  className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-black px-8 py-4 rounded-full shadow-xl transition-all duration-300 hover:scale-105"
-                >
-                  <span>{isFirstStep ? 'Começar' : 'Próxima'}</span>
-                  <ArrowRight className="w-5 h-5" />
-                </button>
-              )}
+              <button
+                onClick={isLastStep ? onClose : goNext}
+                className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-black px-8 py-4 rounded-full shadow-xl transition-all duration-300 hover:scale-105"
+              >
+                <span>{isLastStep ? 'Fechar' : (isFirstStep ? 'Começar' : 'Próxima')}</span>
+                {!isLastStep && <ArrowRight className="w-5 h-5" />}
+              </button>
             </div>
           </div>
         </div>
