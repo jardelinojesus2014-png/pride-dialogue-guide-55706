@@ -260,7 +260,7 @@ export const FluxoAudioUploadDialog = ({
               </label>
               <input
                 type="file"
-                accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg,audio/aac,audio/m4a,audio/*"
+                accept=".mp3,.wav,.m4a,.ogg,.aac,.wma,.flac,audio/*"
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
                 className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground"
                 disabled={uploading}
