@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Info, Edit, Plus } from 'lucide-react';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 import { QualificationItemEditor } from './QualificationItemEditor';
 import { SpinBadge } from './SpinBadge';
 import {
@@ -18,9 +20,12 @@ interface QualificationInfoSectionProps {
 export const QualificationInfoSection = ({ darkMode }: QualificationInfoSectionProps) => {
   const { isAdmin, loading: adminLoading } = useIsAdmin();
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [newItemCategory, setNewItemCategory] = useState<'qualificacao' | 'utilizacao' | 'agendamento'>('qualificacao');
   const { data: items = [], isLoading } = useQualificationItems();
   const updateItem = useUpdateQualificationItem();
   const deleteItem = useDeleteQualificationItem();
+  const addItem = useAddQualificationItem();
 
   const qualificacaoItems = items.filter(
     (item) => item.category === 'qualificacao' || item.category === 'qualificacao_contato'
@@ -34,6 +39,22 @@ export const QualificationInfoSection = ({ darkMode }: QualificationInfoSectionP
 
     const newOrder = direction === 'up' ? item.display_order - 1.5 : item.display_order + 1.5;
     updateItem.mutate({ id: itemId, display_order: newOrder });
+  };
+
+  const handleAddNewItem = (content: string) => {
+    const maxOrder = Math.max(...items.map(i => i.display_order), 0);
+    addItem.mutate({
+      category: newItemCategory,
+      content,
+      display_order: maxOrder + 1,
+      description: null,
+      tip: null,
+      video_url: null,
+      file_url: null,
+      file_name: null,
+      spin_type: null,
+    });
+    setIsAddingNew(false);
   };
 
   const getCategoryTitle = (category: string) => {
@@ -142,16 +163,71 @@ export const QualificationInfoSection = ({ darkMode }: QualificationInfoSectionP
           </h2>
         </div>
         {!adminLoading && isAdmin && (
-          <Button
-            onClick={() => setIsEditMode(!isEditMode)}
-            variant={isEditMode ? 'destructive' : 'default'}
-            className="gap-2"
-          >
-            <Edit className="w-5 h-5" />
-            {isEditMode ? 'Sair da Edição' : 'Editar Seção'}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setIsAddingNew(true)}
+              variant="outline"
+              className="gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              Novo Item
+            </Button>
+            <Button
+              onClick={() => setIsEditMode(!isEditMode)}
+              variant={isEditMode ? 'destructive' : 'default'}
+              className="gap-2"
+            >
+              <Edit className="w-5 h-5" />
+              {isEditMode ? 'Sair da Edição' : 'Editar Seção'}
+            </Button>
+          </div>
         )}
       </div>
+
+      {isAddingNew && (
+        <div className="bg-card border-2 border-primary rounded-lg p-6 mb-6 space-y-4">
+          <h3 className="font-bold text-lg">Adicionar Novo Item</h3>
+          <div className="space-y-2">
+            <Label>Categoria</Label>
+            <select
+              value={newItemCategory}
+              onChange={(e) => setNewItemCategory(e.target.value as any)}
+              className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground"
+            >
+              <option value="qualificacao">Qualificação do Plano</option>
+              <option value="utilizacao">Dados da Utilização</option>
+              <option value="agendamento">Agendamento do Atendimento</option>
+            </select>
+          </div>
+          <div className="space-y-2">
+            <Label>Texto do Item</Label>
+            <Input
+              id="new-item-content"
+              placeholder="Ex: Tempo de Plano atual"
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                  handleAddNewItem(e.currentTarget.value);
+                }
+              }}
+            />
+          </div>
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" onClick={() => setIsAddingNew(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => {
+                const input = document.getElementById('new-item-content') as HTMLInputElement;
+                if (input?.value.trim()) {
+                  handleAddNewItem(input.value);
+                }
+              }}
+            >
+              Adicionar
+            </Button>
+          </div>
+        </div>
+      )}
 
       <div className="space-y-6">
         {/* QUALIFICAÇÃO DO PLANO */}

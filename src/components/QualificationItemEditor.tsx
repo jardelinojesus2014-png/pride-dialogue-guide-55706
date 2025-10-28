@@ -39,6 +39,23 @@ export const QualificationItemEditor = ({
   const [fileName, setFileName] = useState(item.file_name || '');
   const [fileUrl, setFileUrl] = useState(item.file_url || '');
 
+  const convertYouTubeUrl = (url: string): string => {
+    if (!url) return '';
+    
+    // Already an embed URL
+    if (url.includes('youtube.com/embed/')) return url;
+    
+    // Regular YouTube URL
+    const youtubeRegex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/;
+    const match = url.match(youtubeRegex);
+    
+    if (match && match[1]) {
+      return `https://www.youtube.com/embed/${match[1]}`;
+    }
+    
+    return url;
+  };
+
   const handleFileUpload = async (file: File) => {
     setIsUploading(true);
     try {
@@ -74,12 +91,14 @@ export const QualificationItemEditor = ({
   };
 
   const handleSave = () => {
+    const processedVideoUrl = videoUrl ? convertYouTubeUrl(videoUrl) : null;
+    
     onUpdate({
       id: item.id,
       content,
       description: description || null,
       tip: tip || null,
-      video_url: videoUrl || null,
+      video_url: processedVideoUrl,
       file_url: fileUrl || null,
       file_name: fileName || null,
       spin_type: spinType === 'none' ? null : spinType,
@@ -259,10 +278,10 @@ export const QualificationItemEditor = ({
           id={`video-${item.id}`}
           value={videoUrl}
           onChange={(e) => setVideoUrl(e.target.value)}
-          placeholder="Cole o link do vídeo (embed URL)"
+          placeholder="Cole qualquer link do YouTube (será convertido automaticamente)"
         />
         <p className="text-xs text-muted-foreground">
-          Use a URL de incorporação (embed). Ex: https://www.youtube.com/embed/VIDEO_ID
+          Aceita URLs normais do YouTube - será convertido automaticamente para embed
         </p>
       </div>
 
