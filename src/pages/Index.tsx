@@ -158,7 +158,7 @@ const Index = () => {
               <div className="mb-6 flex justify-center">
                 <button
                   onClick={() => setShowMotivationalPopup(true)}
-                  className="bg-gradient-to-r from-orange-500 via-red-600 to-purple-700 hover:from-orange-600 hover:via-red-700 hover:to-purple-800 text-white font-black px-8 py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-sm sm:text-base"
+                  className="bg-gradient-to-r from-orange-500 via-red-600 to-purple-700 hover:from-orange-600 hover:via-red-700 hover:to-purple-800 text-white font-black px-8 py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-sm sm:text-base animate-[pulse_15s_ease-in-out_infinite] opacity-95"
                   title="Mensagem motivacional"
                 >
                   🔥 Clique aqui em caso de insegurança ou medo
@@ -258,7 +258,7 @@ const Index = () => {
               <div className="mt-6 mb-6 flex justify-center">
                 <button
                   onClick={() => setShowPurposePopup(true)}
-                  className="bg-gradient-to-r from-orange-500 via-red-600 to-purple-700 hover:from-orange-600 hover:via-red-700 hover:to-purple-800 text-white font-black px-8 py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-sm sm:text-base"
+                  className="bg-gradient-to-r from-orange-500 via-red-600 to-purple-700 hover:from-orange-600 hover:via-red-700 hover:to-purple-800 text-white font-black px-8 py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-sm sm:text-base animate-[pulse_15s_ease-in-out_infinite] opacity-95"
                   title="Encontre seu propósito"
                 >
                   🔥 Se está desmotivado - CLIQUE AQUI
