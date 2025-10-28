@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Moon, Sun, LogOut, Shield, Eye, EyeOff, Star } from 'lucide-react';
+import { Moon, Sun, LogOut, Shield, Eye, EyeOff, Star, ClipboardList, BookOpen } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useNavigate } from 'react-router-dom';
@@ -111,15 +111,19 @@ const Index = () => {
             <TabsList className="w-full flex mb-6 h-auto p-2 bg-gradient-hero rounded-lg gap-2">
               <TabsTrigger 
                 value="prospeccao" 
-                className="flex-1 text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all"
+                className="flex-1 text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all flex items-center justify-center gap-2"
               >
-                Roteiro de Prospecção SDR
+                <ClipboardList className="w-5 h-5" />
+                <span className="hidden sm:inline">Roteiro de Prospecção SDR</span>
+                <span className="sm:hidden">Roteiro</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="fluxo" 
-                className="flex-1 text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all"
+                className="flex-1 text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all flex items-center justify-center gap-2"
               >
-                Materiais Adicionais
+                <BookOpen className="w-5 h-5" />
+                <span className="hidden sm:inline">Materiais Adicionais</span>
+                <span className="sm:hidden">Materiais</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="pride" 
