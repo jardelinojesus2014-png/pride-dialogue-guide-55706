@@ -90,16 +90,27 @@ export const FluxoVideoSection = ({ darkMode }: FluxoVideoSectionProps) => {
         setCurrentVideo({ url: '', title: '', description: '' });
         setShowVideoForm(false);
         loadVideos();
-      } catch (error: any) {
-        console.error('Error saving video:', error);
-        toast({
-          title: 'Erro ao adicionar vídeo',
-          description: error.message,
-          variant: 'destructive',
-        });
-      } finally {
-        setIsUploading(false);
+    } catch (error: any) {
+      console.error('Error uploading video:', error);
+      
+      let errorMessage = 'Não foi possível fazer o upload do vídeo.';
+      
+      if (error.message) {
+        errorMessage = error.message;
       }
+      
+      if (error.statusCode === '413') {
+        errorMessage = 'O arquivo é muito grande. O limite é de 50MB.';
+      }
+      
+      toast({
+        title: 'Erro ao enviar vídeo',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsUploading(false);
+    }
     } else {
       alert('Por favor, preencha o link, título e descrição do vídeo!');
     }
@@ -107,9 +118,30 @@ export const FluxoVideoSection = ({ darkMode }: FluxoVideoSectionProps) => {
 
   const uploadVideoFile = async () => {
     if (!currentVideo.title.trim() || !currentVideo.description.trim() || !selectedVideo) {
-      alert('Por favor, preencha título, descrição e selecione um arquivo de vídeo!');
+      toast({
+        title: 'Campos obrigatórios',
+        description: 'Por favor, preencha título, descrição e selecione um arquivo de vídeo!',
+        variant: 'destructive',
+      });
       return;
     }
+
+    // Check file size (50MB limit for Supabase free tier)
+    const maxSize = 50 * 1024 * 1024; // 50MB in bytes
+    if (selectedVideo.size > maxSize) {
+      toast({
+        title: 'Arquivo muito grande',
+        description: `O arquivo deve ter no máximo 50MB. Tamanho atual: ${(selectedVideo.size / (1024 * 1024)).toFixed(2)}MB`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    console.log('Starting video upload:', {
+      fileName: selectedVideo.name,
+      fileSize: `${(selectedVideo.size / (1024 * 1024)).toFixed(2)}MB`,
+      fileType: selectedVideo.type
+    });
 
     setIsUploading(true);
     try {
@@ -120,11 +152,21 @@ export const FluxoVideoSection = ({ darkMode }: FluxoVideoSectionProps) => {
       const videoExt = selectedVideo.name.split('.').pop();
       const videoFileName = `${Date.now()}_video.${videoExt}`;
 
-      const { error: videoUploadError } = await supabase.storage
-        .from('fluxo_videos')
-        .upload(videoFileName, selectedVideo);
+      console.log('Uploading to bucket fluxo_videos:', videoFileName);
 
-      if (videoUploadError) throw videoUploadError;
+      const { error: videoUploadError, data: uploadData } = await supabase.storage
+        .from('fluxo_videos')
+        .upload(videoFileName, selectedVideo, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (videoUploadError) {
+        console.error('Upload error:', videoUploadError);
+        throw videoUploadError;
+      }
+
+      console.log('Upload successful:', uploadData);
 
       const { data: videoUrlData } = supabase.storage
         .from('fluxo_videos')
