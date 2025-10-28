@@ -82,8 +82,12 @@ export default {
           },
           to: {
             height: "var(--radix-accordion-content-height)",
-          },
         },
+        shimmer: {
+          "0%": { transform: "translateX(-200%)" },
+          "100%": { transform: "translateX(200%)" },
+        },
+      },
         "accordion-up": {
           from: {
             height: "var(--radix-accordion-content-height)",
@@ -138,6 +142,7 @@ export default {
         "scale-in": "scale-in 0.4s ease-out",
         "slide-down": "slide-down 0.6s ease-out",
         "slide-up": "slide-up 0.8s ease-out",
+        shimmer: "shimmer 3s ease-in-out infinite",
       },
     },
   },
