@@ -25,10 +25,12 @@ interface Audio {
 
 interface AdminAudioSectionProps {
   darkMode: boolean;
+  userViewMode?: boolean;
 }
 
-export const AdminAudioSection = ({ darkMode }: AdminAudioSectionProps) => {
+export const AdminAudioSection = ({ darkMode, userViewMode = false }: AdminAudioSectionProps) => {
   const { isAdmin, loading: adminLoading } = useIsAdmin();
+  const effectiveIsAdmin = isAdmin && !userViewMode;
   const [audios, setAudios] = useState<Audio[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<string | null>(null);

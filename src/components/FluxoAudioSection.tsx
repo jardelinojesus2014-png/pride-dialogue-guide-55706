@@ -15,9 +15,11 @@ interface FluxoAudioFile {
 
 interface FluxoAudioSectionProps {
   darkMode: boolean;
+  userViewMode?: boolean;
 }
 
-export const FluxoAudioSection = ({ darkMode }: FluxoAudioSectionProps) => {
+export const FluxoAudioSection = ({ darkMode, userViewMode = false }: FluxoAudioSectionProps) => {
+  const effectiveIsAdmin = useIsAdmin().isAdmin && !userViewMode;
   const [audioFiles, setAudioFiles] = useState<FluxoAudioFile[]>([]);
   const [playingAudio, setPlayingAudio] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
@@ -133,7 +135,7 @@ export const FluxoAudioSection = ({ darkMode }: FluxoAudioSectionProps) => {
             Áudios de Treinamento
           </h2>
         </div>
-        {!adminLoading && isAdmin && (
+        {!adminLoading && effectiveIsAdmin && (
           <button
             onClick={() => setUploadDialogOpen(true)}
             className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
@@ -205,7 +207,7 @@ export const FluxoAudioSection = ({ darkMode }: FluxoAudioSectionProps) => {
                   </>
                 )}
 
-                {!adminLoading && isAdmin && (
+                {!adminLoading && effectiveIsAdmin && (
                   <button
                     onClick={() => handleDeleteAudio(audio.id, audio.file_url)}
                     className="bg-destructive hover:bg-destructive/90 text-destructive-foreground p-2 rounded-full transition-all duration-300 hover:scale-110"

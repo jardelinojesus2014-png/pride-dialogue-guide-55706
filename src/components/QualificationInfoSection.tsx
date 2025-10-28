@@ -16,10 +16,12 @@ import {
 
 interface QualificationInfoSectionProps {
   darkMode: boolean;
+  userViewMode?: boolean;
 }
 
-export const QualificationInfoSection = ({ darkMode }: QualificationInfoSectionProps) => {
+export const QualificationInfoSection = ({ darkMode, userViewMode = false }: QualificationInfoSectionProps) => {
   const { isAdmin, loading: adminLoading } = useIsAdmin();
+  const effectiveIsAdmin = isAdmin && !userViewMode;
   const [isEditMode, setIsEditMode] = useState(false);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [newItemCategory, setNewItemCategory] = useState<'qualificacao' | 'utilizacao' | 'agendamento'>('qualificacao');
@@ -83,7 +85,7 @@ export const QualificationInfoSection = ({ darkMode }: QualificationInfoSectionP
         {categoryItems.map((item, index) => {
           return (
             <div key={item.id}>
-              {isEditMode && isAdmin ? (
+              {isEditMode && effectiveIsAdmin ? (
                 <QualificationItemEditor
                   item={item}
                   onUpdate={(updated) => updateItem.mutate(updated)}
@@ -179,7 +181,7 @@ export const QualificationInfoSection = ({ darkMode }: QualificationInfoSectionP
             Informações Necessárias na Qualificação
           </h2>
         </div>
-        {!adminLoading && isAdmin && (
+        {!adminLoading && effectiveIsAdmin && (
           <div className="flex gap-2">
             <Button
               onClick={() => setIsAddingNew(true)}

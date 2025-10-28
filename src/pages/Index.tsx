@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Moon, Sun, FileDown, LogOut, Shield } from 'lucide-react';
+import { Moon, Sun, FileDown, LogOut, Shield, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useNavigate } from 'react-router-dom';
@@ -20,11 +20,16 @@ const Index = () => {
   const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
+  const [userViewMode, setUserViewMode] = useState(false);
   const [showMotivationalPopup, setShowMotivationalPopup] = useState(false);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
     document.documentElement.classList.toggle('dark');
+  };
+
+  const toggleUserViewMode = () => {
+    setUserViewMode(!userViewMode);
   };
 
   const exportToPrint = () => {
@@ -67,6 +72,19 @@ const Index = () => {
                   <FileDown className="w-5 h-5" />
                   <span className="hidden sm:inline">Exportar</span>
                 </button>
+                {isAdmin && (
+                  <button
+                    onClick={toggleUserViewMode}
+                    className={`${
+                      userViewMode 
+                        ? 'bg-green-500 hover:bg-green-600 text-white' 
+                        : 'bg-primary/10 hover:bg-primary/20 text-accent'
+                    } font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg`}
+                    title={userViewMode ? 'Modo Admin' : 'Visualizar como Usuário'}
+                  >
+                    {userViewMode ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                )}
                 <button
                   onClick={toggleDarkMode}
                   className="bg-primary/10 hover:bg-primary/20 text-accent font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
@@ -113,10 +131,10 @@ const Index = () => {
               <DosDonts darkMode={darkMode} />
 
               {/* Admin Audio Section */}
-              <AdminAudioSection darkMode={darkMode} />
+              <AdminAudioSection darkMode={darkMode} userViewMode={userViewMode} />
 
               {/* Video Section */}
-              <VideoSection darkMode={darkMode} />
+              <VideoSection darkMode={darkMode} userViewMode={userViewMode} />
 
               {/* Botão Motivacional - Complemento da última seção */}
               <div className="mb-6 flex justify-center">
@@ -132,13 +150,13 @@ const Index = () => {
 
             <TabsContent value="fluxo" className="mt-0">
               {/* Qualification Info Section */}
-              <QualificationInfoSection darkMode={darkMode} />
+              <QualificationInfoSection darkMode={darkMode} userViewMode={userViewMode} />
 
               {/* Fluxo Audio Section */}
-              <FluxoAudioSection darkMode={darkMode} />
+              <FluxoAudioSection darkMode={darkMode} userViewMode={userViewMode} />
 
               {/* Fluxo Video Section */}
-              <FluxoVideoSection darkMode={darkMode} />
+              <FluxoVideoSection darkMode={darkMode} userViewMode={userViewMode} />
             </TabsContent>
           </Tabs>
 

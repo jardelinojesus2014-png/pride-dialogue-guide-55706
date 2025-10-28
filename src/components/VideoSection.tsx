@@ -15,16 +15,18 @@ interface Video {
 
 interface VideoSectionProps {
   darkMode: boolean;
+  userViewMode?: boolean;
 }
 
-export const VideoSection = ({ darkMode }: VideoSectionProps) => {
+export const VideoSection = ({ darkMode, userViewMode = false }: VideoSectionProps) => {
+  const { isAdmin, loading: adminLoading } = useIsAdmin();
+  const effectiveIsAdmin = isAdmin && !userViewMode;
   const [videos, setVideos] = useState<Video[]>([]);
   const [showVideoForm, setShowVideoForm] = useState(false);
   const [currentVideo, setCurrentVideo] = useState({ url: '', title: '', description: '' });
   const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [activeTab, setActiveTab] = useState<'link' | 'upload'>('link');
-  const { isAdmin, loading: adminLoading } = useIsAdmin();
 
   useEffect(() => {
     loadVideos();
@@ -256,7 +258,7 @@ export const VideoSection = ({ darkMode }: VideoSectionProps) => {
           </div>
         </div>
 
-        {!adminLoading && isAdmin && (
+        {!adminLoading && effectiveIsAdmin && (
           <button
             onClick={handleVideoLinkAdd}
             className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
@@ -410,7 +412,7 @@ export const VideoSection = ({ darkMode }: VideoSectionProps) => {
               <div className="p-4">
                 <div className="flex items-start justify-between mb-2">
                   <h4 className="font-bold text-primary">{video.title}</h4>
-                  {!adminLoading && isAdmin && (
+                  {!adminLoading && effectiveIsAdmin && (
                     <button
                       onClick={() => deleteVideo(video.id)}
                       className="text-destructive hover:text-destructive/80 transition-colors flex-shrink-0 ml-2"
