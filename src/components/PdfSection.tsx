@@ -291,45 +291,65 @@ export const PdfSection = ({ darkMode, userViewMode }: PdfSectionProps) => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {pdfFiles.map((pdf) => (
-            <Card key={pdf.id} className="bg-gradient-subtle border-2 border-primary/20 hover:border-primary/40 transition-all p-6 hover:shadow-lg">
+            <Card key={pdf.id} className="bg-gradient-subtle border-2 border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg overflow-hidden">
               <div className="flex flex-col h-full">
-                {/* PDF Icon/Preview */}
-                <div className="bg-primary/10 rounded-lg p-6 mb-4 flex items-center justify-center">
-                  <FileText className="w-16 h-16 text-primary" />
+                {/* PDF Preview */}
+                <div className="bg-gray-100 dark:bg-gray-800 h-48 flex items-center justify-center overflow-hidden relative">
+                  {pdf.thumbnail_url ? (
+                    <img
+                      src={pdf.thumbnail_url}
+                      alt={pdf.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <iframe
+                      src={`${pdf.file_url}#toolbar=0&navpanes=0&scrollbar=0&page=1&view=FitH`}
+                      className="w-full h-full pointer-events-none"
+                      title={`Preview ${pdf.title}`}
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end justify-center pb-2">
+                    <span className="text-white text-xs font-bold bg-black/70 px-2 py-1 rounded">
+                      Prévia
+                    </span>
+                  </div>
                 </div>
 
-                {/* Title */}
-                <h3 className="text-lg font-bold text-primary mb-2 line-clamp-2">
-                  {pdf.title}
-                </h3>
+                {/* Content */}
+                <div className="p-6 flex flex-col flex-grow">
+                  {/* Title */}
+                  <h3 className="text-lg font-bold text-primary mb-2 line-clamp-2">
+                    {pdf.title}
+                  </h3>
 
-                {/* Description */}
-                {pdf.description && (
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-3 flex-grow">
-                    {pdf.description}
-                  </p>
-                )}
-
-                {/* Actions */}
-                <div className="flex gap-2 mt-auto">
-                  <Button
-                    onClick={() => handleDownload(pdf.file_url, pdf.title)}
-                    variant="default"
-                    size="sm"
-                    className="flex-1"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Baixar
-                  </Button>
-                  {showAdminFeatures && (
-                    <Button
-                      onClick={() => handleDelete(pdf.id, pdf.file_url.split('/').pop() || '')}
-                      variant="destructive"
-                      size="sm"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                  {/* Description */}
+                  {pdf.description && (
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-3 flex-grow">
+                      {pdf.description}
+                    </p>
                   )}
+
+                  {/* Actions */}
+                  <div className="flex gap-2 mt-auto">
+                    <Button
+                      onClick={() => handleDownload(pdf.file_url, pdf.title)}
+                      variant="default"
+                      size="sm"
+                      className="flex-1"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Baixar
+                    </Button>
+                    {showAdminFeatures && (
+                      <Button
+                        onClick={() => handleDelete(pdf.id, pdf.file_url.split('/').pop() || '')}
+                        variant="destructive"
+                        size="sm"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             </Card>
