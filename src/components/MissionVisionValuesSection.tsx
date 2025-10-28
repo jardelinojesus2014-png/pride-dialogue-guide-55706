@@ -42,11 +42,17 @@ export const MissionVisionValuesSection = ({ darkMode, userViewMode = false }: M
       if (error) throw error;
       
       if (mvvData) {
-        setData(mvvData);
-        setEditData({
+        const typedData: MVVData = {
+          id: mvvData.id,
           mission: mvvData.mission,
           vision: mvvData.vision,
           values: mvvData.values,
+        };
+        setData(typedData);
+        setEditData({
+          mission: typedData.mission,
+          vision: typedData.vision,
+          values: typedData.values,
         });
       }
     } catch (error: any) {

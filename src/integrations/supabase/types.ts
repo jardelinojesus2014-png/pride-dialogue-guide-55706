@@ -110,6 +110,36 @@ export type Database = {
         }
         Relationships: []
       }
+      mission_vision_values: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          mission: string
+          updated_at: string
+          values: string
+          vision: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          mission: string
+          updated_at?: string
+          values: string
+          vision: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          mission?: string
+          updated_at?: string
+          values?: string
+          vision?: string
+        }
+        Relationships: []
+      }
       podcast_links: {
         Row: {
           created_at: string | null
