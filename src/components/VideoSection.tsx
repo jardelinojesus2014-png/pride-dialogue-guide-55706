@@ -242,26 +242,12 @@ export const VideoSection = ({ darkMode, userViewMode = false }: VideoSectionPro
   };
 
   return (
-    <div className="bg-card rounded-xl shadow-lg p-6 mb-8 border-2 border-border">
+    <div className="p-6">
       <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-        <div className="flex items-center gap-3">
-          <div className="bg-gradient-hero rounded-full p-3 shadow-lg">
-            <svg className="w-6 h-6 text-accent" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
-            </svg>
-          </div>
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-black text-primary">🎥 Vídeos de Treinamento</h2>
-            <p className="text-sm text-muted-foreground">
-              Adicione vídeos com exemplos e simulações do roteiro
-            </p>
-          </div>
-        </div>
-
         {!adminLoading && effectiveIsAdmin && (
           <button
             onClick={handleVideoLinkAdd}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg ml-auto"
           >
             <Upload className="w-5 h-5" />
             Adicionar Vídeo

@@ -148,14 +148,28 @@ const Index = () => {
               </div>
 
               {/* Admin Audio Section */}
-              <div data-section="admin-audio">
-              <AdminAudioSection darkMode={darkMode} userViewMode={userViewMode} />
-              </div>
+              <Accordion type="multiple" className="mb-4" defaultValue={[]}>
+                <AccordionItem value="admin-audio" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="admin-audio">
+                  <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
+                    <h2 className="text-xl font-black text-primary">🎵 Áudios de Treinamento</h2>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-0 pb-0">
+                    <AdminAudioSection darkMode={darkMode} userViewMode={userViewMode} />
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
 
               {/* Video Section */}
-              <div data-section="videos">
-              <VideoSection darkMode={darkMode} userViewMode={userViewMode} />
-              </div>
+              <Accordion type="multiple" className="mb-4" defaultValue={[]}>
+                <AccordionItem value="videos" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="videos">
+                  <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
+                    <h2 className="text-xl font-black text-primary">🎥 Vídeos de Treinamento</h2>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-0 pb-0">
+                    <VideoSection darkMode={darkMode} userViewMode={userViewMode} />
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
 
               {/* Botão Motivacional - Complemento da última seção */}
               <div className="mb-6 flex justify-center">

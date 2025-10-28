@@ -158,20 +158,12 @@ export const AdminAudioSection = ({ darkMode, userViewMode = false }: AdminAudio
   }
 
   return (
-    <section className="bg-card rounded-lg shadow-xl p-6 sm:p-8 mb-6">
+    <section className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="bg-primary rounded-full p-3 shadow-lg">
-            <Music className="w-6 h-6 text-primary-foreground" />
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-primary">
-            Áudios de Treinamento
-          </h2>
-        </div>
-        {isAdmin && (
+        {effectiveIsAdmin && (
           <button
             onClick={() => setUploadDialogOpen(true)}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg ml-auto"
           >
             <Upload className="w-5 h-5" />
             Adicionar Áudio
@@ -202,7 +194,7 @@ export const AdminAudioSection = ({ darkMode, userViewMode = false }: AdminAudio
                       {formatDate(audio.created_at)}
                     </p>
                   </div>
-                  {isAdmin && (
+                  {effectiveIsAdmin && (
                     <button
                       onClick={() => setDeleteId(audio.id)}
                       className="bg-destructive hover:bg-destructive/90 text-destructive-foreground p-2 rounded-lg transition-all ml-3"
