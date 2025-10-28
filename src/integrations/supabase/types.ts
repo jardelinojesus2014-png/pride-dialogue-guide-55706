@@ -164,6 +164,39 @@ export type Database = {
         }
         Relationships: []
       }
+      qualification_items: {
+        Row: {
+          category: string
+          content: string
+          created_at: string
+          description: string | null
+          display_order: number
+          id: string
+          tip: string | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          tip?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          tip?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       script_checked_items: {
         Row: {
           created_at: string
