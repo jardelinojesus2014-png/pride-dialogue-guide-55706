@@ -8,6 +8,7 @@ export interface QualificationItem {
   content: string;
   descriptions?: string[] | null;
   tips?: string[] | null;
+  warnings?: string[] | null;
   video_urls?: string[] | null;
   file_urls?: string[] | null;
   file_names?: string[] | null;
@@ -44,6 +45,7 @@ export const useUpdateQualificationItem = () => {
           content: item.content,
           descriptions: item.descriptions,
           tips: item.tips,
+          warnings: item.warnings,
           video_urls: item.video_urls,
           file_urls: item.file_urls,
           file_names: item.file_names,

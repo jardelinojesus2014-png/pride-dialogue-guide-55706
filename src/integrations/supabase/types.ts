@@ -347,6 +347,7 @@ export type Database = {
           tips: string[] | null
           updated_at: string
           video_urls: string[] | null
+          warnings: string[] | null
         }
         Insert: {
           category: string
@@ -362,6 +363,7 @@ export type Database = {
           tips?: string[] | null
           updated_at?: string
           video_urls?: string[] | null
+          warnings?: string[] | null
         }
         Update: {
           category?: string
@@ -377,6 +379,7 @@ export type Database = {
           tips?: string[] | null
           updated_at?: string
           video_urls?: string[] | null
+          warnings?: string[] | null
         }
         Relationships: []
       }
