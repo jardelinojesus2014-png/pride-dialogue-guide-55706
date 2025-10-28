@@ -147,13 +147,22 @@ export const MissionVisionValuesSection = ({ darkMode, userViewMode = false }: M
   const activeTabData = tabs.find(t => t.id === activeTab);
 
   return (
-    <section className="bg-card rounded-lg shadow-xl p-6 sm:p-8 mb-6">
-      <div className="flex items-center justify-between mb-6">
+    <section className="relative bg-gradient-to-br from-card via-card to-primary/5 rounded-2xl shadow-2xl p-8 sm:p-10 mb-6 border-2 border-primary/20 overflow-hidden">
+      {/* Decorative corner elements */}
+      <div className="absolute top-0 left-0 w-32 h-32 border-l-4 border-t-4 border-yellow-500 rounded-tl-2xl" />
+      <div className="absolute bottom-0 right-0 w-32 h-32 border-r-4 border-b-4 border-yellow-500 rounded-br-2xl" />
+      <div className="absolute top-1/2 left-0 w-1 h-32 bg-gradient-to-b from-transparent via-yellow-500 to-transparent transform -translate-y-1/2" />
+      <div className="absolute top-1/2 right-0 w-1 h-32 bg-gradient-to-b from-transparent via-yellow-500 to-transparent transform -translate-y-1/2" />
+      
+      <div className="relative z-10 flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-black text-primary mb-2">
+          <h2 className="text-3xl sm:text-4xl font-black text-primary mb-2 flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
+              <Target className="w-6 h-6 text-white" />
+            </div>
             Conheça a Pride Corretora
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground ml-15">
             Nossa essência, propósito e compromisso
           </p>
         </div>
@@ -170,19 +179,19 @@ export const MissionVisionValuesSection = ({ darkMode, userViewMode = false }: M
       </div>
 
       {isEditing && effectiveIsAdmin ? (
-        <div className="space-y-6 bg-muted/30 p-6 rounded-lg">
+        <div className="relative z-10 space-y-6 bg-muted/50 backdrop-blur-sm p-8 rounded-xl border border-primary/20">
           {tabs.map((tab) => (
             <div key={tab.id} className="space-y-2">
               <div className="flex items-center gap-2">
                 <tab.icon className="w-5 h-5 text-primary" />
-                <label className="font-bold text-lg">{tab.label}</label>
+                <label className="font-bold text-lg text-primary">{tab.label}</label>
               </div>
               <Textarea
                 value={editData[tab.id]}
                 onChange={(e) => setEditData({ ...editData, [tab.id]: e.target.value })}
                 placeholder={`Descreva a ${tab.label.toLowerCase()} da Pride Corretora...`}
                 rows={4}
-                className="resize-none"
+                className="resize-none border-primary/30"
               />
             </div>
           ))}
@@ -211,9 +220,9 @@ export const MissionVisionValuesSection = ({ darkMode, userViewMode = false }: M
           </div>
         </div>
       ) : data ? (
-        <div className="space-y-6">
+        <div className="relative z-10 space-y-8">
           {/* Botões de navegação */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -223,25 +232,28 @@ export const MissionVisionValuesSection = ({ darkMode, userViewMode = false }: M
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`
-                    relative overflow-hidden rounded-xl p-6 transition-all duration-300 
+                    relative overflow-hidden rounded-2xl p-8 transition-all duration-300 border-2
                     ${isActive 
-                      ? `bg-gradient-to-br ${tab.color} text-white shadow-2xl scale-105` 
-                      : 'bg-muted hover:bg-muted/80 text-foreground hover:scale-102'
+                      ? `bg-gradient-to-br ${tab.color} text-white shadow-2xl scale-105 border-yellow-500` 
+                      : 'bg-card/50 backdrop-blur-sm hover:bg-muted/80 text-foreground hover:scale-102 border-primary/20'
                     }
                   `}
                 >
-                  <div className="flex flex-col items-center gap-3">
+                  <div className="flex flex-col items-center gap-4">
                     <div className={`
-                      rounded-full p-4 transition-all
-                      ${isActive ? 'bg-white/20' : 'bg-primary/10'}
+                      rounded-full p-5 transition-all border-2
+                      ${isActive ? 'bg-white/20 border-white/30' : 'bg-primary/10 border-primary/20'}
                     `}>
-                      <Icon className={`w-8 h-8 ${isActive ? 'text-white' : 'text-primary'}`} />
+                      <Icon className={`w-10 h-10 ${isActive ? 'text-white' : 'text-primary'}`} />
                     </div>
-                    <span className="font-black text-xl">{tab.label}</span>
+                    <span className="font-black text-2xl">{tab.label}</span>
                   </div>
                   
                   {isActive && (
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+                    <>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+                      <div className="absolute top-2 right-2 w-3 h-3 bg-yellow-400 rounded-full animate-pulse" />
+                    </>
                   )}
                 </button>
               );
@@ -251,21 +263,26 @@ export const MissionVisionValuesSection = ({ darkMode, userViewMode = false }: M
           {/* Conteúdo da aba ativa */}
           {activeTabData && (
             <div className={`
-              ${activeTabData.bgLight} 
-              ${activeTabData.borderColor} 
-              border-2 rounded-lg p-6 animate-in fade-in slide-in-from-bottom-4 duration-500
+              relative ${activeTabData.bgLight} 
+              border-4 ${activeTabData.borderColor} 
+              rounded-2xl p-8 animate-in fade-in slide-in-from-bottom-4 duration-500
+              shadow-xl overflow-hidden
             `}>
-              <div className="flex items-start gap-4">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-yellow-500/10 to-transparent rounded-bl-full" />
+              <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-yellow-500/10 to-transparent rounded-tr-full" />
+              
+              <div className="relative z-10 flex items-start gap-6">
                 <div className={`
-                  rounded-full p-3 bg-gradient-to-br ${activeTabData.color}
+                  flex-shrink-0 rounded-full p-4 bg-gradient-to-br ${activeTabData.color} border-4 border-white dark:border-gray-800 shadow-lg
                 `}>
-                  <activeTabData.icon className="w-6 h-6 text-white" />
+                  <activeTabData.icon className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-black text-foreground mb-4">
+                  <h3 className="text-3xl font-black text-primary mb-6 flex items-center gap-2">
                     {activeTabData.label}
+                    <div className="h-1 flex-1 bg-gradient-to-r from-yellow-500 to-transparent rounded" />
                   </h3>
-                  <p className="text-foreground leading-relaxed whitespace-pre-wrap">
+                  <p className="text-foreground/90 text-lg leading-relaxed whitespace-pre-wrap">
                     {data[activeTab]}
                   </p>
                 </div>
@@ -274,11 +291,13 @@ export const MissionVisionValuesSection = ({ darkMode, userViewMode = false }: M
           )}
         </div>
       ) : (
-        <div className="text-center py-12 text-muted-foreground">
-          <Target className="w-12 h-12 mx-auto mb-3 opacity-50" />
-          <p>Nenhum dado configurado ainda</p>
+        <div className="relative z-10 text-center py-16 text-muted-foreground">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center mx-auto mb-4">
+            <Target className="w-10 h-10 text-white" />
+          </div>
+          <p className="text-lg font-semibold">Nenhum dado configurado ainda</p>
           {effectiveIsAdmin && (
-            <Button onClick={() => setIsEditing(true)} className="mt-4">
+            <Button onClick={() => setIsEditing(true)} className="mt-6 px-6 py-3 font-bold">
               Adicionar Informações
             </Button>
           )}
