@@ -67,11 +67,11 @@ export const UserNoteSection = ({ itemId }: UserNoteSectionProps) => {
 
       {/* Caixinha de nota - aparece abaixo quando expandida */}
       {(showNote || (userNote && keepVisible)) && (
-        <div className="ml-10">
+        <div className="w-full">
           {userNote && !showNote && keepVisible && (
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-400 dark:border-yellow-600 rounded-lg p-3">
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-400 dark:border-yellow-600 rounded-lg p-3 break-words">
               <p className="text-sm font-bold text-foreground mb-2">📝 Nota Pessoal:</p>
-              <p className="text-sm text-foreground whitespace-pre-wrap">{userNote.note}</p>
+              <p className="text-sm text-foreground whitespace-pre-wrap break-words">{userNote.note}</p>
             </div>
           )}
           
@@ -82,7 +82,7 @@ export const UserNoteSection = ({ itemId }: UserNoteSectionProps) => {
                 onChange={(e) => setNoteText(e.target.value)}
                 placeholder="Adicione suas observações pessoais aqui..."
                 rows={3}
-                className="w-full p-3 rounded-lg border-2 border-yellow-400 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-900/20 focus:border-yellow-500 focus:outline-none transition-colors text-sm text-foreground"
+                className="w-full p-3 rounded-lg border-2 border-yellow-400 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-900/20 focus:border-yellow-500 focus:outline-none transition-colors text-sm text-foreground resize-none"
               />
               <div className="flex items-center gap-2 flex-wrap">
                 <Button size="sm" onClick={handleSave} disabled={!noteText.trim()} className="bg-yellow-500 hover:bg-yellow-600 text-white">
