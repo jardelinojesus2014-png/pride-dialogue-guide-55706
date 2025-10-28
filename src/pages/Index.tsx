@@ -131,7 +131,7 @@ const Index = () => {
               </TabsTrigger>
               <TabsTrigger 
                 value="avaliacoes" 
-                className="flex-[0.6] text-sm sm:text-base font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-primary data-[state=inactive]:bg-primary/10 data-[state=inactive]:text-accent rounded-lg transition-all"
+                className="flex-[0.6] text-sm sm:text-base font-black py-3 bg-accent text-primary hover:bg-accent/90 data-[state=active]:bg-accent data-[state=active]:text-primary rounded-lg transition-all"
               >
                 Avaliações
               </TabsTrigger>
