@@ -130,8 +130,8 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="fluxo" className="mt-0">
-              {/* Admin Audio Section */}
-              <AdminAudioSection darkMode={darkMode} />
+              {/* Fluxo Audio Section */}
+              <FluxoAudioSection darkMode={darkMode} />
 
               {/* Fluxo Video Section */}
               <FluxoVideoSection darkMode={darkMode} />
