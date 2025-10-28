@@ -1,11 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Upload, X } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { toast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 
 interface Video {
-  id: number;
+  id: string;
   url: string;
   title: string;
   description: string;
+  created_at: string;
 }
 
 interface VideoSectionProps {
@@ -13,46 +18,183 @@ interface VideoSectionProps {
 }
 
 export const VideoSection = ({ darkMode }: VideoSectionProps) => {
-  const [videos, setVideos] = useState<Video[]>([
-    {
-      id: 1,
-      url: 'https://drive.google.com/file/d/1dXCN9ZCXPRvpRMrFIF2VDT-hGSJfmb5k/preview',
-      title: 'Vídeo de Treinamento Pride',
-      description: 'Guia completo sobre o roteiro de prospecção',
-    },
-  ]);
+  const [videos, setVideos] = useState<Video[]>([]);
   const [showVideoForm, setShowVideoForm] = useState(false);
   const [currentVideo, setCurrentVideo] = useState({ url: '', title: '', description: '' });
+  const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'link' | 'upload'>('link');
+  const { isAdmin } = useIsAdmin();
+
+  useEffect(() => {
+    loadVideos();
+  }, []);
+
+  const loadVideos = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('video_links')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      
+      const formattedVideos = (data || []).map((v: any) => ({
+        id: v.id,
+        url: v.video_url,
+        title: v.title,
+        description: v.description || '',
+        created_at: v.created_at,
+      }));
+      
+      setVideos(formattedVideos);
+    } catch (error: any) {
+      console.error('Error loading videos:', error);
+    }
+  };
 
   const handleVideoLinkAdd = () => {
     setShowVideoForm(true);
   };
 
-  const saveVideo = () => {
+  const saveVideoLink = async () => {
     if (currentVideo.url.trim() && currentVideo.title.trim() && currentVideo.description.trim()) {
-      let embedUrl = currentVideo.url.trim();
-      if (embedUrl.includes('drive.google.com')) {
-        const fileIdMatch = embedUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (fileIdMatch) {
-          embedUrl = `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
-        }
-      }
+      setIsUploading(true);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Usuário não autenticado');
 
-      setVideos([...videos, { ...currentVideo, url: embedUrl, id: Date.now() }]);
-      setCurrentVideo({ url: '', title: '', description: '' });
-      setShowVideoForm(false);
+        let embedUrl = currentVideo.url.trim();
+        
+        if (embedUrl.includes('drive.google.com')) {
+          const fileIdMatch = embedUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+          if (fileIdMatch) {
+            embedUrl = `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
+          }
+        }
+
+        const { error } = await supabase
+          .from('video_links')
+          .insert({
+            title: currentVideo.title.trim(),
+            description: currentVideo.description.trim(),
+            video_url: embedUrl,
+            created_by: user.id,
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: 'Vídeo adicionado com sucesso!',
+          description: `"${currentVideo.title}" foi adicionado.`,
+        });
+
+        setCurrentVideo({ url: '', title: '', description: '' });
+        setShowVideoForm(false);
+        loadVideos();
+      } catch (error: any) {
+        console.error('Error saving video:', error);
+        toast({
+          title: 'Erro ao adicionar vídeo',
+          description: error.message,
+          variant: 'destructive',
+        });
+      } finally {
+        setIsUploading(false);
+      }
     } else {
       alert('Por favor, preencha o link, título e descrição do vídeo!');
     }
   };
 
-  const deleteVideo = (id: number) => {
-    setVideos(videos.filter((v) => v.id !== id));
+  const uploadVideoFile = async () => {
+    if (!currentVideo.title.trim() || !currentVideo.description.trim() || !selectedVideo) {
+      alert('Por favor, preencha título, descrição e selecione um arquivo de vídeo!');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Usuário não autenticado');
+
+      const videoExt = selectedVideo.name.split('.').pop();
+      const videoFileName = `${Date.now()}_video.${videoExt}`;
+
+      const { error: videoUploadError } = await supabase.storage
+        .from('video_files')
+        .upload(videoFileName, selectedVideo);
+
+      if (videoUploadError) throw videoUploadError;
+
+      const { data: videoUrlData } = supabase.storage
+        .from('video_files')
+        .getPublicUrl(videoFileName);
+
+      const { error: dbError } = await supabase
+        .from('video_links')
+        .insert({
+          title: currentVideo.title.trim(),
+          description: currentVideo.description.trim(),
+          video_url: videoUrlData.publicUrl,
+          created_by: user.id,
+        });
+
+      if (dbError) throw dbError;
+
+      toast({
+        title: 'Vídeo enviado com sucesso!',
+        description: `"${currentVideo.title}" foi adicionado.`,
+      });
+
+      setCurrentVideo({ url: '', title: '', description: '' });
+      setSelectedVideo(null);
+      setShowVideoForm(false);
+      loadVideos();
+    } catch (error: any) {
+      console.error('Error uploading video:', error);
+      toast({
+        title: 'Erro ao enviar vídeo',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const deleteVideo = async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir este vídeo?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('video_links')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Vídeo excluído',
+        description: 'O vídeo foi removido com sucesso.',
+      });
+
+      loadVideos();
+    } catch (error: any) {
+      console.error('Error deleting video:', error);
+      toast({
+        title: 'Erro ao excluir vídeo',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
   };
 
   const cancelVideo = () => {
     setCurrentVideo({ url: '', title: '', description: '' });
+    setSelectedVideo(null);
     setShowVideoForm(false);
+    setActiveTab('link');
   };
 
   return (
@@ -72,13 +214,15 @@ export const VideoSection = ({ darkMode }: VideoSectionProps) => {
           </div>
         </div>
 
-        <button
-          onClick={handleVideoLinkAdd}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
-        >
-          <Upload className="w-5 h-5" />
-          Adicionar Vídeo
-        </button>
+        {isAdmin && (
+          <button
+            onClick={handleVideoLinkAdd}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
+          >
+            <Upload className="w-5 h-5" />
+            Adicionar Vídeo
+          </button>
+        )}
       </div>
 
       {showVideoForm && (
@@ -90,47 +234,108 @@ export const VideoSection = ({ darkMode }: VideoSectionProps) => {
             </button>
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-semibold mb-2 text-foreground">Link do Vídeo *</label>
-              <input
-                type="text"
-                value={currentVideo.url}
-                onChange={(e) => setCurrentVideo({ ...currentVideo, url: e.target.value })}
-                placeholder="https://drive.google.com/... ou https://youtube.com/..."
-                className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
-              />
-            </div>
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'link' | 'upload')}>
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="link">Link do Vídeo</TabsTrigger>
+              <TabsTrigger value="upload">Upload do PC</TabsTrigger>
+            </TabsList>
 
-            <div>
-              <label className="block text-sm font-semibold mb-2 text-foreground">Título do Vídeo *</label>
-              <input
-                type="text"
-                value={currentVideo.title}
-                onChange={(e) => setCurrentVideo({ ...currentVideo, title: e.target.value })}
-                placeholder="Ex: Simulação da Etapa de Apresentação"
-                className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
-              />
-            </div>
+            <TabsContent value="link" className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-foreground">Link do Vídeo *</label>
+                <input
+                  type="text"
+                  value={currentVideo.url}
+                  onChange={(e) => setCurrentVideo({ ...currentVideo, url: e.target.value })}
+                  placeholder="https://drive.google.com/... ou https://youtube.com/..."
+                  className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
+                  disabled={isUploading}
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-semibold mb-2 text-foreground">Descrição *</label>
-              <textarea
-                value={currentVideo.description}
-                onChange={(e) => setCurrentVideo({ ...currentVideo, description: e.target.value })}
-                placeholder="Descreva brevemente o conteúdo deste vídeo..."
-                className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
-                rows={3}
-              />
-            </div>
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-foreground">Título do Vídeo *</label>
+                <input
+                  type="text"
+                  value={currentVideo.title}
+                  onChange={(e) => setCurrentVideo({ ...currentVideo, title: e.target.value })}
+                  placeholder="Ex: Simulação da Etapa de Apresentação"
+                  className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
+                  disabled={isUploading}
+                />
+              </div>
 
-            <button
-              onClick={saveVideo}
-              className="w-full bg-gradient-hero hover:opacity-90 text-accent font-bold py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg"
-            >
-              ✓ Salvar Vídeo
-            </button>
-          </div>
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-foreground">Descrição *</label>
+                <textarea
+                  value={currentVideo.description}
+                  onChange={(e) => setCurrentVideo({ ...currentVideo, description: e.target.value })}
+                  placeholder="Descreva brevemente o conteúdo deste vídeo..."
+                  className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
+                  rows={3}
+                  disabled={isUploading}
+                />
+              </div>
+
+              <button
+                onClick={saveVideoLink}
+                disabled={isUploading}
+                className="w-full bg-gradient-hero hover:opacity-90 text-accent font-bold py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg disabled:opacity-50"
+              >
+                {isUploading ? 'Salvando...' : '✓ Salvar Vídeo'}
+              </button>
+            </TabsContent>
+
+            <TabsContent value="upload" className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-foreground">Título do Vídeo *</label>
+                <input
+                  type="text"
+                  value={currentVideo.title}
+                  onChange={(e) => setCurrentVideo({ ...currentVideo, title: e.target.value })}
+                  placeholder="Ex: Simulação da Etapa de Apresentação"
+                  className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
+                  disabled={isUploading}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-foreground">Descrição *</label>
+                <textarea
+                  value={currentVideo.description}
+                  onChange={(e) => setCurrentVideo({ ...currentVideo, description: e.target.value })}
+                  placeholder="Descreva brevemente o conteúdo deste vídeo..."
+                  className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
+                  rows={3}
+                  disabled={isUploading}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-foreground">Arquivo de Vídeo *</label>
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={(e) => setSelectedVideo(e.target.files?.[0] || null)}
+                  className="w-full p-3 rounded-lg border-2 border-input bg-card focus:border-accent focus:outline-none transition-colors text-foreground"
+                  disabled={isUploading}
+                />
+                {selectedVideo && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Vídeo selecionado: {selectedVideo.name}
+                  </p>
+                )}
+              </div>
+
+              <button
+                onClick={uploadVideoFile}
+                disabled={isUploading}
+                className="w-full bg-gradient-hero hover:opacity-90 text-accent font-bold py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg disabled:opacity-50"
+              >
+                {isUploading ? 'Enviando...' : '✓ Fazer Upload'}
+              </button>
+            </TabsContent>
+          </Tabs>
         </div>
       )}
 
@@ -142,23 +347,35 @@ export const VideoSection = ({ darkMode }: VideoSectionProps) => {
               className="bg-muted rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
             >
               <div className="relative aspect-video bg-black">
-                <iframe
-                  src={video.url}
-                  className="w-full h-full absolute top-0 left-0"
-                  allow="autoplay"
-                  allowFullScreen
-                  title={video.title}
-                />
+                {video.url.includes('drive.google.com') || video.url.includes('youtube.com') || video.url.includes('youtu.be') ? (
+                  <iframe
+                    src={video.url}
+                    className="w-full h-full absolute top-0 left-0"
+                    allowFullScreen
+                    title={video.title}
+                  />
+                ) : (
+                  <video
+                    controls
+                    className="w-full h-full absolute top-0 left-0"
+                    preload="metadata"
+                  >
+                    <source src={video.url} type="video/mp4" />
+                    Seu navegador não suporta a reprodução de vídeos.
+                  </video>
+                )}
               </div>
               <div className="p-4">
                 <div className="flex items-start justify-between mb-2">
                   <h4 className="font-bold text-primary">{video.title}</h4>
-                  <button
-                    onClick={() => deleteVideo(video.id)}
-                    className="text-destructive hover:text-destructive/80 transition-colors flex-shrink-0 ml-2"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
+                  {isAdmin && (
+                    <button
+                      onClick={() => deleteVideo(video.id)}
+                      className="text-destructive hover:text-destructive/80 transition-colors flex-shrink-0 ml-2"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  )}
                 </div>
                 <p className="text-sm text-muted-foreground mb-2">{video.description}</p>
               </div>
