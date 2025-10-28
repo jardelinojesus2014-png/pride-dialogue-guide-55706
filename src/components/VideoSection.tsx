@@ -24,7 +24,7 @@ export const VideoSection = ({ darkMode }: VideoSectionProps) => {
   const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [activeTab, setActiveTab] = useState<'link' | 'upload'>('link');
-  const { isAdmin } = useIsAdmin();
+  const { isAdmin, loading: adminLoading } = useIsAdmin();
 
   useEffect(() => {
     loadVideos();
@@ -214,7 +214,7 @@ export const VideoSection = ({ darkMode }: VideoSectionProps) => {
           </div>
         </div>
 
-        {isAdmin && (
+        {!adminLoading && isAdmin && (
           <button
             onClick={handleVideoLinkAdd}
             className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
@@ -368,7 +368,7 @@ export const VideoSection = ({ darkMode }: VideoSectionProps) => {
               <div className="p-4">
                 <div className="flex items-start justify-between mb-2">
                   <h4 className="font-bold text-primary">{video.title}</h4>
-                  {isAdmin && (
+                  {!adminLoading && isAdmin && (
                     <button
                       onClick={() => deleteVideo(video.id)}
                       className="text-destructive hover:text-destructive/80 transition-colors flex-shrink-0 ml-2"
