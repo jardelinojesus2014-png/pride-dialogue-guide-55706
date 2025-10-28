@@ -6,14 +6,17 @@ import { useQualificationUserNotes, useUpsertUserNote, useDeleteUserNote } from 
 
 interface UserNoteSectionProps {
   itemId: string;
+  iconOnly?: boolean;
+  showNoteBox?: boolean;
 }
 
-export const UserNoteSection = ({ itemId }: UserNoteSectionProps) => {
+export const UserNoteSection = ({ itemId, iconOnly, showNoteBox }: UserNoteSectionProps) => {
   const { data: notes = [] } = useQualificationUserNotes(itemId);
   const upsertNote = useUpsertUserNote();
   const deleteNote = useDeleteUserNote();
   const [showNote, setShowNote] = useState(false);
   const [noteText, setNoteText] = useState('');
+  const [keepVisible, setKeepVisible] = useState(false);
 
   const userNote = notes[0]; // Each user has only one note per item
 
@@ -31,7 +34,7 @@ export const UserNoteSection = ({ itemId }: UserNoteSectionProps) => {
         note: noteText.trim(),
         noteId: userNote?.id,
       });
-      setShowNote(false);
+      setShowNote(keepVisible);
     }
   };
 
@@ -40,11 +43,13 @@ export const UserNoteSection = ({ itemId }: UserNoteSectionProps) => {
       deleteNote.mutate({ noteId: userNote.id, itemId });
       setNoteText('');
       setShowNote(false);
+      setKeepVisible(false);
     }
   };
 
-  return (
-    <div className="mt-2">
+  // Renderiza apenas o ícone
+  if (iconOnly) {
+    return (
       <button
         onClick={handleToggle}
         className={`${
@@ -61,33 +66,58 @@ export const UserNoteSection = ({ itemId }: UserNoteSectionProps) => {
           Nota Pessoal
         </span>
       </button>
+    );
+  }
 
-      {showNote && (
-        <div className="mt-3 space-y-2">
-          <Textarea
-            value={noteText}
-            onChange={(e) => setNoteText(e.target.value)}
-            placeholder="Adicione suas observações pessoais aqui..."
-            rows={3}
-            className="w-full p-3 rounded-lg border-2 border-yellow-400 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-900/20 focus:border-yellow-500 focus:outline-none transition-colors text-sm text-foreground"
-          />
-          <div className="flex gap-2">
-            <Button size="sm" onClick={handleSave} disabled={!noteText.trim()} className="bg-yellow-500 hover:bg-yellow-600 text-white">
-              <Save className="w-4 h-4 mr-2" />
-              Salvar
-            </Button>
-            {userNote && (
-              <Button size="sm" variant="outline" onClick={handleDelete}>
-                Excluir Nota
-              </Button>
-            )}
-            <Button size="sm" variant="outline" onClick={() => setShowNote(false)}>
-              <X className="w-4 h-4 mr-2" />
-              Fechar
-            </Button>
+  // Renderiza a caixinha de nota
+  if (showNoteBox && (showNote || (userNote && keepVisible))) {
+    return (
+      <div className="ml-10 space-y-2">
+        {userNote && !showNote && keepVisible && (
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-400 dark:border-yellow-600 rounded-lg p-3">
+            <p className="text-sm font-bold text-foreground mb-2">📝 Nota Pessoal:</p>
+            <p className="text-sm text-foreground whitespace-pre-wrap">{userNote.note}</p>
           </div>
-        </div>
-      )}
-    </div>
-  );
+        )}
+        
+        {showNote && (
+          <div className="space-y-2">
+            <Textarea
+              value={noteText}
+              onChange={(e) => setNoteText(e.target.value)}
+              placeholder="Adicione suas observações pessoais aqui..."
+              rows={3}
+              className="w-full p-3 rounded-lg border-2 border-yellow-400 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-900/20 focus:border-yellow-500 focus:outline-none transition-colors text-sm text-foreground"
+            />
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button size="sm" onClick={handleSave} disabled={!noteText.trim()} className="bg-yellow-500 hover:bg-yellow-600 text-white">
+                <Save className="w-4 h-4 mr-2" />
+                Salvar
+              </Button>
+              {userNote && (
+                <Button size="sm" variant="outline" onClick={handleDelete}>
+                  Excluir Nota
+                </Button>
+              )}
+              <Button size="sm" variant="outline" onClick={() => setShowNote(false)}>
+                <X className="w-4 h-4 mr-2" />
+                Fechar
+              </Button>
+              <label className="flex items-center gap-2 text-xs text-muted-foreground ml-2">
+                <input
+                  type="checkbox"
+                  checked={keepVisible}
+                  onChange={(e) => setKeepVisible(e.target.checked)}
+                  className="rounded"
+                />
+                Manter nota visível
+              </label>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return null;
 };
