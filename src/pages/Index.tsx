@@ -17,7 +17,7 @@ import { MissionVisionValuesSection } from '@/components/MissionVisionValuesSect
 import { WebsiteSection } from '@/components/WebsiteSection';
 import { GoogleReviewsSection } from '@/components/GoogleReviewsSection';
 import { UserPurposeAnswersSection } from '@/components/UserPurposeAnswersSection';
-import { ExportDialog } from '@/components/ExportDialog';
+
 import { MotivationalPopup } from '@/components/MotivationalPopup';
 import { PurposePopup } from '@/components/PurposePopup';
 import { TrainingPopup } from '@/components/TrainingPopup';
@@ -74,7 +74,7 @@ const Index = () => {
                     <span className="hidden sm:inline">Admin</span>
                   </button>
                 )}
-                <ExportDialog darkMode={darkMode} />
+                
                 {isAdmin && (
                   <button
                     onClick={toggleUserViewMode}
