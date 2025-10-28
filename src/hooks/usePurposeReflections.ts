@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useAuth } from './useAuth';
+import { toast } from 'sonner';
 
 export interface PurposeReflection {
   id: string;
@@ -16,25 +17,28 @@ export interface PurposeReflection {
 }
 
 export const usePurposeReflections = () => {
-  const { toast } = useToast();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
 
   const { data: reflections, isLoading } = useQuery({
-    queryKey: ['purpose-reflections'],
+    queryKey: ['purpose-reflections', user?.id],
     queryFn: async () => {
+      if (!user) return [];
+      
       const { data, error } = await supabase
         .from('user_purpose_reflections')
         .select('*')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       return data as PurposeReflection[];
     },
+    enabled: !!user,
   });
 
   const saveMutation = useMutation({
-    mutationFn: async (reflection: Omit<PurposeReflection, 'id' | 'created_at' | 'updated_at' | 'user_id'>) => {
-      const { data: { user } } = await supabase.auth.getUser();
+    mutationFn: async (reflection: Omit<PurposeReflection, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
       if (!user) throw new Error('User not authenticated');
 
       // Check if user already has a reflection
@@ -42,10 +46,10 @@ export const usePurposeReflections = () => {
         .from('user_purpose_reflections')
         .select('id')
         .eq('user_id', user.id)
-        .maybeSingle();
+        .single();
 
       if (existing) {
-        // Update existing
+        // Update existing reflection
         const { data, error } = await supabase
           .from('user_purpose_reflections')
           .update(reflection)
@@ -56,10 +60,13 @@ export const usePurposeReflections = () => {
         if (error) throw error;
         return data;
       } else {
-        // Create new
+        // Insert new reflection
         const { data, error } = await supabase
           .from('user_purpose_reflections')
-          .insert([{ ...reflection, user_id: user.id }])
+          .insert({
+            ...reflection,
+            user_id: user.id,
+          })
           .select()
           .single();
 
@@ -69,18 +76,11 @@ export const usePurposeReflections = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['purpose-reflections'] });
-      toast({
-        title: 'Reflexões salvas!',
-        description: 'Suas respostas foram registradas com sucesso.',
-      });
+      toast.success('Suas reflexões foram salvas com sucesso! 🎯');
     },
     onError: (error) => {
-      toast({
-        title: 'Erro ao salvar',
-        description: 'Não foi possível salvar suas reflexões. Tente novamente.',
-        variant: 'destructive',
-      });
       console.error('Error saving reflection:', error);
+      toast.error('Erro ao salvar suas reflexões. Tente novamente.');
     },
   });
 
@@ -92,28 +92,26 @@ export const usePurposeReflections = () => {
   };
 };
 
-export const useUserReflection = () => {
-  const { toast } = useToast();
-
-  const { data: reflection, isLoading } = useQuery({
-    queryKey: ['user-purpose-reflection'],
+// Hook for admin to view all reflections
+export const useAllPurposeReflections = () => {
+  const { data: reflections, isLoading } = useQuery({
+    queryKey: ['all-purpose-reflections'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
-
       const { data, error } = await supabase
         .from('user_purpose_reflections')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
+        .select(`
+          *,
+          profiles (email)
+        `)
+        .order('created_at', { ascending: false});
 
       if (error) throw error;
-      return data as PurposeReflection | null;
+      return data;
     },
   });
 
   return {
-    reflection,
+    reflections,
     isLoading,
   };
 };

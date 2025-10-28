@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, ArrowRight, ArrowLeft } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
-import { useUserReflection, usePurposeReflections } from '@/hooks/usePurposeReflections';
+import { usePurposeReflections } from '@/hooks/usePurposeReflections';
 
 interface PurposePopupProps {
   onClose: () => void;
@@ -9,10 +9,8 @@ interface PurposePopupProps {
 
 export const PurposePopup = ({ onClose }: PurposePopupProps) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const { reflection } = useUserReflection();
-  const { saveReflection, isSaving } = usePurposeReflections();
+  const { reflections, saveReflection, isSaving } = usePurposeReflections();
   
-  // Form state
   const [answers, setAnswers] = useState({
     why: '',
     why_here: '',
@@ -22,25 +20,24 @@ export const PurposePopup = ({ onClose }: PurposePopupProps) => {
     what_today: '',
   });
 
-  // Load existing reflection if available
+  // Load existing reflections when component mounts
   useEffect(() => {
-    if (reflection) {
+    if (reflections && reflections.length > 0) {
+      const latest = reflections[0];
       setAnswers({
-        why: reflection.why || '',
-        why_here: reflection.why_here || '',
-        what_control: reflection.what_control || '',
-        improve_what: reflection.improve_what || '',
-        strengths: reflection.strengths || '',
-        what_today: reflection.what_today || '',
+        why: latest.why || '',
+        why_here: latest.why_here || '',
+        what_control: latest.what_control || '',
+        improve_what: latest.improve_what || '',
+        strengths: latest.strengths || '',
+        what_today: latest.what_today || '',
       });
     }
-  }, [reflection]);
+  }, [reflections]);
 
-  const handleSaveReflection = () => {
+  const handleSaveAnswers = () => {
     saveReflection(answers);
-    setTimeout(() => {
-      onClose();
-    }, 1500);
+    onClose();
   };
 
   const steps = [
@@ -273,90 +270,90 @@ export const PurposePopup = ({ onClose }: PurposePopupProps) => {
         </div>
       ),
     },
-    // Etapa 8: Formulário de Respostas
+    // Etapa 8: Registro de Respostas
     {
-      type: 'form',
+      type: 'answers',
       content: (
         <div className="space-y-6 animate-fade-in">
           <div className="text-center mb-8">
             <h2 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-red-500 to-purple-500 mb-4">
-              Registre suas Respostas
+              Registre suas respostas
             </h2>
-            <p className="text-white/70">
-              Escreva suas reflexões abaixo. Você pode voltar e editar a qualquer momento.
+            <p className="text-white/70 text-lg">
+              Escreva suas reflexões. Elas ficarão salvas para você revisar quando quiser.
             </p>
           </div>
 
-          <div className="space-y-5 max-h-[50vh] overflow-y-auto pr-2">
+          <div className="space-y-6 max-h-[400px] overflow-y-auto pr-4">
             <div>
-              <label className="block text-white font-bold mb-2 text-sm">
+              <label className="block text-white font-bold mb-2 text-lg">
                 💭 Qual o seu porquê?
               </label>
               <Textarea
                 value={answers.why}
                 onChange={(e) => setAnswers({ ...answers, why: e.target.value })}
-                placeholder="Escreva aqui seu objetivo, propósito..."
-                className="bg-white/10 border-orange-500/30 text-white placeholder:text-white/40 min-h-[80px]"
+                placeholder="Seu objetivo, seu propósito..."
+                className="min-h-[100px] bg-white/10 border-white/20 text-white placeholder:text-white/40"
               />
             </div>
 
             <div>
-              <label className="block text-white font-bold mb-2 text-sm">
-                🤔 Por que aqui? (E não em qualquer outro lugar?)
+              <label className="block text-white font-bold mb-2 text-lg">
+                🤔 Por que aqui?
               </label>
               <Textarea
                 value={answers.why_here}
                 onChange={(e) => setAnswers({ ...answers, why_here: e.target.value })}
-                placeholder="O que faz sentido pra você aqui..."
-                className="bg-white/10 border-red-500/30 text-white placeholder:text-white/40 min-h-[80px]"
+                placeholder="Por que este lugar faz sentido para você?"
+                className="min-h-[100px] bg-white/10 border-white/20 text-white placeholder:text-white/40"
               />
             </div>
 
             <div>
-              <label className="block text-white font-bold mb-2 text-sm">
+              <label className="block text-white font-bold mb-2 text-lg">
                 💡 O que está no seu controle?
               </label>
               <Textarea
                 value={answers.what_control}
                 onChange={(e) => setAnswers({ ...answers, what_control: e.target.value })}
-                placeholder="O que você pode mudar, suas ações..."
-                className="bg-white/10 border-purple-500/30 text-white placeholder:text-white/40 min-h-[80px]"
+                placeholder="O que você pode mudar e influenciar..."
+                className="min-h-[100px] bg-white/10 border-white/20 text-white placeholder:text-white/40"
               />
             </div>
 
             <div>
-              <label className="block text-white font-bold mb-2 text-sm">
+              <label className="block text-white font-bold mb-2 text-lg">
                 📈 Em que você pode ser melhor?
               </label>
               <Textarea
                 value={answers.improve_what}
                 onChange={(e) => setAnswers({ ...answers, improve_what: e.target.value })}
-                placeholder="Áreas de crescimento e evolução..."
-                className="bg-white/10 border-orange-500/30 text-white placeholder:text-white/40 min-h-[80px]"
+                placeholder="Onde você quer evoluir..."
+                className="min-h-[100px] bg-white/10 border-white/20 text-white placeholder:text-white/40"
               />
             </div>
 
             <div>
-              <label className="block text-white font-bold mb-2 text-sm">
-                ⭐ Por que você? (Seus pontos fortes)
+              <label className="block text-white font-bold mb-2 text-lg">
+                ⭐ Seus pontos fortes
               </label>
               <Textarea
                 value={answers.strengths}
                 onChange={(e) => setAnswers({ ...answers, strengths: e.target.value })}
-                placeholder="Seus diferenciais, o que te torna único..."
-                className="bg-white/10 border-red-500/30 text-white placeholder:text-white/40 min-h-[80px]"
+                placeholder="Por que você? O que te torna único..."
+                className="min-h-[100px] bg-white/10 border-white/20 text-white placeholder:text-white/40"
               />
             </div>
 
             <div>
-              <label className="block text-white font-bold mb-2 text-sm">
+              <label className="block text-white font-bold mb-2 text-lg">
                 🎯 O que você precisa fazer HOJE?
               </label>
               <Textarea
                 value={answers.what_today}
                 onChange={(e) => setAnswers({ ...answers, what_today: e.target.value })}
-                placeholder="Ações concretas para conquistar seus objetivos..."
-                className="bg-white/10 border-purple-500/30 text-white placeholder:text-white/40 min-h-[80px]"
+                placeholder="O que você PRECISA fazer HOJE para CONQUISTAR seus objetivos..."
+                className="min-h-[100px] bg-white/10 border-white/20 text-white placeholder:text-white/40"
               />
             </div>
           </div>
@@ -465,11 +462,11 @@ export const PurposePopup = ({ onClose }: PurposePopupProps) => {
 
               {isLastStep ? (
                 <button
-                  onClick={handleSaveReflection}
+                  onClick={handleSaveAnswers}
                   disabled={isSaving}
                   className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-black px-10 py-4 rounded-full text-lg shadow-2xl transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isSaving ? 'SALVANDO...' : 'SALVAR RESPOSTAS 💾'}
+                  {isSaving ? 'SALVANDO...' : 'SALVAR RESPOSTAS 🚀'}
                 </button>
               ) : (
                 <button
