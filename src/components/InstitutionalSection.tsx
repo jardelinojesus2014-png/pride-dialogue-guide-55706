@@ -36,16 +36,22 @@ export const InstitutionalSection = ({ darkMode, userViewMode = false }: Institu
       const { data, error } = await supabase
         .from('institutional_videos')
         .select('*')
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error) throw error;
       
       if (data) {
-        setVideo(data);
-        setEditData({
+        const videoData: InstitutionalVideo = {
+          id: data.id,
           video_url: data.video_url,
           title: data.title,
-          description: data.description,
+          description: data.description || '',
+        };
+        setVideo(videoData);
+        setEditData({
+          video_url: videoData.video_url,
+          title: videoData.title,
+          description: videoData.description,
         });
       }
     } catch (error: any) {
