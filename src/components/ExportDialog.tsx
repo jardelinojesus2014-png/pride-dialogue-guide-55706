@@ -147,7 +147,7 @@ export const ExportDialog = ({ darkMode }: ExportDialogProps) => {
                 <Checkbox
                   id="golden-rule"
                   checked={selectedSections.goldenRule}
-                  onCheckedChange={() => toggleSection('goldenRule')}
+                  onCheckedChange={(checked) => checked !== 'indeterminate' && toggleSection('goldenRule')}
                 />
                 <Label htmlFor="golden-rule" className="cursor-pointer">Regra de Ouro</Label>
               </div>
@@ -155,7 +155,7 @@ export const ExportDialog = ({ darkMode }: ExportDialogProps) => {
                 <Checkbox
                   id="script-sections"
                   checked={selectedSections.scriptSections}
-                  onCheckedChange={() => toggleSection('scriptSections')}
+                  onCheckedChange={(checked) => checked !== 'indeterminate' && toggleSection('scriptSections')}
                 />
                 <Label htmlFor="script-sections" className="cursor-pointer">Seções do Roteiro</Label>
               </div>
@@ -163,7 +163,7 @@ export const ExportDialog = ({ darkMode }: ExportDialogProps) => {
                 <Checkbox
                   id="dos-donts"
                   checked={selectedSections.dosDonts}
-                  onCheckedChange={() => toggleSection('dosDonts')}
+                  onCheckedChange={(checked) => checked !== 'indeterminate' && toggleSection('dosDonts')}
                 />
                 <Label htmlFor="dos-donts" className="cursor-pointer">Do's and Don'ts</Label>
               </div>
@@ -171,7 +171,7 @@ export const ExportDialog = ({ darkMode }: ExportDialogProps) => {
                 <Checkbox
                   id="admin-audio"
                   checked={selectedSections.adminAudio}
-                  onCheckedChange={() => toggleSection('adminAudio')}
+                  onCheckedChange={(checked) => checked !== 'indeterminate' && toggleSection('adminAudio')}
                 />
                 <Label htmlFor="admin-audio" className="cursor-pointer">Áudios</Label>
               </div>
@@ -179,7 +179,7 @@ export const ExportDialog = ({ darkMode }: ExportDialogProps) => {
                 <Checkbox
                   id="videos"
                   checked={selectedSections.videos}
-                  onCheckedChange={() => toggleSection('videos')}
+                  onCheckedChange={(checked) => checked !== 'indeterminate' && toggleSection('videos')}
                 />
                 <Label htmlFor="videos" className="cursor-pointer">Vídeos</Label>
               </div>
@@ -196,7 +196,7 @@ export const ExportDialog = ({ darkMode }: ExportDialogProps) => {
                 <Checkbox
                   id="qualification"
                   checked={selectedSections.qualification}
-                  onCheckedChange={() => toggleSection('qualification')}
+                  onCheckedChange={(checked) => checked !== 'indeterminate' && toggleSection('qualification')}
                 />
                 <Label htmlFor="qualification" className="cursor-pointer">Informações de Qualificação</Label>
               </div>
@@ -204,7 +204,7 @@ export const ExportDialog = ({ darkMode }: ExportDialogProps) => {
                 <Checkbox
                   id="pdfs"
                   checked={selectedSections.pdfs}
-                  onCheckedChange={() => toggleSection('pdfs')}
+                  onCheckedChange={(checked) => checked !== 'indeterminate' && toggleSection('pdfs')}
                 />
                 <Label htmlFor="pdfs" className="cursor-pointer">Materiais em PDF</Label>
               </div>
@@ -212,7 +212,7 @@ export const ExportDialog = ({ darkMode }: ExportDialogProps) => {
                 <Checkbox
                   id="fluxo-audio"
                   checked={selectedSections.fluxoAudio}
-                  onCheckedChange={() => toggleSection('fluxoAudio')}
+                  onCheckedChange={(checked) => checked !== 'indeterminate' && toggleSection('fluxoAudio')}
                 />
                 <Label htmlFor="fluxo-audio" className="cursor-pointer">Áudios (Treinamentos)</Label>
               </div>
@@ -220,7 +220,7 @@ export const ExportDialog = ({ darkMode }: ExportDialogProps) => {
                 <Checkbox
                   id="fluxo-video"
                   checked={selectedSections.fluxoVideo}
-                  onCheckedChange={() => toggleSection('fluxoVideo')}
+                  onCheckedChange={(checked) => checked !== 'indeterminate' && toggleSection('fluxoVideo')}
                 />
                 <Label htmlFor="fluxo-video" className="cursor-pointer">Vídeos (Treinamentos)</Label>
               </div>
@@ -228,7 +228,7 @@ export const ExportDialog = ({ darkMode }: ExportDialogProps) => {
                 <Checkbox
                   id="purpose-reflections"
                   checked={selectedSections.purposeReflections}
-                  onCheckedChange={() => toggleSection('purposeReflections')}
+                  onCheckedChange={(checked) => checked !== 'indeterminate' && toggleSection('purposeReflections')}
                 />
                 <Label htmlFor="purpose-reflections" className="cursor-pointer">Minhas Reflexões de Propósito</Label>
               </div>
@@ -245,7 +245,7 @@ export const ExportDialog = ({ darkMode }: ExportDialogProps) => {
                 <Checkbox
                   id="website"
                   checked={selectedSections.website}
-                  onCheckedChange={() => toggleSection('website')}
+                  onCheckedChange={(checked) => checked !== 'indeterminate' && toggleSection('website')}
                 />
                 <Label htmlFor="website" className="cursor-pointer">Site Pride Corretora</Label>
               </div>
@@ -253,7 +253,7 @@ export const ExportDialog = ({ darkMode }: ExportDialogProps) => {
                 <Checkbox
                   id="reviews"
                   checked={selectedSections.reviews}
-                  onCheckedChange={() => toggleSection('reviews')}
+                  onCheckedChange={(checked) => checked !== 'indeterminate' && toggleSection('reviews')}
                 />
                 <Label htmlFor="reviews" className="cursor-pointer">Avaliações do Google</Label>
               </div>
@@ -261,7 +261,7 @@ export const ExportDialog = ({ darkMode }: ExportDialogProps) => {
                 <Checkbox
                   id="institutional"
                   checked={selectedSections.institutional}
-                  onCheckedChange={() => toggleSection('institutional')}
+                  onCheckedChange={(checked) => checked !== 'indeterminate' && toggleSection('institutional')}
                 />
                 <Label htmlFor="institutional" className="cursor-pointer">Vídeo Institucional</Label>
               </div>
@@ -269,7 +269,7 @@ export const ExportDialog = ({ darkMode }: ExportDialogProps) => {
                 <Checkbox
                   id="mission-vision"
                   checked={selectedSections.missionVision}
-                  onCheckedChange={() => toggleSection('missionVision')}
+                  onCheckedChange={(checked) => checked !== 'indeterminate' && toggleSection('missionVision')}
                 />
                 <Label htmlFor="mission-vision" className="cursor-pointer">Missão, Visão e Valores</Label>
               </div>
