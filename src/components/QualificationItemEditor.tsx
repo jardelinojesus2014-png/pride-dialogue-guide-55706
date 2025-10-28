@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Trash2, Save, X, ChevronUp, ChevronDown, Upload, Link as LinkIcon, File, Video, ExternalLink, Plus } from 'lucide-react';
+import { Trash2, Save, X, ChevronUp, ChevronDown, Plus, Video, File } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
@@ -31,23 +31,24 @@ export const QualificationItemEditor = ({
 }: QualificationItemEditorProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(item.content);
-  const [description, setDescription] = useState(item.description || '');
-  const [tip, setTip] = useState(item.tip || '');
-  const [videoUrl, setVideoUrl] = useState(item.video_url || '');
+  const [descriptions, setDescriptions] = useState<string[]>(item.descriptions || []);
+  const [tips, setTips] = useState<string[]>(item.tips || []);
+  const [videoUrls, setVideoUrls] = useState<string[]>(item.video_urls || []);
+  const [fileUrls, setFileUrls] = useState<string[]>(item.file_urls || []);
+  const [fileNames, setFileNames] = useState<string[]>(item.file_names || []);
   const [spinType, setSpinType] = useState<'S' | 'P' | 'none'>(item.spin_type || 'none');
-  const [isUploading, setIsUploading] = useState(false);
-  const [fileName, setFileName] = useState(item.file_name || '');
-  const [fileUrl, setFileUrl] = useState(item.file_url || '');
   const [examples, setExamples] = useState<string[]>(item.examples || []);
+  
+  const [newDescription, setNewDescription] = useState('');
+  const [newTip, setNewTip] = useState('');
+  const [newVideoUrl, setNewVideoUrl] = useState('');
   const [newExample, setNewExample] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
 
   const convertYouTubeUrl = (url: string): string => {
     if (!url) return '';
-    
-    // Already an embed URL
     if (url.includes('youtube.com/embed/')) return url;
     
-    // Regular YouTube URL
     const youtubeRegex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/;
     const match = url.match(youtubeRegex);
     
@@ -74,8 +75,8 @@ export const QualificationItemEditor = ({
         .from('fluxo_audio_files')
         .getPublicUrl(filePath);
 
-      setFileUrl(publicUrl);
-      setFileName(file.name);
+      setFileUrls([...fileUrls, publicUrl]);
+      setFileNames([...fileNames, file.name]);
 
       toast({
         title: 'Arquivo enviado',
@@ -93,43 +94,31 @@ export const QualificationItemEditor = ({
   };
 
   const handleSave = () => {
-    const processedVideoUrl = videoUrl ? convertYouTubeUrl(videoUrl) : null;
+    const processedVideoUrls = videoUrls.map(convertYouTubeUrl);
     
     onUpdate({
       id: item.id,
       content,
-      description: description || null,
-      tip: tip || null,
-      video_url: processedVideoUrl,
-      file_url: fileUrl || null,
-      file_name: fileName || null,
+      descriptions: descriptions.length > 0 ? descriptions : null,
+      tips: tips.length > 0 ? tips : null,
+      video_urls: processedVideoUrls.length > 0 ? processedVideoUrls : null,
+      file_urls: fileUrls.length > 0 ? fileUrls : null,
+      file_names: fileNames.length > 0 ? fileNames : null,
       spin_type: spinType === 'none' ? null : spinType,
       examples: examples.length > 0 ? examples : null,
     });
     setIsEditing(false);
   };
 
-  const handleAddExample = () => {
-    if (newExample.trim()) {
-      setExamples([...examples, newExample.trim()]);
-      setNewExample('');
-    }
-  };
-
-  const handleRemoveExample = (index: number) => {
-    setExamples(examples.filter((_, i) => i !== index));
-  };
-
   const handleCancel = () => {
     setContent(item.content);
-    setDescription(item.description || '');
-    setTip(item.tip || '');
-    setVideoUrl(item.video_url || '');
-    setFileUrl(item.file_url || '');
-    setFileName(item.file_name || '');
+    setDescriptions(item.descriptions || []);
+    setTips(item.tips || []);
+    setVideoUrls(item.video_urls || []);
+    setFileUrls(item.file_urls || []);
+    setFileNames(item.file_names || []);
     setSpinType(item.spin_type || 'none');
     setExamples(item.examples || []);
-    setNewExample('');
     setIsEditing(false);
   };
 
@@ -140,92 +129,72 @@ export const QualificationItemEditor = ({
           <div className="flex items-start gap-3">
             {item.spin_type && <SpinBadge type={item.spin_type} />}
             <span className="text-primary font-bold text-lg">•</span>
-            <div className="flex-1">
+            <div className="flex-1 space-y-2">
               <span className="text-foreground font-bold">{item.content}</span>
               
-              {item.description && (
-                <div className="mt-2 bg-primary/10 border border-primary/20 rounded-lg p-3 text-sm text-foreground">
-                  📝 {item.description}
+              {item.descriptions && item.descriptions.map((desc, idx) => (
+                <div key={idx} className="bg-primary/10 border border-primary/20 rounded-lg p-3 text-sm text-foreground">
+                  📝 {desc}
                 </div>
-              )}
+              ))}
               
-              {item.tip && (
-                <div className="bg-accent/10 border-l-4 border-accent p-3 rounded text-sm mt-2">
-                  <p className="text-foreground">
-                    💡 <strong>Dica:</strong> {item.tip}
-                  </p>
+              {item.examples && item.examples.map((example, idx) => (
+                <div key={idx} className="bg-purple-50 dark:bg-purple-950/20 border border-purple-300 dark:border-purple-700 rounded-lg p-3 text-sm text-foreground">
+                  ✨ <strong>Exemplo:</strong> {example}
                 </div>
-              )}
+              ))}
               
-              {item.examples && item.examples.length > 0 && (
-                <div className="mt-2 space-y-2">
-                  {item.examples.map((example, idx) => (
-                    <div key={idx} className="bg-purple-50 dark:bg-purple-950/20 border border-purple-300 dark:border-purple-700 rounded-lg p-3 text-sm text-foreground">
-                      ✨ <strong>Exemplo:</strong> {example}
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              {item.video_url && (
-                <div className="mt-3">
+              {item.video_urls && item.video_urls.map((videoUrl, idx) => (
+                <div key={idx} className="mt-3">
                   <div className="w-64 aspect-video rounded-lg overflow-hidden bg-black shadow-lg">
                     <iframe
-                      src={item.video_url}
+                      src={videoUrl}
                       className="w-full h-full"
                       allowFullScreen
-                      title={item.content}
+                      title={`${item.content} - Vídeo ${idx + 1}`}
                     />
                   </div>
                 </div>
-              )}
+              ))}
               
-              {item.file_url && item.file_name && (
+              {item.file_names && item.file_urls && item.file_names.map((fileName, idx) => (
                 <a
-                  href={item.file_url}
+                  key={idx}
+                  href={item.file_urls![idx]}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-2 inline-flex items-center gap-2 text-sm bg-secondary hover:bg-secondary/80 text-secondary-foreground px-3 py-2 rounded-lg transition-colors"
+                  className="inline-flex items-center gap-2 text-sm bg-secondary hover:bg-secondary/80 text-secondary-foreground px-3 py-2 rounded-lg transition-colors mr-2"
                 >
                   <File className="w-4 h-4" />
-                  {item.file_name}
-                  <ExternalLink className="w-3 h-3" />
+                  {fileName}
                 </a>
-              )}
+              ))}
+              
+              {item.tips && item.tips.map((tip, idx) => (
+                <div key={idx} className="bg-accent/10 border-l-4 border-accent p-4 rounded text-sm mt-3 ml-[-8px] mr-[-8px] animate-pulse">
+                  <p className="text-foreground">
+                    <span className="inline-block animate-[pulse_2s_ease-in-out_infinite]">💡</span> <strong>Dica:</strong> {tip}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={onMoveUp}
-            disabled={!canMoveUp}
-            title="Mover para cima"
-          >
+          <Button size="sm" variant="outline" onClick={onMoveUp} disabled={!canMoveUp}>
             <ChevronUp className="w-4 h-4" />
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={onMoveDown}
-            disabled={!canMoveDown}
-            title="Mover para baixo"
-          >
+          <Button size="sm" variant="outline" onClick={onMoveDown} disabled={!canMoveDown}>
             <ChevronDown className="w-4 h-4" />
           </Button>
           <Button size="sm" variant="outline" onClick={() => setIsEditing(true)}>
             Editar
           </Button>
-          <Button
-            size="sm"
-            variant="destructive"
-            onClick={() => {
-              if (confirm('Tem certeza que deseja excluir este item?')) {
-                onDelete(item.id);
-              }
-            }}
-          >
+          <Button size="sm" variant="destructive" onClick={() => {
+            if (confirm('Tem certeza que deseja excluir este item?')) {
+              onDelete(item.id);
+            }
+          }}>
             <Trash2 className="w-4 h-4" />
           </Button>
         </div>
@@ -236,158 +205,163 @@ export const QualificationItemEditor = ({
   return (
     <div className="bg-card border-2 border-primary rounded-lg p-6 space-y-4">
       <div className="space-y-2">
-        <Label htmlFor={`content-${item.id}`}>Texto do Item *</Label>
-        <Input
-          id={`content-${item.id}`}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Ex: Nome da Empresa/ Cliente"
-        />
+        <Label>Texto do Item *</Label>
+        <Input value={content} onChange={(e) => setContent(e.target.value)} />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor={`spin-${item.id}`}>SPIN - Tipo de Pergunta</Label>
+        <Label>SPIN - Tipo de Pergunta</Label>
         <Select value={spinType} onValueChange={(value: 'S' | 'P' | 'none') => setSpinType(value)}>
-          <SelectTrigger id={`spin-${item.id}`}>
+          <SelectTrigger>
             <SelectValue placeholder="Selecione o tipo" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="none">Nenhum</SelectItem>
-            <SelectItem value="S">
-              <div className="flex items-center gap-2">
-                <SpinBadge type="S" />
-                <span>Situação</span>
-              </div>
-            </SelectItem>
-            <SelectItem value="P">
-              <div className="flex items-center gap-2">
-                <SpinBadge type="P" />
-                <span>Problema</span>
-              </div>
-            </SelectItem>
+            <SelectItem value="S">S - Situação</SelectItem>
+            <SelectItem value="P">P - Problema</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
+      {/* Descriptions */}
       <div className="space-y-2">
-        <Label htmlFor={`description-${item.id}`}>
-          Descrição (aparece em caixa colorida)
-        </Label>
-        <Textarea
-          id={`description-${item.id}`}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Adicione uma descrição opcional que aparecerá em uma caixa destacada..."
-          rows={2}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor={`tip-${item.id}`}>
-          Dica (aparece com ícone de lâmpada)
-        </Label>
-        <Textarea
-          id={`tip-${item.id}`}
-          value={tip}
-          onChange={(e) => setTip(e.target.value)}
-          placeholder="Adicione uma dica opcional que aparecerá com destaque..."
-          rows={2}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label>
-          ✨ Exemplos (caixinha roxa)
-        </Label>
-        <div className="space-y-2">
-          {examples.map((example, index) => (
-            <div key={index} className="flex items-start gap-2 bg-purple-50 dark:bg-purple-950/20 border border-purple-300 dark:border-purple-700 rounded-lg p-3">
-              <span className="flex-1 text-sm">{example}</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleRemoveExample(index)}
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-          ))}
-          <div className="flex gap-2">
-            <Input
-              value={newExample}
-              onChange={(e) => setNewExample(e.target.value)}
-              placeholder="Digite um exemplo e clique em Adicionar"
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleAddExample();
-                }
-              }}
-            />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleAddExample}
-              disabled={!newExample.trim()}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Adicionar
+        <Label>📝 Descrições</Label>
+        {descriptions.map((desc, idx) => (
+          <div key={idx} className="flex gap-2">
+            <Input value={desc} onChange={(e) => {
+              const newDescs = [...descriptions];
+              newDescs[idx] = e.target.value;
+              setDescriptions(newDescs);
+            }} />
+            <Button variant="ghost" size="sm" onClick={() => setDescriptions(descriptions.filter((_, i) => i !== idx))}>
+              <X className="w-4 h-4" />
             </Button>
           </div>
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor={`video-${item.id}`}>
-          <Video className="w-4 h-4 inline mr-2" />
-          Link do Vídeo (YouTube, Vimeo, etc.)
-        </Label>
-        <Input
-          id={`video-${item.id}`}
-          value={videoUrl}
-          onChange={(e) => setVideoUrl(e.target.value)}
-          placeholder="Cole qualquer link do YouTube (será convertido automaticamente)"
-        />
-        <p className="text-xs text-muted-foreground">
-          Aceita URLs normais do YouTube - será convertido automaticamente para embed
-        </p>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor={`file-${item.id}`}>
-          <File className="w-4 h-4 inline mr-2" />
-          Arquivo Anexo
-        </Label>
+        ))}
         <div className="flex gap-2">
           <Input
-            id={`file-${item.id}`}
-            type="file"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handleFileUpload(file);
-            }}
-            disabled={isUploading}
-            className="flex-1"
+            value={newDescription}
+            onChange={(e) => setNewDescription(e.target.value)}
+            placeholder="Nova descrição"
+            onKeyPress={(e) => e.key === 'Enter' && newDescription && (setDescriptions([...descriptions, newDescription]), setNewDescription(''))}
           />
-          {fileName && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setFileUrl('');
-                setFileName('');
-              }}
-            >
-              Remover
-            </Button>
-          )}
+          <Button onClick={() => newDescription && (setDescriptions([...descriptions, newDescription]), setNewDescription(''))}>
+            <Plus className="w-4 h-4" />
+          </Button>
         </div>
-        {fileName && (
-          <p className="text-sm text-muted-foreground flex items-center gap-2">
+      </div>
+
+      {/* Examples */}
+      <div className="space-y-2">
+        <Label>✨ Exemplos</Label>
+        {examples.map((ex, idx) => (
+          <div key={idx} className="flex gap-2">
+            <Input value={ex} onChange={(e) => {
+              const newExs = [...examples];
+              newExs[idx] = e.target.value;
+              setExamples(newExs);
+            }} />
+            <Button variant="ghost" size="sm" onClick={() => setExamples(examples.filter((_, i) => i !== idx))}>
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        ))}
+        <div className="flex gap-2">
+          <Input
+            value={newExample}
+            onChange={(e) => setNewExample(e.target.value)}
+            placeholder="Novo exemplo"
+            onKeyPress={(e) => e.key === 'Enter' && newExample && (setExamples([...examples, newExample]), setNewExample(''))}
+          />
+          <Button onClick={() => newExample && (setExamples([...examples, newExample]), setNewExample(''))}>
+            <Plus className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Video URLs */}
+      <div className="space-y-2">
+        <Label><Video className="w-4 h-4 inline mr-2" />Vídeos</Label>
+        {videoUrls.map((url, idx) => (
+          <div key={idx} className="flex gap-2">
+            <Input value={url} onChange={(e) => {
+              const newUrls = [...videoUrls];
+              newUrls[idx] = e.target.value;
+              setVideoUrls(newUrls);
+            }} />
+            <Button variant="ghost" size="sm" onClick={() => setVideoUrls(videoUrls.filter((_, i) => i !== idx))}>
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        ))}
+        <div className="flex gap-2">
+          <Input
+            value={newVideoUrl}
+            onChange={(e) => setNewVideoUrl(e.target.value)}
+            placeholder="URL do YouTube"
+            onKeyPress={(e) => e.key === 'Enter' && newVideoUrl && (setVideoUrls([...videoUrls, newVideoUrl]), setNewVideoUrl(''))}
+          />
+          <Button onClick={() => newVideoUrl && (setVideoUrls([...videoUrls, newVideoUrl]), setNewVideoUrl(''))}>
+            <Plus className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+
+      {/* File Upload */}
+      <div className="space-y-2">
+        <Label><File className="w-4 h-4 inline mr-2" />Arquivos</Label>
+        {fileNames.map((name, idx) => (
+          <div key={idx} className="flex items-center gap-2 bg-muted p-2 rounded">
             <File className="w-4 h-4" />
-            {fileName}
-          </p>
-        )}
+            <span className="flex-1 text-sm">{name}</span>
+            <Button variant="ghost" size="sm" onClick={() => {
+              setFileNames(fileNames.filter((_, i) => i !== idx));
+              setFileUrls(fileUrls.filter((_, i) => i !== idx));
+            }}>
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        ))}
+        <Input
+          type="file"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleFileUpload(file);
+          }}
+          disabled={isUploading}
+        />
+      </div>
+
+      {/* Tips */}
+      <div className="space-y-2">
+        <Label>💡 Dicas (sempre aparecem no final)</Label>
+        {tips.map((tip, idx) => (
+          <div key={idx} className="flex gap-2">
+            <Textarea
+              value={tip}
+              onChange={(e) => {
+                const newTips = [...tips];
+                newTips[idx] = e.target.value;
+                setTips(newTips);
+              }}
+              rows={2}
+            />
+            <Button variant="ghost" size="sm" onClick={() => setTips(tips.filter((_, i) => i !== idx))}>
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        ))}
+        <div className="flex gap-2">
+          <Textarea
+            value={newTip}
+            onChange={(e) => setNewTip(e.target.value)}
+            placeholder="Nova dica"
+            rows={2}
+          />
+          <Button onClick={() => newTip && (setTips([...tips, newTip]), setNewTip(''))}>
+            <Plus className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
 
       <div className="flex gap-2 justify-end pt-4 border-t">

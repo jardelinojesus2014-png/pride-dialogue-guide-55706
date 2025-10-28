@@ -6,11 +6,11 @@ export interface QualificationItem {
   id: string;
   category: string;
   content: string;
-  description?: string | null;
-  tip?: string | null;
-  video_url?: string | null;
-  file_url?: string | null;
-  file_name?: string | null;
+  descriptions?: string[] | null;
+  tips?: string[] | null;
+  video_urls?: string[] | null;
+  file_urls?: string[] | null;
+  file_names?: string[] | null;
   spin_type?: 'S' | 'P' | null;
   examples?: string[] | null;
   display_order: number;
@@ -42,11 +42,11 @@ export const useUpdateQualificationItem = () => {
         .from('qualification_items')
         .update({
           content: item.content,
-          description: item.description,
-          tip: item.tip,
-          video_url: item.video_url,
-          file_url: item.file_url,
-          file_name: item.file_name,
+          descriptions: item.descriptions,
+          tips: item.tips,
+          video_urls: item.video_urls,
+          file_urls: item.file_urls,
+          file_names: item.file_names,
           spin_type: item.spin_type,
           examples: item.examples,
           display_order: item.display_order,

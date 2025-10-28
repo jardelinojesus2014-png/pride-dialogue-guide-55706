@@ -6,6 +6,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { QualificationItemEditor } from './QualificationItemEditor';
 import { SpinBadge } from './SpinBadge';
+import { UserNoteSection } from './UserNoteSection';
 import {
   useQualificationItems,
   useUpdateQualificationItem,
@@ -47,11 +48,11 @@ export const QualificationInfoSection = ({ darkMode }: QualificationInfoSectionP
       category: newItemCategory,
       content,
       display_order: maxOrder + 1,
-      description: null,
-      tip: null,
-      video_url: null,
-      file_url: null,
-      file_name: null,
+      descriptions: null,
+      tips: null,
+      video_urls: null,
+      file_urls: null,
+      file_names: null,
       spin_type: null,
       examples: null,
     });
@@ -98,60 +99,63 @@ export const QualificationInfoSection = ({ darkMode }: QualificationInfoSectionP
                     <div className="flex items-start gap-3">
                       {item.spin_type && <SpinBadge type={item.spin_type} />}
                       <span className="text-primary font-bold text-lg">•</span>
-                      <div className="flex-1">
+                      <div className="flex-1 space-y-2">
                         <span className="font-bold text-foreground">{item.content}</span>
-                        {item.description && (
-                          <div className="mt-2 bg-primary/10 border border-primary/20 rounded-lg p-3 text-sm">
-                            📝 {item.description}
+                        
+                        {item.descriptions && item.descriptions.map((desc, idx) => (
+                          <div key={idx} className="bg-primary/10 border border-primary/20 rounded-lg p-3 text-sm">
+                            📝 {desc}
                           </div>
-                        )}
-                        {item.tip && (
-                          <div className="bg-accent/10 border-l-4 border-accent p-3 rounded text-sm mt-2">
-                            <p className="text-foreground">
-                              💡 <strong>Dica:</strong> {item.tip}
-                            </p>
+                        ))}
+                        
+                        {item.examples && item.examples.map((example, idx) => (
+                          <div key={idx} className="bg-purple-50 dark:bg-purple-950/20 border border-purple-300 dark:border-purple-700 rounded-lg p-3 text-sm text-foreground">
+                            ✨ <strong>Exemplo:</strong> {example}
                           </div>
-                        )}
-                        {item.examples && item.examples.length > 0 && (
-                          <div className="mt-2 space-y-2">
-                            {item.examples.map((example, idx) => (
-                              <div key={idx} className="bg-purple-50 dark:bg-purple-950/20 border border-purple-300 dark:border-purple-700 rounded-lg p-3 text-sm text-foreground">
-                                ✨ <strong>Exemplo:</strong> {example}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                        {item.video_url && (
-                          <div className="mt-3">
+                        ))}
+                        
+                        {item.video_urls && item.video_urls.map((videoUrl, idx) => (
+                          <div key={idx} className="mt-3">
                             <div className="w-64 aspect-video rounded-lg overflow-hidden bg-black shadow-lg">
                               <iframe
-                                src={item.video_url}
+                                src={videoUrl}
                                 className="w-full h-full"
                                 allowFullScreen
-                                title={item.content}
+                                title={`${item.content} - Vídeo ${idx + 1}`}
                               />
                             </div>
                           </div>
-                        )}
-                        {item.file_url && item.file_name && (
+                        ))}
+                        
+                        {item.file_names && item.file_urls && item.file_names.map((fileName, idx) => (
                           <a
-                            href={item.file_url}
+                            key={idx}
+                            href={item.file_urls![idx]}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="mt-2 inline-flex items-center gap-2 text-sm bg-secondary hover:bg-secondary/80 text-secondary-foreground px-3 py-2 rounded-lg transition-colors"
+                            className="inline-flex items-center gap-2 text-sm bg-secondary hover:bg-secondary/80 text-secondary-foreground px-3 py-2 rounded-lg transition-colors mr-2 mt-2"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                             </svg>
-                            {item.file_name}
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
+                            {fileName}
                           </a>
-                        )}
+                        ))}
+                        
+                        {/* Dicas sempre no final com destaque especial */}
+                        {item.tips && item.tips.map((tip, idx) => (
+                          <div key={idx} className="bg-accent/10 border-l-4 border-accent p-4 rounded text-sm mt-3 ml-[-8px] mr-[-8px] animate-[pulse_3s_ease-in-out_infinite]">
+                            <p className="text-foreground">
+                              <span className="inline-block animate-[pulse_2s_ease-in-out_infinite]">💡</span> <strong>Dica:</strong> {tip}
+                            </p>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
+                  
+                  {/* User Note Section */}
+                  <UserNoteSection itemId={item.id} />
                 </div>
               )}
             </div>

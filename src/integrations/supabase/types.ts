@@ -169,48 +169,83 @@ export type Database = {
           category: string
           content: string
           created_at: string
-          description: string | null
+          descriptions: string[] | null
           display_order: number
           examples: string[] | null
-          file_name: string | null
-          file_url: string | null
+          file_names: string[] | null
+          file_urls: string[] | null
           id: string
           spin_type: string | null
-          tip: string | null
+          tips: string[] | null
           updated_at: string
-          video_url: string | null
+          video_urls: string[] | null
         }
         Insert: {
           category: string
           content: string
           created_at?: string
-          description?: string | null
+          descriptions?: string[] | null
           display_order?: number
           examples?: string[] | null
-          file_name?: string | null
-          file_url?: string | null
+          file_names?: string[] | null
+          file_urls?: string[] | null
           id?: string
           spin_type?: string | null
-          tip?: string | null
+          tips?: string[] | null
           updated_at?: string
-          video_url?: string | null
+          video_urls?: string[] | null
         }
         Update: {
           category?: string
           content?: string
           created_at?: string
-          description?: string | null
+          descriptions?: string[] | null
           display_order?: number
           examples?: string[] | null
-          file_name?: string | null
-          file_url?: string | null
+          file_names?: string[] | null
+          file_urls?: string[] | null
           id?: string
           spin_type?: string | null
-          tip?: string | null
+          tips?: string[] | null
           updated_at?: string
-          video_url?: string | null
+          video_urls?: string[] | null
         }
         Relationships: []
+      }
+      qualification_user_notes: {
+        Row: {
+          created_at: string
+          id: string
+          item_id: string
+          note: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_id: string
+          note: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_id?: string
+          note?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qualification_user_notes_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "qualification_items"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       script_checked_items: {
         Row: {
