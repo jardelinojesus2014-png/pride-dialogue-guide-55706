@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Button } from './ui/button';
-import { Upload } from 'lucide-react';
+import { Upload, Link as LinkIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface FluxoAudioUploadDialogProps {
   open: boolean;
@@ -18,137 +21,253 @@ export const FluxoAudioUploadDialog = ({
   onOpenChange,
   onUploadSuccess,
 }: FluxoAudioUploadDialogProps) => {
+  const [uploading, setUploading] = useState(false);
   const [title, setTitle] = useState('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-
-  const handleFileUpload = async () => {
-    if (!title.trim() || !selectedFile) {
-      alert('Por favor, preencha o título e selecione um arquivo');
-      return;
-    }
-
-    setIsUploading(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Usuário não autenticado');
-
-      const fileExt = selectedFile.name.split('.').pop();
-      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-      const filePath = fileName;
-
-      const { error: uploadError } = await supabase.storage
-        .from('fluxo_audio_files')
-        .upload(filePath, selectedFile);
-
-      if (uploadError) throw uploadError;
-
-      const { data: urlData } = supabase.storage
-        .from('fluxo_audio_files')
-        .getPublicUrl(filePath);
-
-      const { error: dbError } = await supabase
-        .from('fluxo_audio_files')
-        .insert({
-          title: title.trim(),
-          file_url: urlData.publicUrl,
-          file_path: filePath,
-          created_by: user.id,
-        });
-
-      if (dbError) throw dbError;
-
-      toast({
-        title: 'Áudio enviado com sucesso!',
-        description: `"${title}" foi adicionado.`,
-      });
-
-      resetForm();
-      onOpenChange(false);
-      onUploadSuccess();
-    } catch (error: any) {
-      console.error('Error uploading file:', error);
-      toast({
-        title: 'Erro ao enviar áudio',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } finally {
-      setIsUploading(false);
-    }
-  };
+  const [file, setFile] = useState<File | null>(null);
+  const [driveLink, setDriveLink] = useState('');
+  const [uploadMode, setUploadMode] = useState<'file' | 'link'>('file');
 
   const resetForm = () => {
     setTitle('');
-    setSelectedFile(null);
+    setFile(null);
+    setDriveLink('');
+    setUploadMode('file');
   };
 
-  const handleOpenChange = (open: boolean) => {
-    if (!open && !isUploading) {
-      resetForm();
+  const handleFileUpload = async () => {
+    if (!title.trim()) {
+      toast({
+        title: 'Título obrigatório',
+        description: 'Por favor, insira um título para o áudio.',
+        variant: 'destructive',
+      });
+      return;
     }
-    onOpenChange(open);
+
+    if (!file) {
+      toast({
+        title: 'Arquivo necessário',
+        description: 'Por favor, selecione um arquivo de áudio.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('fluxo_audio_files')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('fluxo_audio_files')
+        .getPublicUrl(filePath);
+
+      const { data: userData } = await supabase.auth.getUser();
+
+      // Get audio duration
+      const audio = new Audio();
+      audio.src = URL.createObjectURL(file);
+      
+      await new Promise((resolve) => {
+        audio.onloadedmetadata = () => {
+          resolve(null);
+        };
+      });
+
+      const durationSeconds = Math.floor(audio.duration);
+
+      const { error: insertError } = await supabase
+        .from('fluxo_audio_files')
+        .insert({
+          title: title.trim(),
+          file_path: filePath,
+          file_url: publicUrl,
+          created_by: userData.user?.id,
+          duration_seconds: durationSeconds,
+        });
+
+      if (insertError) throw insertError;
+
+      toast({
+        title: 'Áudio enviado',
+        description: 'O áudio foi enviado com sucesso.',
+      });
+
+      resetForm();
+      onUploadSuccess();
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Error uploading audio:', error);
+      toast({
+        title: 'Erro no upload',
+        description: 'Não foi possível enviar o áudio.',
+        variant: 'destructive',
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDriveLinkUpload = async () => {
+    if (!title.trim()) {
+      toast({
+        title: 'Título obrigatório',
+        description: 'Por favor, insira um título para o áudio.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!driveLink.trim()) {
+      toast({
+        title: 'Link necessário',
+        description: 'Por favor, insira um link do Google Drive.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const fileIdMatch = driveLink.match(/\/d\/([^/]+)/);
+      if (!fileIdMatch) {
+        throw new Error('Link do Google Drive inválido');
+      }
+
+      const fileId = fileIdMatch[1];
+      const directUrl = `https://drive.google.com/uc?id=${fileId}&export=download`;
+
+      const { data: userData } = await supabase.auth.getUser();
+
+      const { error: insertError } = await supabase
+        .from('fluxo_audio_files')
+        .insert({
+          title: title.trim(),
+          file_path: driveLink,
+          file_url: directUrl,
+          created_by: userData.user?.id,
+        });
+
+      if (insertError) throw insertError;
+
+      toast({
+        title: 'Áudio adicionado',
+        description: 'O link do áudio foi adicionado com sucesso.',
+      });
+
+      resetForm();
+      onUploadSuccess();
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Error adding drive link:', error);
+      toast({
+        title: 'Erro ao adicionar link',
+        description: 'Não foi possível adicionar o link do áudio.',
+        variant: 'destructive',
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (uploadMode === 'file') {
+      handleFileUpload();
+    } else {
+      handleDriveLinkUpload();
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Adicionar Áudio</DialogTitle>
+          <DialogTitle>Adicionar Novo Áudio</DialogTitle>
+          <DialogDescription>
+            Envie um arquivo de áudio do seu computador ou adicione um link do Google Drive.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="fluxo-audio-title">Título do Áudio *</Label>
-            <Input
-              id="fluxo-audio-title"
-              placeholder="Ex: Cadência de Follow-up"
+          <div>
+            <label className="block text-sm font-semibold text-foreground mb-2">
+              Título do Áudio *
+            </label>
+            <input
+              type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              disabled={isUploading}
+              placeholder="Digite o título do áudio"
+              className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground"
             />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="fluxo-audio-file">Arquivo de Áudio</Label>
-            <Input
-              id="fluxo-audio-file"
-              type="file"
-              accept="audio/*"
-              onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-              disabled={isUploading}
-            />
-            {selectedFile && (
-              <p className="text-sm text-muted-foreground">
-                Arquivo selecionado: {selectedFile.name}
-              </p>
-            )}
           </div>
 
           <div className="flex gap-2">
-            <Button
-              onClick={() => handleOpenChange(false)}
-              variant="outline"
-              className="flex-1"
-              disabled={isUploading}
+            <button
+              onClick={() => setUploadMode('file')}
+              className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all ${
+                uploadMode === 'file'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              }`}
             >
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleFileUpload}
-              disabled={!title.trim() || !selectedFile || isUploading}
-              className="flex-1 gap-2"
+              <Upload className="w-4 h-4 inline mr-2" />
+              Upload de Arquivo
+            </button>
+            <button
+              onClick={() => setUploadMode('link')}
+              className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all ${
+                uploadMode === 'link'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              }`}
             >
-              {isUploading ? (
-                <>Enviando...</>
-              ) : (
-                <>
-                  <Upload className="w-4 h-4" />
-                  Fazer Upload
-                </>
-              )}
-            </Button>
+              <LinkIcon className="w-4 h-4 inline mr-2" />
+              Link do Google Drive
+            </button>
           </div>
+
+          {uploadMode === 'file' ? (
+            <div>
+              <label className="block text-sm font-semibold text-foreground mb-2">
+                Arquivo de Áudio
+              </label>
+              <input
+                type="file"
+                accept="audio/*"
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground"
+              />
+            </div>
+          ) : (
+            <div>
+              <label className="block text-sm font-semibold text-foreground mb-2">
+                Link do Google Drive
+              </label>
+              <input
+                type="text"
+                value={driveLink}
+                onChange={(e) => setDriveLink(e.target.value)}
+                placeholder="Cole o link do Google Drive aqui"
+                className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground"
+              />
+            </div>
+          )}
+
+          <button
+            onClick={handleSubmit}
+            disabled={uploading || !title.trim() || (uploadMode === 'file' ? !file : !driveLink.trim())}
+            className="w-full bg-accent hover:bg-accent/90 disabled:opacity-50 text-accent-foreground font-bold px-6 py-3 rounded-lg transition-all"
+          >
+            {uploading ? 'Enviando...' : 'Adicionar Áudio'}
+          </button>
         </div>
       </DialogContent>
     </Dialog>
