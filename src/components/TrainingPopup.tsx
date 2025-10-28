@@ -127,9 +127,9 @@ export const TrainingPopup = ({ onClose }: TrainingPopupProps) => {
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-fade-in">
-      <div className="relative bg-gradient-to-br from-green-500 via-purple-600 to-orange-600 rounded-3xl p-1 max-w-4xl w-full animate-scale-in shadow-2xl">
-        <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 md:p-12 relative overflow-hidden min-h-[500px] flex items-center justify-center">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-fade-in overflow-y-auto">
+      <div className="relative bg-gradient-to-br from-green-500 via-purple-600 to-orange-600 rounded-3xl p-1 max-w-4xl w-full animate-scale-in shadow-2xl my-auto">
+        <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 md:p-12 relative overflow-hidden min-h-[400px] max-h-[90vh] overflow-y-auto flex items-center justify-center">
           {/* Efeitos de fundo */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-10 left-10 w-32 h-32 bg-green-500 rounded-full blur-3xl animate-pulse" />

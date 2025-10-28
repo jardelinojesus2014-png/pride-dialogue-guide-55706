@@ -6,10 +6,10 @@ interface MotivationalPopupProps {
 
 export const MotivationalPopup = ({ onClose }: MotivationalPopupProps) => {
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-fade-in">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-fade-in overflow-y-auto">
       {/* Conteúdo do Pop-up */}
-      <div className="relative bg-gradient-to-br from-orange-500 via-red-600 to-purple-700 rounded-3xl p-1 max-w-4xl w-full animate-scale-in shadow-2xl">
-        <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 md:p-12 text-center relative overflow-hidden">
+      <div className="relative bg-gradient-to-br from-orange-500 via-red-600 to-purple-700 rounded-3xl p-1 max-w-4xl w-full animate-scale-in shadow-2xl my-auto">
+        <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 md:p-12 text-center relative overflow-hidden max-h-[90vh] overflow-y-auto">
           {/* Efeitos de fundo */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-10 left-10 w-32 h-32 bg-orange-500 rounded-full blur-3xl animate-pulse" />
