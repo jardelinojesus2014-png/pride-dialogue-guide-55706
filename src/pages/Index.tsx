@@ -163,37 +163,37 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="pride" className="mt-0">
-              <Accordion type="multiple" defaultValue={["website", "reviews", "institutional", "mission"]} className="w-full space-y-4">
-                <AccordionItem value="website" className="bg-card rounded-lg shadow-lg border-2 border-primary/20 overflow-hidden">
-                  <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-primary/5">
-                    <h2 className="text-xl font-bold text-primary">🌐 Site Pride Corretora</h2>
+              <Accordion type="multiple" className="w-full space-y-4">
+                <AccordionItem value="website" className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-xl shadow-lg border-4 border-yellow-400 overflow-hidden">
+                  <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-white/50 dark:hover:bg-black/20 transition-colors">
+                    <h2 className="text-xl font-black text-blue-900 dark:text-blue-100">🌐 Site Pride Corretora</h2>
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <WebsiteSection darkMode={darkMode} />
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="reviews" className="bg-card rounded-lg shadow-lg border-2 border-primary/20 overflow-hidden">
-                  <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-primary/5">
-                    <h2 className="text-xl font-bold text-primary">⭐ Avaliações do Google</h2>
+                <AccordionItem value="reviews" className="bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-950 dark:to-yellow-900 rounded-xl shadow-lg border-4 border-blue-400 overflow-hidden">
+                  <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-white/50 dark:hover:bg-black/20 transition-colors">
+                    <h2 className="text-xl font-black text-yellow-900 dark:text-yellow-100">⭐ Avaliações do Google</h2>
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <GoogleReviewsSection darkMode={darkMode} />
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="institutional" className="bg-card rounded-lg shadow-lg border-2 border-primary/20 overflow-hidden">
-                  <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-primary/5">
-                    <h2 className="text-xl font-bold text-primary">🎥 Vídeo Institucional</h2>
+                <AccordionItem value="institutional" className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 rounded-xl shadow-lg border-4 border-pink-400 overflow-hidden">
+                  <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-white/50 dark:hover:bg-black/20 transition-colors">
+                    <h2 className="text-xl font-black text-purple-900 dark:text-purple-100">🎥 Vídeo Institucional</h2>
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <InstitutionalSection darkMode={darkMode} userViewMode={userViewMode} />
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="mission" className="bg-card rounded-lg shadow-lg border-2 border-primary/20 overflow-hidden">
-                  <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-primary/5">
-                    <h2 className="text-xl font-bold text-primary">🎯 Missão, Visão e Valores</h2>
+                <AccordionItem value="mission" className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 rounded-xl shadow-lg border-4 border-emerald-400 overflow-hidden">
+                  <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-white/50 dark:hover:bg-black/20 transition-colors">
+                    <h2 className="text-xl font-black text-green-900 dark:text-green-100">🎯 Missão, Visão e Valores</h2>
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <MissionVisionValuesSection darkMode={darkMode} userViewMode={userViewMode} />
@@ -203,28 +203,28 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="fluxo" className="mt-0">
-              <Accordion type="multiple" defaultValue={["qualification", "audio", "video"]} className="w-full space-y-4">
-                <AccordionItem value="qualification" className="bg-card rounded-lg shadow-lg border-2 border-primary/20 overflow-hidden">
-                  <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-primary/5">
-                    <h2 className="text-xl font-bold text-primary">📋 Informações de Qualificação</h2>
+              <Accordion type="multiple" className="w-full space-y-4">
+                <AccordionItem value="qualification" className="bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 rounded-xl shadow-lg border-4 border-red-400 overflow-hidden">
+                  <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-white/50 dark:hover:bg-black/20 transition-colors">
+                    <h2 className="text-xl font-black text-orange-900 dark:text-orange-100">📋 Informações de Qualificação</h2>
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <QualificationInfoSection darkMode={darkMode} userViewMode={userViewMode} />
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="audio" className="bg-card rounded-lg shadow-lg border-2 border-primary/20 overflow-hidden">
-                  <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-primary/5">
-                    <h2 className="text-xl font-bold text-primary">🎧 Áudios do Fluxo</h2>
+                <AccordionItem value="audio" className="bg-gradient-to-r from-cyan-50 to-cyan-100 dark:from-cyan-950 dark:to-cyan-900 rounded-xl shadow-lg border-4 border-blue-400 overflow-hidden">
+                  <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-white/50 dark:hover:bg-black/20 transition-colors">
+                    <h2 className="text-xl font-black text-cyan-900 dark:text-cyan-100">🎧 Áudios do Fluxo</h2>
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <FluxoAudioSection darkMode={darkMode} userViewMode={userViewMode} />
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="video" className="bg-card rounded-lg shadow-lg border-2 border-primary/20 overflow-hidden">
-                  <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-primary/5">
-                    <h2 className="text-xl font-bold text-primary">🎬 Vídeos do Fluxo</h2>
+                <AccordionItem value="video" className="bg-gradient-to-r from-pink-50 to-pink-100 dark:from-pink-950 dark:to-pink-900 rounded-xl shadow-lg border-4 border-purple-400 overflow-hidden">
+                  <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-white/50 dark:hover:bg-black/20 transition-colors">
+                    <h2 className="text-xl font-black text-pink-900 dark:text-pink-100">🎬 Vídeos do Fluxo</h2>
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <FluxoVideoSection darkMode={darkMode} userViewMode={userViewMode} />
