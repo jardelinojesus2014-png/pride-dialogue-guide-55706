@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Moon, Sun, FileDown, LogOut, Shield, Eye, EyeOff } from 'lucide-react';
+import { Moon, Sun, LogOut, Shield, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useNavigate } from 'react-router-dom';
@@ -17,6 +17,7 @@ import { MissionVisionValuesSection } from '@/components/MissionVisionValuesSect
 import { WebsiteSection } from '@/components/WebsiteSection';
 import { GoogleReviewsSection } from '@/components/GoogleReviewsSection';
 import { UserPurposeAnswersSection } from '@/components/UserPurposeAnswersSection';
+import { ExportDialog } from '@/components/ExportDialog';
 import { MotivationalPopup } from '@/components/MotivationalPopup';
 import { PurposePopup } from '@/components/PurposePopup';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -40,10 +41,6 @@ const Index = () => {
 
   const toggleUserViewMode = () => {
     setUserViewMode(!userViewMode);
-  };
-
-  const exportToPrint = () => {
-    window.print();
   };
 
   return (
@@ -75,13 +72,7 @@ const Index = () => {
                     <span className="hidden sm:inline">Admin</span>
                   </button>
                 )}
-                <button
-                  onClick={exportToPrint}
-                  className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
-                >
-                  <FileDown className="w-5 h-5" />
-                  <span className="hidden sm:inline">Exportar</span>
-                </button>
+                <ExportDialog darkMode={darkMode} />
                 {isAdmin && (
                   <button
                     onClick={toggleUserViewMode}
@@ -138,21 +129,31 @@ const Index = () => {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="prospeccao" className="mt-0">
+            <TabsContent value="prospeccao" className="mt-0" data-section="prospeccao-tab">
               {/* Golden Rule */}
+              <div data-section="golden-rule">
               <GoldenRule darkMode={darkMode} />
+              </div>
 
               {/* Script Sections */}
+              <div data-section="script-sections">
               <ScriptSections darkMode={darkMode} userViewMode={userViewMode} />
+              </div>
 
               {/* Do's and Don'ts */}
+              <div data-section="dos-donts">
               <DosDonts darkMode={darkMode} />
+              </div>
 
               {/* Admin Audio Section */}
+              <div data-section="admin-audio">
               <AdminAudioSection darkMode={darkMode} userViewMode={userViewMode} />
+              </div>
 
               {/* Video Section */}
+              <div data-section="videos">
               <VideoSection darkMode={darkMode} userViewMode={userViewMode} />
+              </div>
 
               {/* Botão Motivacional - Complemento da última seção */}
               <div className="mb-6 flex justify-center">
@@ -168,7 +169,7 @@ const Index = () => {
 
             <TabsContent value="pride" className="mt-0">
               <Accordion type="multiple" className="w-full space-y-4">
-                <AccordionItem value="website" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors">
+                <AccordionItem value="website" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="website">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <h2 className="text-xl font-black text-primary">🌐 Site Pride Corretora</h2>
                   </AccordionTrigger>
@@ -177,7 +178,7 @@ const Index = () => {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="reviews" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors">
+                <AccordionItem value="reviews" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="reviews">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <h2 className="text-xl font-black text-primary">⭐ Avaliações do Google</h2>
                   </AccordionTrigger>
@@ -186,7 +187,7 @@ const Index = () => {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="institutional" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors">
+                <AccordionItem value="institutional" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="institutional">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <h2 className="text-xl font-black text-primary">🎥 Vídeo Institucional</h2>
                   </AccordionTrigger>
@@ -195,7 +196,7 @@ const Index = () => {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="mission" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors">
+                <AccordionItem value="mission" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="mission-vision">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <h2 className="text-xl font-black text-primary">🎯 Missão, Visão e Valores</h2>
                   </AccordionTrigger>
@@ -208,7 +209,7 @@ const Index = () => {
 
             <TabsContent value="fluxo" className="mt-0">
               <Accordion type="multiple" className="w-full space-y-4">
-                <AccordionItem value="qualification" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors">
+                <AccordionItem value="qualification" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="qualification">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <h2 className="text-xl font-black text-primary">📋 Informações de Qualificação</h2>
                   </AccordionTrigger>
@@ -217,7 +218,7 @@ const Index = () => {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="pdf" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors">
+                <AccordionItem value="pdf" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="pdfs">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <h2 className="text-xl font-black text-primary">📄 Materiais em PDF</h2>
                   </AccordionTrigger>
@@ -226,7 +227,7 @@ const Index = () => {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="audio" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors">
+                <AccordionItem value="audio" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="fluxo-audio">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <h2 className="text-xl font-black text-primary">🎧 Áudios (Treinamentos)</h2>
                   </AccordionTrigger>
@@ -235,7 +236,7 @@ const Index = () => {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="video" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors">
+                <AccordionItem value="video" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="fluxo-video">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <h2 className="text-xl font-black text-primary">🎬 Vídeos (Treinamentos)</h2>
                   </AccordionTrigger>
@@ -244,7 +245,7 @@ const Index = () => {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="purpose-answers" className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 rounded-xl shadow-lg border-2 border-orange-200/50 dark:border-orange-700/30 overflow-hidden hover:border-orange-300/70 dark:hover:border-orange-600/50 transition-colors">
+                <AccordionItem value="purpose-answers" className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 rounded-xl shadow-lg border-2 border-orange-200/50 dark:border-orange-700/30 overflow-hidden hover:border-orange-300/70 dark:hover:border-orange-600/50 transition-colors" data-section="purpose-reflections">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <h2 className="text-xl font-black text-primary">📝 Minhas Reflexões de Propósito</h2>
                   </AccordionTrigger>
