@@ -16,6 +16,7 @@ import { InstitutionalSection } from '@/components/InstitutionalSection';
 import { MissionVisionValuesSection } from '@/components/MissionVisionValuesSection';
 import { WebsiteSection } from '@/components/WebsiteSection';
 import { GoogleReviewsSection } from '@/components/GoogleReviewsSection';
+import { UserPurposeAnswersSection } from '@/components/UserPurposeAnswersSection';
 import { MotivationalPopup } from '@/components/MotivationalPopup';
 import { PurposePopup } from '@/components/PurposePopup';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -206,17 +207,6 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="fluxo" className="mt-0">
-              {/* Botão Motivacional - Antes de todas as seções */}
-              <div className="mb-6 flex justify-center">
-                <button
-                  onClick={() => setShowPurposePopup(true)}
-                  className="bg-gradient-to-r from-red-600 via-purple-600 to-orange-600 hover:from-red-700 hover:via-purple-700 hover:to-orange-700 text-white font-black px-10 py-5 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-lg sm:text-xl animate-[pulse_4s_ease-in-out_infinite]"
-                  title="Encontre seu propósito"
-                >
-                  💭 Se está desmotivado - CLIQUE AQUI
-                </button>
-              </div>
-
               <Accordion type="multiple" className="w-full space-y-4">
                 <AccordionItem value="qualification" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
@@ -253,7 +243,27 @@ const Index = () => {
                     <FluxoVideoSection darkMode={darkMode} userViewMode={userViewMode} />
                   </AccordionContent>
                 </AccordionItem>
+
+                <AccordionItem value="purpose-answers" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors">
+                  <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
+                    <h2 className="text-xl font-black text-primary">📝 Minhas Reflexões de Propósito</h2>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-0 pb-0">
+                    <UserPurposeAnswersSection darkMode={darkMode} />
+                  </AccordionContent>
+                </AccordionItem>
               </Accordion>
+
+              {/* Botão Motivacional - Final da página */}
+              <div className="mt-6 mb-6 flex justify-center">
+                <button
+                  onClick={() => setShowPurposePopup(true)}
+                  className="bg-gradient-to-r from-orange-500 via-red-600 to-purple-700 hover:from-orange-600 hover:via-red-700 hover:to-purple-800 text-white font-black px-8 py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-sm sm:text-base animate-[pulse_3s_ease-in-out_infinite]"
+                  title="Encontre seu propósito"
+                >
+                  🔥 Se está desmotivado - CLIQUE AQUI
+                </button>
+              </div>
             </TabsContent>
           </Tabs>
 
