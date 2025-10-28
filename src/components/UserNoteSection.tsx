@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Edit, Save, X, StickyNote } from 'lucide-react';
+import { StickyNote, Save, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { useQualificationUserNotes, useUpsertUserNote, useDeleteUserNote } from '@/hooks/useQualificationUserNotes';
@@ -12,10 +12,17 @@ export const UserNoteSection = ({ itemId }: UserNoteSectionProps) => {
   const { data: notes = [] } = useQualificationUserNotes(itemId);
   const upsertNote = useUpsertUserNote();
   const deleteNote = useDeleteUserNote();
-  const [isEditing, setIsEditing] = useState(false);
+  const [showNote, setShowNote] = useState(false);
   const [noteText, setNoteText] = useState('');
 
   const userNote = notes[0]; // Each user has only one note per item
+
+  const handleToggle = () => {
+    if (!showNote && userNote) {
+      setNoteText(userNote.note);
+    }
+    setShowNote(!showNote);
+  };
 
   const handleSave = () => {
     if (noteText.trim()) {
@@ -24,83 +31,63 @@ export const UserNoteSection = ({ itemId }: UserNoteSectionProps) => {
         note: noteText.trim(),
         noteId: userNote?.id,
       });
-      setIsEditing(false);
+      setShowNote(false);
     }
-  };
-
-  const handleEdit = () => {
-    setNoteText(userNote?.note || '');
-    setIsEditing(true);
   };
 
   const handleDelete = () => {
     if (userNote && confirm('Tem certeza que deseja excluir sua nota?')) {
       deleteNote.mutate({ noteId: userNote.id, itemId });
       setNoteText('');
+      setShowNote(false);
     }
   };
 
-  if (isEditing) {
-    return (
-      <div className="mt-3 bg-yellow-50 dark:bg-yellow-950/20 border-2 border-yellow-400 dark:border-yellow-600 rounded-lg p-4 space-y-3">
-        <div className="flex items-center gap-2 text-sm font-bold text-yellow-800 dark:text-yellow-200">
-          <StickyNote className="w-4 h-4" />
-          Minha Nota
-        </div>
-        <Textarea
-          value={noteText}
-          onChange={(e) => setNoteText(e.target.value)}
-          placeholder="Adicione suas observações pessoais aqui..."
-          rows={3}
-          className="bg-white dark:bg-gray-900"
-        />
-        <div className="flex gap-2">
-          <Button size="sm" onClick={handleSave} disabled={!noteText.trim()}>
-            <Save className="w-4 h-4 mr-2" />
-            Salvar
-          </Button>
-          <Button size="sm" variant="outline" onClick={() => setIsEditing(false)}>
-            <X className="w-4 h-4 mr-2" />
-            Cancelar
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  if (userNote) {
-    return (
-      <div className="mt-3 bg-yellow-50 dark:bg-yellow-950/20 border-2 border-yellow-400 dark:border-yellow-600 rounded-lg p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 text-sm font-bold text-yellow-800 dark:text-yellow-200 mb-2">
-              <StickyNote className="w-4 h-4" />
-              Minha Nota
-            </div>
-            <p className="text-sm text-foreground whitespace-pre-wrap">{userNote.note}</p>
-          </div>
-          <div className="flex gap-2">
-            <Button size="sm" variant="ghost" onClick={handleEdit}>
-              <Edit className="w-4 h-4" />
-            </Button>
-            <Button size="sm" variant="ghost" onClick={handleDelete}>
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <Button
-      size="sm"
-      variant="outline"
-      onClick={handleEdit}
-      className="mt-3 w-full border-2 border-dashed border-yellow-400 hover:border-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-950/20"
-    >
-      <StickyNote className="w-4 h-4 mr-2" />
-      Adicionar Nota Pessoal
-    </Button>
+    <div className="mt-2">
+      <button
+        onClick={handleToggle}
+        className={`${
+          showNote || userNote ? 'bg-yellow-100 dark:bg-yellow-900/30' : 'bg-muted hover:bg-muted/80'
+        } p-2 rounded-lg transition-all duration-300 group relative`}
+        title="Nota pessoal"
+      >
+        <StickyNote
+          className={`w-4 h-4 ${
+            showNote || userNote ? 'text-yellow-600 dark:text-yellow-400' : 'text-muted-foreground'
+          }`}
+        />
+        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10 shadow-lg">
+          Nota Pessoal
+        </span>
+      </button>
+
+      {showNote && (
+        <div className="mt-3 space-y-2">
+          <Textarea
+            value={noteText}
+            onChange={(e) => setNoteText(e.target.value)}
+            placeholder="Adicione suas observações pessoais aqui..."
+            rows={3}
+            className="w-full p-3 rounded-lg border-2 border-yellow-400 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-900/20 focus:border-yellow-500 focus:outline-none transition-colors text-sm text-foreground"
+          />
+          <div className="flex gap-2">
+            <Button size="sm" onClick={handleSave} disabled={!noteText.trim()} className="bg-yellow-500 hover:bg-yellow-600 text-white">
+              <Save className="w-4 h-4 mr-2" />
+              Salvar
+            </Button>
+            {userNote && (
+              <Button size="sm" variant="outline" onClick={handleDelete}>
+                Excluir Nota
+              </Button>
+            )}
+            <Button size="sm" variant="outline" onClick={() => setShowNote(false)}>
+              <X className="w-4 h-4 mr-2" />
+              Fechar
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
