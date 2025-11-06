@@ -3,6 +3,7 @@ import { Moon, Sun, LogOut, Shield, Eye, EyeOff, Star, ClipboardList, BookOpen }
 import { useAuth } from '@/hooks/useAuth';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useNavigate } from 'react-router-dom';
+import { HowToUseVideoDialog } from '@/components/HowToUseVideoDialog';
 import { GoldenRule } from '@/components/GoldenRule';
 import { ScriptSections } from '@/components/ScriptSections';
 import { DosDonts } from '@/components/DosDonts';
@@ -64,6 +65,8 @@ const Index = () => {
                 </div>
               </div>
               <div className="flex gap-3">
+                <HowToUseVideoDialog isAdmin={isAdmin} />
+                
                 {isAdmin && (
                   <button
                     onClick={() => navigate('/admin')}

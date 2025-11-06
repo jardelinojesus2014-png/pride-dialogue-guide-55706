@@ -149,6 +149,33 @@ export type Database = {
         }
         Relationships: []
       }
+      how_to_use_video: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          title: string
+          updated_at: string | null
+          video_url: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          title?: string
+          updated_at?: string | null
+          video_url: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          title?: string
+          updated_at?: string | null
+          video_url?: string
+        }
+        Relationships: []
+      }
       institutional_videos: {
         Row: {
           created_at: string
