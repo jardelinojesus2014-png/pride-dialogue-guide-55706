@@ -111,45 +111,45 @@ const Index = () => {
 
           {/* Tabs Navigation */}
           <Tabs defaultValue="prospeccao" className="w-full">
-            <TabsList className="w-full flex mb-6 h-auto p-2 bg-gradient-hero rounded-lg gap-2">
+            <TabsList className="w-full flex flex-wrap mb-6 h-auto p-2 bg-gradient-hero rounded-lg gap-2">
               <TabsTrigger 
                 value="prospeccao" 
-                className="flex-1 text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all flex items-center justify-center gap-2"
+                className="flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all flex items-center justify-center gap-1.5"
               >
-                <ClipboardList className="w-5 h-5" />
-                <span className="hidden sm:inline">Roteiro de Prospecção SDR</span>
-                <span className="sm:hidden">Roteiro</span>
+                <ClipboardList className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden md:inline">Roteiro de Prospecção SDR</span>
+                <span className="md:hidden">Roteiro</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="cadencia" 
-                className="flex-1 text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all flex items-center justify-center gap-2"
+                className="flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all flex items-center justify-center gap-1.5"
               >
-                <Workflow className="w-5 h-5" />
-                <span className="hidden sm:inline">Fluxo/ Cadência de Atendimento</span>
-                <span className="sm:hidden">Cadência</span>
+                <Workflow className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden lg:inline">Fluxo/ Cadência de Atendimento</span>
+                <span className="lg:hidden">Cadência</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="fluxo" 
-                className="flex-1 text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all flex items-center justify-center gap-2"
+                className="flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all flex items-center justify-center gap-1.5"
               >
-                <BookOpen className="w-5 h-5" />
-                <span className="hidden sm:inline">Materiais Adicionais</span>
-                <span className="sm:hidden">Materiais</span>
+                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden md:inline">Materiais Adicionais</span>
+                <span className="md:hidden">Materiais</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="pride" 
-                className="flex-1 text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all flex items-center justify-center gap-2"
+                className="flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all flex items-center justify-center gap-1.5"
               >
-                <img src={logoPrideGold} alt="Pride" className="w-8 h-8 object-contain" />
-                <span className="hidden sm:inline">Conheça a Pride Corretora</span>
-                <span className="sm:hidden">Pride</span>
+                <img src={logoPrideGold} alt="Pride" className="w-6 h-6 sm:w-7 sm:h-7 object-contain" />
+                <span className="hidden lg:inline">Conheça a Pride Corretora</span>
+                <span className="lg:hidden">Pride</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="avaliacoes" 
-                className="flex-none text-sm sm:text-base font-black py-3 px-4 bg-accent text-primary hover:bg-accent/90 data-[state=active]:bg-accent data-[state=active]:text-primary rounded-lg transition-all flex items-center gap-2"
+                className="flex-none min-w-[110px] text-sm sm:text-base font-black py-2.5 px-3 bg-accent text-primary hover:bg-accent/90 data-[state=active]:bg-accent data-[state=active]:text-primary rounded-lg transition-all flex items-center justify-center gap-1.5"
               >
-                <Star className="w-5 h-5" />
-                Avaliações
+                <Star className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>Avaliações</span>
               </TabsTrigger>
             </TabsList>
 
