@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ChevronUp } from 'lucide-react';
 import { ScriptSection } from './ScriptSection';
-import { cadenciaData } from '@/data/cadenciaData';
+import { useCadenciaItems } from '@/hooks/useCadenciaItems';
 import { useScriptNotes } from '@/hooks/useScriptNotes';
 import { useScriptCheckedItems } from '@/hooks/useScriptCheckedItems';
 
@@ -11,11 +11,46 @@ interface CadenciaSectionsProps {
 }
 
 export const CadenciaSections = ({ darkMode, userViewMode = false }: CadenciaSectionsProps) => {
+  const { items, loading: itemsLoading } = useCadenciaItems();
   const { notes, saveNote, loading: notesLoading } = useScriptNotes();
   const { checkedItems, toggleCheck, loading: checkedLoading } = useScriptCheckedItems();
   
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [showNotes, setShowNotes] = useState<Record<string, boolean>>({});
+
+  // Group items by day
+  const dayGroups = items.reduce((acc, item) => {
+    if (!acc[item.day_id]) {
+      acc[item.day_id] = [];
+    }
+    acc[item.day_id].push(item);
+    return acc;
+  }, {} as Record<string, typeof items>);
+
+  // Create sections data structure
+  const daysData = Object.entries(dayGroups).map(([dayId, dayItems]) => {
+    const dayNumber = dayId.replace('dia', '');
+    const firstItem = dayItems[0];
+    
+    return {
+      id: dayId,
+      title: `DIA ${dayNumber}`,
+      subtitle: firstItem ? 
+        (dayId === 'dia1' ? 'Primeiro contato - Apresentação e qualificação inicial' :
+         dayId === 'dia2' ? 'Follow-up - Reforço com vídeo institucional' :
+         dayId === 'dia3' ? 'Reengajamento - Credibilidade com avaliações' :
+         'Encerramento - Última tentativa e disponibilização') : '',
+      colorClass: 'bg-accent/10',
+      items: dayItems.map(item => ({
+        id: item.item_id,
+        label: item.label,
+        script: item.script,
+        note: item.note,
+        tip: item.tip,
+        collect: item.collect
+      }))
+    };
+  }).sort((a, b) => a.id.localeCompare(b.id));
 
   const toggleSection = (section: string) => {
     setExpandedSections((prev) => ({
@@ -46,7 +81,7 @@ export const CadenciaSections = ({ darkMode, userViewMode = false }: CadenciaSec
 
   const hasExpandedSections = Object.values(expandedSections).some((val) => val === true);
 
-  if (notesLoading || checkedLoading) {
+  if (itemsLoading || notesLoading || checkedLoading) {
     return (
       <div className="flex justify-center items-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -57,7 +92,7 @@ export const CadenciaSections = ({ darkMode, userViewMode = false }: CadenciaSec
   return (
     <>
       <div className="space-y-4 mb-8">
-        {cadenciaData.map((day) => (
+        {daysData.map((day) => (
           <ScriptSection
             key={day.id}
             section={day}

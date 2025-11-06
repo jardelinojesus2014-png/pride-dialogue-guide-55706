@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Users, FileText, Music, Filter, X } from 'lucide-react';
+import { ArrowLeft, Users, FileText, Music, Filter, X, Workflow, Pencil } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserAudioFile } from '@/hooks/useUserAudioFiles';
@@ -19,6 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useCadenciaItems } from '@/hooks/useCadenciaItems';
+import { CadenciaItemEditor } from '@/components/CadenciaItemEditor';
 
 interface UserNote {
   id: string;
@@ -50,6 +52,10 @@ const Admin = () => {
   const [audioFiles, setAudioFiles] = useState<AdminAudioFile[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Cadência
+  const { items: cadenciaItems, updateItem: updateCadenciaItem, refreshItems: refreshCadenciaItems } = useCadenciaItems();
+  const [editingCadenciaItem, setEditingCadenciaItem] = useState<any>(null);
   
   // Estados de filtro
   const [showFilters, setShowFilters] = useState(false);
@@ -307,9 +313,10 @@ const Admin = () => {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="users">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="users">Usuários</TabsTrigger>
                 <TabsTrigger value="reflections">Reflexões</TabsTrigger>
+                <TabsTrigger value="cadencia">Cadência</TabsTrigger>
                 <TabsTrigger value="notes">Anotações ({filteredNotes.length})</TabsTrigger>
                 <TabsTrigger value="audio">Áudios ({filteredAudioFiles.length})</TabsTrigger>
               </TabsList>
@@ -320,6 +327,49 @@ const Admin = () => {
 
               <TabsContent value="reflections" className="space-y-4">
                 <PurposeReflectionsSection />
+              </TabsContent>
+
+              <TabsContent value="cadencia" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Gerenciar Itens da Cadência</CardTitle>
+                    <CardDescription>Edite os itens de cada dia da cadência de atendimento</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {['dia1', 'dia2', 'dia3', 'dia4'].map((dayId) => {
+                      const dayNumber = dayId.replace('dia', '');
+                      const dayItems = cadenciaItems.filter(item => item.day_id === dayId);
+                      
+                      return (
+                        <div key={dayId} className="space-y-2">
+                          <h3 className="text-lg font-bold text-primary flex items-center gap-2">
+                            <Workflow className="w-5 h-5" />
+                            DIA {dayNumber}
+                          </h3>
+                          <div className="grid gap-2">
+                            {dayItems.map((item) => (
+                              <Card key={item.id} className="bg-accent/5">
+                                <CardHeader className="py-3">
+                                  <div className="flex items-center justify-between">
+                                    <CardTitle className="text-sm">{item.label}</CardTitle>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => setEditingCadenciaItem(item)}
+                                    >
+                                      <Pencil className="w-4 h-4 mr-1" />
+                                      Editar
+                                    </Button>
+                                  </div>
+                                </CardHeader>
+                              </Card>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </CardContent>
+                </Card>
               </TabsContent>
 
               <TabsContent value="notes" className="space-y-4">
@@ -389,6 +439,18 @@ const Admin = () => {
           </CardContent>
         </Card>
       </div>
+
+      {editingCadenciaItem && (
+        <CadenciaItemEditor
+          item={editingCadenciaItem}
+          open={!!editingCadenciaItem}
+          onOpenChange={(open) => !open && setEditingCadenciaItem(null)}
+          onSave={async (itemId, updates) => {
+            await updateCadenciaItem(itemId, updates);
+            await refreshCadenciaItems();
+          }}
+        />
+      )}
     </div>
   );
 };

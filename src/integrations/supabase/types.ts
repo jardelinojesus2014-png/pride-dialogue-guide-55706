@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      cadencia_items: {
+        Row: {
+          collect: string[] | null
+          created_at: string
+          day_id: string
+          display_order: number
+          id: string
+          item_id: string
+          label: string
+          note: string | null
+          script: string
+          tip: string | null
+          updated_at: string
+        }
+        Insert: {
+          collect?: string[] | null
+          created_at?: string
+          day_id: string
+          display_order?: number
+          id?: string
+          item_id: string
+          label: string
+          note?: string | null
+          script: string
+          tip?: string | null
+          updated_at?: string
+        }
+        Update: {
+          collect?: string[] | null
+          created_at?: string
+          day_id?: string
+          display_order?: number
+          id?: string
+          item_id?: string
+          label?: string
+          note?: string | null
+          script?: string
+          tip?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       fluxo_audio_files: {
         Row: {
           created_at: string
