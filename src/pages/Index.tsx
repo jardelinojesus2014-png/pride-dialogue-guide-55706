@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { HowToUseVideoDialog } from '@/components/HowToUseVideoDialog';
 import { GoldenRule } from '@/components/GoldenRule';
 import { ScriptSections } from '@/components/ScriptSections';
+import { CadenciaSections } from '@/components/CadenciaSections';
 import { DosDonts } from '@/components/DosDonts';
 import { AdminAudioSection } from '@/components/AdminAudioSection';
 import { VideoSection } from '@/components/VideoSection';
@@ -214,13 +215,17 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="cadencia" className="mt-0">
-              <div className="bg-card rounded-xl shadow-lg border-2 border-primary/30 p-6">
-                <h2 className="text-2xl font-black text-primary mb-4">
+              <div className="mb-6 bg-gradient-hero rounded-xl shadow-lg p-6">
+                <h2 className="text-2xl font-black text-accent mb-2">
                   Fluxo/ Cadência de Atendimento
                 </h2>
-                <p className="text-muted-foreground">
-                  Conteúdo sobre fluxo e cadência de atendimento será adicionado aqui.
+                <p className="text-accent/80">
+                  Acompanhe o fluxo de cadência dos seus atendimentos dia a dia
                 </p>
+              </div>
+
+              <div data-section="cadencia-sections">
+                <CadenciaSections darkMode={darkMode} userViewMode={userViewMode} />
               </div>
             </TabsContent>
 
