@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Moon, Sun, LogOut, Shield, Eye, EyeOff, Star, ClipboardList, BookOpen } from 'lucide-react';
+import { Moon, Sun, LogOut, Shield, Eye, EyeOff, Star, ClipboardList, BookOpen, Workflow } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useNavigate } from 'react-router-dom';
@@ -121,6 +121,14 @@ const Index = () => {
                 <span className="sm:hidden">Roteiro</span>
               </TabsTrigger>
               <TabsTrigger 
+                value="cadencia" 
+                className="flex-1 text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all flex items-center justify-center gap-2"
+              >
+                <Workflow className="w-5 h-5" />
+                <span className="hidden sm:inline">Fluxo/ Cadência de Atendimento</span>
+                <span className="sm:hidden">Cadência</span>
+              </TabsTrigger>
+              <TabsTrigger 
                 value="fluxo" 
                 className="flex-1 text-base sm:text-lg font-black py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all flex items-center justify-center gap-2"
               >
@@ -194,6 +202,17 @@ const Index = () => {
                 >
                   🔥 Em caso de insegurança ou medo - CLIQUE AQUI
                 </button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="cadencia" className="mt-0">
+              <div className="bg-card rounded-xl shadow-lg border-2 border-primary/30 p-6">
+                <h2 className="text-2xl font-black text-primary mb-4">
+                  Fluxo/ Cadência de Atendimento
+                </h2>
+                <p className="text-muted-foreground">
+                  Conteúdo sobre fluxo e cadência de atendimento será adicionado aqui.
+                </p>
               </div>
             </TabsContent>
 
