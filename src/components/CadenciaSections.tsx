@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import { ChevronUp } from 'lucide-react';
+import { ChevronUp, Edit } from 'lucide-react';
 import { ScriptSection } from './ScriptSection';
 import { useCadenciaItems } from '@/hooks/useCadenciaItems';
 import { useCadenciaDays } from '@/hooks/useCadenciaDays';
 import { useScriptNotes } from '@/hooks/useScriptNotes';
 import { useScriptCheckedItems } from '@/hooks/useScriptCheckedItems';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { CadenciaDayEditor } from './CadenciaDayEditor';
+import { Button } from './ui/button';
 
 interface CadenciaSectionsProps {
   darkMode: boolean;
@@ -13,12 +16,14 @@ interface CadenciaSectionsProps {
 
 export const CadenciaSections = ({ darkMode, userViewMode = false }: CadenciaSectionsProps) => {
   const { items, loading: itemsLoading } = useCadenciaItems();
-  const { days, isLoading: daysLoading } = useCadenciaDays();
+  const { days, isLoading: daysLoading, updateDay } = useCadenciaDays();
   const { notes, saveNote, loading: notesLoading } = useScriptNotes();
   const { checkedItems, toggleCheck, loading: checkedLoading } = useScriptCheckedItems();
+  const { isAdmin } = useIsAdmin();
   
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [showNotes, setShowNotes] = useState<Record<string, boolean>>({});
+  const [editingDay, setEditingDay] = useState<string | null>(null);
 
   // Group items by day
   const dayGroups = items.reduce((acc, item) => {
@@ -91,25 +96,46 @@ export const CadenciaSections = ({ darkMode, userViewMode = false }: CadenciaSec
     );
   }
 
+  const editingDayData = editingDay ? days.find(d => d.day_id === editingDay) : null;
+
+  const handleSaveDay = (id: string, updates: Partial<typeof editingDayData>) => {
+    updateDay({ id, updates });
+  };
+
   return (
     <>
       <div className="space-y-4 mb-8">
-        {daysData.map((day) => (
-          <ScriptSection
-            key={day.id}
-            section={day}
-            darkMode={darkMode}
-            isExpanded={expandedSections[day.id] || false}
-            onToggle={() => toggleSection(day.id)}
-            checkedItems={checkedItems}
-            onToggleCheck={handleToggleCheck}
-            notes={notes}
-            onNoteChange={handleNoteChange}
-            showNotes={showNotes}
-            onToggleNotes={toggleNotes}
-            userViewMode={userViewMode}
-          />
-        ))}
+        {daysData.map((day) => {
+          const dayInfo = days.find(d => d.day_id === day.id);
+          
+          return (
+            <div key={day.id} className="relative">
+              {isAdmin && !userViewMode && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute -top-2 right-2 z-10"
+                  onClick={() => setEditingDay(day.id)}
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+              )}
+              <ScriptSection
+                section={day}
+                darkMode={darkMode}
+                isExpanded={expandedSections[day.id] || false}
+                onToggle={() => toggleSection(day.id)}
+                checkedItems={checkedItems}
+                onToggleCheck={handleToggleCheck}
+                notes={notes}
+                onNoteChange={handleNoteChange}
+                showNotes={showNotes}
+                onToggleNotes={toggleNotes}
+                userViewMode={userViewMode}
+              />
+            </div>
+          );
+        })}
       </div>
 
       {hasExpandedSections && (
@@ -121,6 +147,15 @@ export const CadenciaSections = ({ darkMode, userViewMode = false }: CadenciaSec
           <ChevronUp className="w-5 h-5" />
           <span className="hidden sm:inline">Minimizar Tudo</span>
         </button>
+      )}
+
+      {editingDayData && (
+        <CadenciaDayEditor
+          day={editingDayData}
+          open={!!editingDay}
+          onOpenChange={(open) => !open && setEditingDay(null)}
+          onSave={handleSaveDay}
+        />
       )}
     </>
   );
