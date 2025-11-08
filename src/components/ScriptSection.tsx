@@ -23,7 +23,7 @@ interface Section {
 }
 
 interface ScriptSectionProps {
-  section: Section;
+  section: Section & { items?: any[] };
   darkMode: boolean;
   isExpanded: boolean;
   onToggle: () => void;
@@ -53,7 +53,8 @@ export const ScriptSection = ({
   const [showAudioList, setShowAudioList] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const { audioFiles, uploadAudioFile, deleteAudioFile, loading } = useUserAudioFiles(section.id);
-  const { data: items = [], isLoading } = useScriptItems(section.id);
+  const { data: fetchedItems = [], isLoading } = useScriptItems(section.id);
+  const items = section.items || fetchedItems;
   const updateItem = useUpdateScriptItem();
   const deleteItem = useDeleteScriptItem();
   const { isAdmin, loading: adminLoading } = useIsAdmin();

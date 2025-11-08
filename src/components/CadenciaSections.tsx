@@ -42,12 +42,17 @@ export const CadenciaSections = ({ darkMode, userViewMode = false }: CadenciaSec
          'Encerramento - Última tentativa e disponibilização') : '',
       colorClass: 'bg-accent/10',
       items: dayItems.map(item => ({
-        id: item.item_id,
+        id: item.id,
+        section_id: item.day_id,
+        item_id: item.item_id,
         label: item.label,
         script: item.script,
-        note: item.note,
-        tip: item.tip,
-        collect: item.collect
+        alternatives: null,
+        tips: item.tip ? [item.tip] : null,
+        warnings: item.note ? [item.note] : null,
+        collect: item.collect,
+        response_options: null,
+        display_order: item.display_order
       }))
     };
   }).sort((a, b) => a.id.localeCompare(b.id));
