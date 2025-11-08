@@ -20,7 +20,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useCadenciaItems } from '@/hooks/useCadenciaItems';
+import { useCadenciaDays } from '@/hooks/useCadenciaDays';
 import { CadenciaItemEditor } from '@/components/CadenciaItemEditor';
+import { CadenciaDayEditor } from '@/components/CadenciaDayEditor';
 
 interface UserNote {
   id: string;
@@ -55,7 +57,9 @@ const Admin = () => {
   
   // Cadência
   const { items: cadenciaItems, updateItem: updateCadenciaItem, refreshItems: refreshCadenciaItems } = useCadenciaItems();
+  const { days: cadenciaDays, updateDay: updateCadenciaDay } = useCadenciaDays();
   const [editingCadenciaItem, setEditingCadenciaItem] = useState<any>(null);
+  const [editingCadenciaDay, setEditingCadenciaDay] = useState<any>(null);
   
   // Estados de filtro
   const [showFilters, setShowFilters] = useState(false);
@@ -339,13 +343,29 @@ const Admin = () => {
                     {['dia1', 'dia2', 'dia3', 'dia4'].map((dayId) => {
                       const dayNumber = dayId.replace('dia', '');
                       const dayItems = cadenciaItems.filter(item => item.day_id === dayId);
+                      const dayInfo = cadenciaDays.find(d => d.day_id === dayId);
                       
                       return (
                         <div key={dayId} className="space-y-2">
-                          <h3 className="text-lg font-bold text-primary flex items-center gap-2">
-                            <Workflow className="w-5 h-5" />
-                            DIA {dayNumber}
-                          </h3>
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-bold text-primary flex items-center gap-2">
+                              <Workflow className="w-5 h-5" />
+                              {dayInfo?.title || `DIA ${dayNumber}`}
+                              <span className="text-sm font-normal text-muted-foreground">
+                                {dayInfo?.subtitle}
+                              </span>
+                            </h3>
+                            {dayInfo && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => setEditingCadenciaDay(dayInfo)}
+                              >
+                                <Pencil className="w-4 h-4 mr-1" />
+                                Editar Título
+                              </Button>
+                            )}
+                          </div>
                           <div className="grid gap-2">
                             {dayItems.map((item) => (
                               <Card key={item.id} className="bg-accent/5">
@@ -448,6 +468,18 @@ const Admin = () => {
           onSave={async (itemId, updates) => {
             await updateCadenciaItem(itemId, updates);
             await refreshCadenciaItems();
+          }}
+        />
+      )}
+
+      {editingCadenciaDay && (
+        <CadenciaDayEditor
+          day={editingCadenciaDay}
+          open={!!editingCadenciaDay}
+          onOpenChange={(open) => !open && setEditingCadenciaDay(null)}
+          onSave={(id, updates) => {
+            updateCadenciaDay({ id, updates });
+            setEditingCadenciaDay(null);
           }}
         />
       )}

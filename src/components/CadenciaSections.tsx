@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ChevronUp } from 'lucide-react';
 import { ScriptSection } from './ScriptSection';
 import { useCadenciaItems } from '@/hooks/useCadenciaItems';
+import { useCadenciaDays } from '@/hooks/useCadenciaDays';
 import { useScriptNotes } from '@/hooks/useScriptNotes';
 import { useScriptCheckedItems } from '@/hooks/useScriptCheckedItems';
 
@@ -12,6 +13,7 @@ interface CadenciaSectionsProps {
 
 export const CadenciaSections = ({ darkMode, userViewMode = false }: CadenciaSectionsProps) => {
   const { items, loading: itemsLoading } = useCadenciaItems();
+  const { days, isLoading: daysLoading } = useCadenciaDays();
   const { notes, saveNote, loading: notesLoading } = useScriptNotes();
   const { checkedItems, toggleCheck, loading: checkedLoading } = useScriptCheckedItems();
   
@@ -27,19 +29,14 @@ export const CadenciaSections = ({ darkMode, userViewMode = false }: CadenciaSec
     return acc;
   }, {} as Record<string, typeof items>);
 
-  // Create sections data structure
+  // Create sections data structure with titles from database
   const daysData = Object.entries(dayGroups).map(([dayId, dayItems]) => {
-    const dayNumber = dayId.replace('dia', '');
-    const firstItem = dayItems[0];
+    const dayInfo = days.find(d => d.day_id === dayId);
     
     return {
       id: dayId,
-      title: `DIA ${dayNumber}`,
-      subtitle: firstItem ? 
-        (dayId === 'dia1' ? 'Primeiro contato - Apresentação e qualificação inicial' :
-         dayId === 'dia2' ? 'Follow-up - Reforço com vídeo institucional' :
-         dayId === 'dia3' ? 'Reengajamento - Credibilidade com avaliações' :
-         'Encerramento - Última tentativa e disponibilização') : '',
+      title: dayInfo?.title || `DIA ${dayId.replace('dia', '')}`,
+      subtitle: dayInfo?.subtitle || '',
       colorClass: 'bg-accent/10',
       items: dayItems.map(item => ({
         id: item.id,
@@ -86,7 +83,7 @@ export const CadenciaSections = ({ darkMode, userViewMode = false }: CadenciaSec
 
   const hasExpandedSections = Object.values(expandedSections).some((val) => val === true);
 
-  if (itemsLoading || notesLoading || checkedLoading) {
+  if (itemsLoading || daysLoading || notesLoading || checkedLoading) {
     return (
       <div className="flex justify-center items-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>

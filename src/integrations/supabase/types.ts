@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      cadencia_days: {
+        Row: {
+          created_at: string
+          day_id: string
+          id: string
+          subtitle: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day_id: string
+          id?: string
+          subtitle: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day_id?: string
+          id?: string
+          subtitle?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cadencia_items: {
         Row: {
           collect: string[] | null
