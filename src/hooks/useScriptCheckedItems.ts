@@ -18,6 +18,8 @@ export const useScriptCheckedItems = () => {
     if (!user) return;
 
     try {
+      // Explicitly filter by current user's ID to ensure we only get their items
+      // even if RLS allows admins to see all items
       const { data, error } = await supabase
         .from('script_checked_items')
         .select('*')
@@ -27,8 +29,11 @@ export const useScriptCheckedItems = () => {
 
       const checkedMap: Record<string, boolean> = {};
       data?.forEach((item) => {
-        const key = `${item.section_id}-${item.item_id}`;
-        checkedMap[key] = item.is_checked;
+        // Double-check that we only include items for the current user
+        if (item.user_id === user.id) {
+          const key = `${item.section_id}-${item.item_id}`;
+          checkedMap[key] = item.is_checked;
+        }
       });
 
       setCheckedItems(checkedMap);

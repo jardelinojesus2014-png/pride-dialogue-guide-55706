@@ -15,10 +15,17 @@ export const useQualificationUserNotes = (itemId: string) => {
   return useQuery({
     queryKey: ['qualification-user-notes', itemId],
     queryFn: async () => {
+      // Get current user to filter notes
+      const { data: userData } = await supabase.auth.getUser();
+      const userId = userData.user?.id;
+      
+      if (!userId) return [];
+
       const { data, error } = await supabase
         .from('qualification_user_notes')
         .select('*')
-        .eq('item_id', itemId);
+        .eq('item_id', itemId)
+        .eq('user_id', userId); // Explicitly filter by current user
 
       if (error) throw error;
       return data as QualificationUserNote[];
