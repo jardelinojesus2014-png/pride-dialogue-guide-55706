@@ -18,6 +18,8 @@ export const useScriptNotes = () => {
     if (!user) return;
 
     try {
+      // Explicitly filter by current user's ID to ensure we only get their notes
+      // even if RLS allows admins to see all notes
       const { data, error } = await supabase
         .from('script_notes')
         .select('*')
@@ -27,8 +29,11 @@ export const useScriptNotes = () => {
 
       const notesMap: Record<string, string> = {};
       data?.forEach((note) => {
-        const key = `${note.section_id}-${note.item_id}`;
-        notesMap[key] = note.note;
+        // Double-check that we only include notes for the current user
+        if (note.user_id === user.id) {
+          const key = `${note.section_id}-${note.item_id}`;
+          notesMap[key] = note.note;
+        }
       });
 
       setNotes(notesMap);
