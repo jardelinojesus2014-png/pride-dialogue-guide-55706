@@ -649,6 +649,33 @@ export type Database = {
         }
         Relationships: []
       }
+      section_titles: {
+        Row: {
+          created_at: string
+          id: string
+          section_key: string
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          section_key: string
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          section_key?: string
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_audio_files: {
         Row: {
           created_at: string
