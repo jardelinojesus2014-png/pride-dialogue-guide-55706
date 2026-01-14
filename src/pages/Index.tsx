@@ -21,6 +21,8 @@ import { WebsiteSection } from '@/components/WebsiteSection';
 import { GoogleReviewsSection } from '@/components/GoogleReviewsSection';
 import { UserPurposeAnswersSection } from '@/components/UserPurposeAnswersSection';
 import { EditableSectionHeader } from '@/components/EditableSectionHeader';
+import { EditableTabTitle } from '@/components/EditableTabTitle';
+import { EditableAccordionTitle } from '@/components/EditableAccordionTitle';
 
 import { MotivationalPopup } from '@/components/MotivationalPopup';
 import { PurposePopup } from '@/components/PurposePopup';
@@ -122,50 +124,68 @@ const Index = () => {
             <TabsList className="w-full flex flex-wrap mb-6 h-auto p-2 bg-gradient-hero rounded-lg gap-2">
               <TabsTrigger 
                 value="prospeccao" 
-                className="flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all flex items-center justify-center gap-1.5"
+                className="flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all"
               >
-                <ClipboardList className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                <span className="hidden md:inline text-center leading-tight">
-                  Roteiro de<br />Prospecção SDR
-                </span>
-                <span className="md:hidden">Roteiro</span>
+                <EditableTabTitle
+                  sectionKey="tab_prospeccao"
+                  defaultTitle="Roteiro de&#10;Prospecção SDR"
+                  defaultShortTitle="Roteiro"
+                  isAdmin={isAdmin}
+                  userViewMode={userViewMode}
+                  icon={<ClipboardList className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />}
+                />
               </TabsTrigger>
               <TabsTrigger 
                 value="cadencia" 
-                className="flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all flex items-center justify-center gap-1.5"
+                className="flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all"
               >
-                <Workflow className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                <span className="hidden lg:inline text-center leading-tight">
-                  Fluxo/ Cadência<br />- Qualificação
-                </span>
-                <span className="lg:hidden">Cadência</span>
+                <EditableTabTitle
+                  sectionKey="tab_cadencia"
+                  defaultTitle="Fluxo/ Cadência&#10;- Qualificação"
+                  defaultShortTitle="Cadência"
+                  isAdmin={isAdmin}
+                  userViewMode={userViewMode}
+                  icon={<Workflow className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />}
+                />
               </TabsTrigger>
               <TabsTrigger 
                 value="fluxo" 
-                className="flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all flex items-center justify-center gap-1.5"
+                className="flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all"
               >
-                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                <span className="hidden md:inline text-center leading-tight">
-                  Materiais<br />Adicionais
-                </span>
-                <span className="md:hidden">Materiais</span>
+                <EditableTabTitle
+                  sectionKey="tab_materiais"
+                  defaultTitle="Materiais&#10;Adicionais"
+                  defaultShortTitle="Materiais"
+                  isAdmin={isAdmin}
+                  userViewMode={userViewMode}
+                  icon={<BookOpen className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />}
+                />
               </TabsTrigger>
               <TabsTrigger 
                 value="pride" 
-                className="flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all flex items-center justify-center gap-1.5"
+                className="flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all"
               >
-                <img src={logoPrideGold} alt="Pride" className="w-6 h-6 sm:w-7 sm:h-7 object-contain flex-shrink-0" />
-                <span className="hidden lg:inline text-center leading-tight">
-                  Conheça a<br />Pride Corretora
-                </span>
-                <span className="lg:hidden">Pride</span>
+                <EditableTabTitle
+                  sectionKey="tab_pride"
+                  defaultTitle="Conheça a&#10;Pride Corretora"
+                  defaultShortTitle="Pride"
+                  isAdmin={isAdmin}
+                  userViewMode={userViewMode}
+                  icon={<img src={logoPrideGold} alt="Pride" className="w-6 h-6 sm:w-7 sm:h-7 object-contain flex-shrink-0" />}
+                />
               </TabsTrigger>
               <TabsTrigger 
                 value="avaliacoes" 
-                className="flex-none min-w-[110px] text-sm sm:text-base font-black py-2.5 px-3 bg-accent text-primary hover:bg-accent/90 data-[state=active]:bg-accent data-[state=active]:text-primary rounded-lg transition-all flex items-center justify-center gap-1.5"
+                className="flex-none min-w-[110px] text-sm sm:text-base font-black py-2.5 px-3 bg-accent text-primary hover:bg-accent/90 data-[state=active]:bg-accent data-[state=active]:text-primary rounded-lg transition-all"
               >
-                <Star className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                <span>Avaliações</span>
+                <EditableTabTitle
+                  sectionKey="tab_avaliacoes"
+                  defaultTitle="Avaliações"
+                  isAdmin={isAdmin}
+                  userViewMode={userViewMode}
+                  icon={<Star className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />}
+                  showShortOnMobile={false}
+                />
               </TabsTrigger>
             </TabsList>
 
@@ -189,7 +209,12 @@ const Index = () => {
               <Accordion type="multiple" className="mb-4" defaultValue={[]}>
                 <AccordionItem value="admin-audio" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="admin-audio">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
-                    <h2 className="text-xl font-black text-primary">🎵 Áudios de Treinamento</h2>
+                    <EditableAccordionTitle
+                      sectionKey="accordion_audios_treinamento"
+                      defaultTitle="🎵 Áudios de Treinamento"
+                      isAdmin={isAdmin}
+                      userViewMode={userViewMode}
+                    />
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <AdminAudioSection darkMode={darkMode} userViewMode={userViewMode} />
@@ -201,7 +226,12 @@ const Index = () => {
               <Accordion type="multiple" className="mb-4" defaultValue={[]}>
                 <AccordionItem value="videos" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="videos">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
-                    <h2 className="text-xl font-black text-primary">🎥 Vídeos de Treinamento</h2>
+                    <EditableAccordionTitle
+                      sectionKey="accordion_videos_treinamento"
+                      defaultTitle="🎥 Vídeos de Treinamento"
+                      isAdmin={isAdmin}
+                      userViewMode={userViewMode}
+                    />
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <VideoSection darkMode={darkMode} userViewMode={userViewMode} />
@@ -243,7 +273,12 @@ const Index = () => {
               <Accordion type="multiple" className="w-full space-y-4">
                 <AccordionItem value="website" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="website">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
-                    <h2 className="text-xl font-black text-primary">🌐 Site Pride Corretora</h2>
+                    <EditableAccordionTitle
+                      sectionKey="accordion_site_pride"
+                      defaultTitle="🌐 Site Pride Corretora"
+                      isAdmin={isAdmin}
+                      userViewMode={userViewMode}
+                    />
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <WebsiteSection darkMode={darkMode} />
@@ -252,7 +287,12 @@ const Index = () => {
 
                 <AccordionItem value="reviews" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="reviews">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
-                    <h2 className="text-xl font-black text-primary">⭐ Avaliações do Google</h2>
+                    <EditableAccordionTitle
+                      sectionKey="accordion_avaliacoes_google"
+                      defaultTitle="⭐ Avaliações do Google"
+                      isAdmin={isAdmin}
+                      userViewMode={userViewMode}
+                    />
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <GoogleReviewsSection darkMode={darkMode} />
@@ -261,7 +301,12 @@ const Index = () => {
 
                 <AccordionItem value="institutional" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="institutional">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
-                    <h2 className="text-xl font-black text-primary">🎥 Vídeo Institucional</h2>
+                    <EditableAccordionTitle
+                      sectionKey="accordion_video_institucional"
+                      defaultTitle="🎥 Vídeo Institucional"
+                      isAdmin={isAdmin}
+                      userViewMode={userViewMode}
+                    />
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <InstitutionalSection darkMode={darkMode} userViewMode={userViewMode} />
@@ -270,7 +315,12 @@ const Index = () => {
 
                 <AccordionItem value="mission" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="mission-vision">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
-                    <h2 className="text-xl font-black text-primary">🎯 Missão, Visão e Valores</h2>
+                    <EditableAccordionTitle
+                      sectionKey="accordion_missao_visao"
+                      defaultTitle="🎯 Missão, Visão e Valores"
+                      isAdmin={isAdmin}
+                      userViewMode={userViewMode}
+                    />
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <MissionVisionValuesSection darkMode={darkMode} userViewMode={userViewMode} />
@@ -294,7 +344,12 @@ const Index = () => {
               <Accordion type="multiple" className="w-full space-y-4">
                 <AccordionItem value="qualification" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="qualification">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
-                    <h2 className="text-xl font-black text-primary">📋 Informações de Qualificação</h2>
+                    <EditableAccordionTitle
+                      sectionKey="accordion_info_qualificacao"
+                      defaultTitle="📋 Informações de Qualificação"
+                      isAdmin={isAdmin}
+                      userViewMode={userViewMode}
+                    />
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <QualificationInfoSection darkMode={darkMode} userViewMode={userViewMode} />
@@ -303,7 +358,12 @@ const Index = () => {
 
                 <AccordionItem value="pdf" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="pdfs">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
-                    <h2 className="text-xl font-black text-primary">📄 Materiais em PDF</h2>
+                    <EditableAccordionTitle
+                      sectionKey="accordion_materiais_pdf"
+                      defaultTitle="📄 Materiais em PDF"
+                      isAdmin={isAdmin}
+                      userViewMode={userViewMode}
+                    />
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <PdfSection darkMode={darkMode} userViewMode={userViewMode} />
@@ -312,7 +372,12 @@ const Index = () => {
 
                 <AccordionItem value="audio" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="fluxo-audio">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
-                    <h2 className="text-xl font-black text-primary">🎧 Áudios (Treinamentos)</h2>
+                    <EditableAccordionTitle
+                      sectionKey="accordion_audios_fluxo"
+                      defaultTitle="🎧 Áudios (Treinamentos)"
+                      isAdmin={isAdmin}
+                      userViewMode={userViewMode}
+                    />
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <FluxoAudioSection darkMode={darkMode} userViewMode={userViewMode} />
@@ -321,7 +386,12 @@ const Index = () => {
 
                 <AccordionItem value="video" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="fluxo-video">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
-                    <h2 className="text-xl font-black text-primary">🎬 Vídeos (Treinamentos)</h2>
+                    <EditableAccordionTitle
+                      sectionKey="accordion_videos_fluxo"
+                      defaultTitle="🎬 Vídeos (Treinamentos)"
+                      isAdmin={isAdmin}
+                      userViewMode={userViewMode}
+                    />
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <FluxoVideoSection darkMode={darkMode} userViewMode={userViewMode} />
@@ -330,7 +400,12 @@ const Index = () => {
 
                 <AccordionItem value="purpose-answers" className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 rounded-xl shadow-lg border-2 border-orange-200/50 dark:border-orange-700/30 overflow-hidden hover:border-orange-300/70 dark:hover:border-orange-600/50 transition-colors" data-section="purpose-reflections">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
-                    <h2 className="text-xl font-black text-primary">📝 Minhas Reflexões de Propósito</h2>
+                    <EditableAccordionTitle
+                      sectionKey="accordion_reflexoes_proposito"
+                      defaultTitle="📝 Minhas Reflexões de Propósito"
+                      isAdmin={isAdmin}
+                      userViewMode={userViewMode}
+                    />
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0">
                     <UserPurposeAnswersSection darkMode={darkMode} />
