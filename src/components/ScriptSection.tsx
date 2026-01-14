@@ -173,8 +173,10 @@ export const ScriptSection = ({
             <p className="text-muted-foreground">Carregando...</p>
           ) : (
             <>
-              {items.map((item, index) => {
-                const key = `${section.id}-${item.item_id}`;
+            {items.map((item, index) => {
+                // Use item_id if available (from database), otherwise fall back to id (from static data)
+                const itemIdentifier = item.item_id || item.id;
+                const key = `${section.id}-${itemIdentifier}`;
                 return isEditMode && effectiveIsAdmin ? (
                   <ScriptItemEditor
                     key={item.id}
@@ -192,11 +194,11 @@ export const ScriptSection = ({
                     item={item}
                     darkMode={darkMode}
                     isChecked={checkedItems[key] || false}
-                    onToggleCheck={() => onToggleCheck(section.id, item.item_id)}
+                    onToggleCheck={() => onToggleCheck(section.id, itemIdentifier)}
                     note={notes[key] || ''}
-                    onNoteChange={(value) => onNoteChange(section.id, item.item_id, value)}
+                    onNoteChange={(value) => onNoteChange(section.id, itemIdentifier, value)}
                     showNote={showNotes[key] || false}
-                    onToggleNote={() => onToggleNotes(section.id, item.item_id)}
+                    onToggleNote={() => onToggleNotes(section.id, itemIdentifier)}
                   />
                 );
               })}
