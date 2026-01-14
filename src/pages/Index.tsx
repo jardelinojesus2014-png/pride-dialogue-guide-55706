@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Moon, Sun, LogOut, Shield, Eye, EyeOff, Star, ClipboardList, BookOpen, Workflow } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { useSectionTitles } from '@/hooks/useSectionTitles';
 import { useNavigate } from 'react-router-dom';
 import { HowToUseVideoDialog } from '@/components/HowToUseVideoDialog';
 import { GoldenRule } from '@/components/GoldenRule';
@@ -19,6 +20,7 @@ import { MissionVisionValuesSection } from '@/components/MissionVisionValuesSect
 import { WebsiteSection } from '@/components/WebsiteSection';
 import { GoogleReviewsSection } from '@/components/GoogleReviewsSection';
 import { UserPurposeAnswersSection } from '@/components/UserPurposeAnswersSection';
+import { EditableSectionHeader } from '@/components/EditableSectionHeader';
 
 import { MotivationalPopup } from '@/components/MotivationalPopup';
 import { PurposePopup } from '@/components/PurposePopup';
@@ -31,12 +33,17 @@ import logoPrideGold from '@/assets/Logo_Pride-2.png';
 const Index = () => {
   const { signOut, user } = useAuth();
   const { isAdmin } = useIsAdmin();
+  const { data: sectionTitles = {} } = useSectionTitles();
   const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
   const [userViewMode, setUserViewMode] = useState(false);
   const [showMotivationalPopup, setShowMotivationalPopup] = useState(false);
   const [showPurposePopup, setShowPurposePopup] = useState(false);
   const [showTrainingPopup, setShowTrainingPopup] = useState(false);
+
+  // Get section titles with fallbacks
+  const getCadenciaTitle = () => sectionTitles['cadencia_header']?.title || 'Fluxo/ Cadência - Qualificação';
+  const getCadenciaSubtitle = () => sectionTitles['cadencia_header']?.subtitle || 'Acompanhe o fluxo de cadência dos seus atendimentos dia a dia';
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -129,7 +136,7 @@ const Index = () => {
               >
                 <Workflow className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                 <span className="hidden lg:inline text-center leading-tight">
-                  Fluxo/ Cadência<br />de Atendimento
+                  Fluxo/ Cadência<br />- Qualificação
                 </span>
                 <span className="lg:hidden">Cadência</span>
               </TabsTrigger>
@@ -216,12 +223,15 @@ const Index = () => {
 
             <TabsContent value="cadencia" className="mt-0">
               <div className="mb-6 bg-gradient-hero rounded-xl shadow-lg p-6">
-                <h2 className="text-2xl font-black text-accent mb-2">
-                  Fluxo/ Cadência de Atendimento
-                </h2>
-                <p className="text-accent/80">
-                  Acompanhe o fluxo de cadência dos seus atendimentos dia a dia
-                </p>
+                <EditableSectionHeader
+                  sectionKey="cadencia_header"
+                  title={getCadenciaTitle()}
+                  subtitle={getCadenciaSubtitle()}
+                  isAdmin={isAdmin}
+                  userViewMode={userViewMode}
+                  titleClassName="text-2xl font-black text-accent mb-2"
+                  subtitleClassName="text-accent/80"
+                />
               </div>
 
               <div data-section="cadencia-sections">
