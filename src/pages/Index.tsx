@@ -423,10 +423,11 @@ const Index = () => {
               {fluxoExpandedItems.length > 0 && (
                 <button
                   onClick={() => setFluxoExpandedItems([])}
-                  className="fixed bottom-6 right-6 bg-accent hover:bg-accent/90 text-primary font-bold px-6 py-3 rounded-full shadow-xl transition-all duration-300 hover:scale-105 flex items-center gap-2 z-50"
+                  className="fixed bottom-6 right-6 bg-gradient-hero hover:opacity-90 text-accent font-bold px-4 py-3 rounded-full shadow-2xl flex items-center gap-2 transition-all duration-300 hover:scale-110 z-50 border-2 border-accent"
+                  title="Minimizar todas as seções"
                 >
                   <ChevronUp className="w-5 h-5" />
-                  Minimizar Tudo
+                  <span className="hidden sm:inline">Minimizar Tudo</span>
                 </button>
               )}
 
