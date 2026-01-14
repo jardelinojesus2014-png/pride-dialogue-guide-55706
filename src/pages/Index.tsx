@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Moon, Sun, LogOut, Shield, Eye, EyeOff, Star, ClipboardList, BookOpen, Workflow } from 'lucide-react';
+import { Moon, Sun, LogOut, Shield, Eye, EyeOff, Star, ClipboardList, BookOpen, Workflow, ChevronUp } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useSectionTitles } from '@/hooks/useSectionTitles';
@@ -42,6 +42,7 @@ const Index = () => {
   const [showMotivationalPopup, setShowMotivationalPopup] = useState(false);
   const [showPurposePopup, setShowPurposePopup] = useState(false);
   const [showTrainingPopup, setShowTrainingPopup] = useState(false);
+  const [fluxoExpandedItems, setFluxoExpandedItems] = useState<string[]>([]);
 
   // Get section titles with fallbacks
   const getCadenciaTitle = () => sectionTitles['cadencia_header']?.title || 'Fluxo/ Cadência - Qualificação';
@@ -341,7 +342,12 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="fluxo" className="mt-0">
-              <Accordion type="multiple" className="w-full space-y-4">
+              <Accordion 
+                type="multiple" 
+                className="w-full space-y-4"
+                value={fluxoExpandedItems}
+                onValueChange={setFluxoExpandedItems}
+              >
                 <AccordionItem value="qualification" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="qualification">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <EditableAccordionTitle
@@ -412,6 +418,17 @@ const Index = () => {
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
+
+              {/* Botão Minimizar Tudo */}
+              {fluxoExpandedItems.length > 0 && (
+                <button
+                  onClick={() => setFluxoExpandedItems([])}
+                  className="fixed bottom-6 right-6 bg-accent hover:bg-accent/90 text-primary font-bold px-6 py-3 rounded-full shadow-xl transition-all duration-300 hover:scale-105 flex items-center gap-2 z-50"
+                >
+                  <ChevronUp className="w-5 h-5" />
+                  Minimizar Tudo
+                </button>
+              )}
 
               {/* Botão Motivacional - Final da página */}
               <div className="mt-6 mb-6 flex justify-center">
