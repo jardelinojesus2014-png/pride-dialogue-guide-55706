@@ -23,6 +23,7 @@ import { UserPurposeAnswersSection } from '@/components/UserPurposeAnswersSectio
 import { EditableSectionHeader } from '@/components/EditableSectionHeader';
 import { EditableTabTitle } from '@/components/EditableTabTitle';
 import { EditableAccordionTitle } from '@/components/EditableAccordionTitle';
+import { UnderConstructionBanner } from '@/components/UnderConstructionBanner';
 
 import { MotivationalPopup } from '@/components/MotivationalPopup';
 import { PurposePopup } from '@/components/PurposePopup';
@@ -253,6 +254,8 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="cadencia" className="mt-0">
+              <UnderConstructionBanner />
+              
               <div className="mb-6 bg-gradient-hero rounded-xl shadow-lg p-6">
                 <EditableSectionHeader
                   sectionKey="cadencia_header"
@@ -342,6 +345,8 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="fluxo" className="mt-0">
+              <UnderConstructionBanner />
+              
               <Accordion 
                 type="multiple" 
                 className="w-full space-y-4"
