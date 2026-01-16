@@ -145,7 +145,7 @@ const OperadoraCard = ({ operadora, isExpanded, onToggle, showAdminControls, onD
     <div className="relative group">
       <button
         onClick={onToggle}
-        className={`w-full aspect-square rounded-lg border-2 transition-all duration-200 overflow-hidden bg-white hover:shadow-lg hover:scale-105 ${
+        className={`w-full h-32 rounded-lg border-2 transition-all duration-200 overflow-hidden hover:shadow-lg hover:scale-105 ${
           isExpanded 
             ? 'border-accent ring-2 ring-accent/50 shadow-lg' 
             : 'border-border hover:border-accent/50'
@@ -154,7 +154,7 @@ const OperadoraCard = ({ operadora, isExpanded, onToggle, showAdminControls, onD
         <img
           src={operadora.logo_url}
           alt={operadora.name}
-          className="w-full h-full object-contain p-2"
+          className="w-full h-full object-cover"
         />
       </button>
       
