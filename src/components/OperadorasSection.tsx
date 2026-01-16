@@ -128,6 +128,18 @@ export const OperadorasSection = ({ isAdmin, userViewMode }: OperadorasSectionPr
           onClose={() => setExpandedOperadora(null)}
         />
       )}
+
+      {/* Botão Minimizar Tudo */}
+      {expandedOperadora && (
+        <button
+          onClick={() => setExpandedOperadora(null)}
+          className="fixed bottom-6 right-6 bg-gradient-hero hover:opacity-90 text-accent font-bold px-4 py-3 rounded-full shadow-2xl flex items-center gap-2 transition-all duration-300 hover:scale-110 z-50 border-2 border-accent"
+          title="Minimizar todas as seções"
+        >
+          <ChevronUp className="w-5 h-5" />
+          <span className="hidden sm:inline">Minimizar Tudo</span>
+        </button>
+      )}
     </div>
   );
 };
