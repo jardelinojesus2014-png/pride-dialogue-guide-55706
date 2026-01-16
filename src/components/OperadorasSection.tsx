@@ -288,13 +288,15 @@ const ExpandedOperadoraContent = ({ operadoraId, operadoraName, showAdminControl
                   {/* Content Preview */}
                   <div className="mt-3 flex justify-center">
                     {item.content_type === 'video' && isEmbeddable(item.file_url) ? (
-                      <div className="aspect-video w-full max-w-2xl rounded-lg overflow-hidden">
+                      <div className="aspect-video w-full max-w-2xl rounded-lg overflow-hidden relative">
                         <iframe
-                          src={`${formatVideoUrl(item.file_url)}?rel=0&modestbranding=1&showinfo=0`}
+                          src={`${formatVideoUrl(item.file_url)}?rel=0&modestbranding=1&showinfo=0&iv_load_policy=3&disablekb=0`}
                           className="w-full h-full"
                           allowFullScreen
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                         />
+                        {/* Overlay para esconder o botão "Ver no YouTube" */}
+                        <div className="absolute bottom-0 left-0 w-32 h-12 bg-transparent pointer-events-none" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.8) 0%, transparent 100%)' }} />
                       </div>
                     ) : item.content_type === 'video' ? (
                       <video 
