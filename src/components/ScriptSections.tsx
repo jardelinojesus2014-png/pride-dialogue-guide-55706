@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronUp } from 'lucide-react';
+import { ChevronUp, AlertTriangle } from 'lucide-react';
 import { ScriptSection } from './ScriptSection';
 import { sectionsData } from '@/data/sectionsData';
 import { useScriptNotes } from '@/hooks/useScriptNotes';
@@ -56,6 +56,17 @@ export const ScriptSections = ({ darkMode, userViewMode = false }: ScriptSection
 
   return (
     <>
+      {/* Banner de alerta antes da etapa 1 */}
+      <div className="mb-6 bg-red-600 dark:bg-red-700 rounded-xl p-4 border-2 border-red-700 dark:border-red-500 shadow-lg">
+        <div className="flex items-center justify-center gap-3">
+          <AlertTriangle className="w-5 h-5 text-white flex-shrink-0" />
+          <p className="text-white font-bold text-sm sm:text-base text-center">
+            A ordem dos fatores altera o resultado
+          </p>
+          <AlertTriangle className="w-5 h-5 text-white flex-shrink-0" />
+        </div>
+      </div>
+
       <div className="space-y-4 mb-8">
         {sectionsData.map((section) => (
           <ScriptSection
