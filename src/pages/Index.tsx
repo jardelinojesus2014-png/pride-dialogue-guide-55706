@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Moon, Sun, LogOut, Shield, Eye, EyeOff, Star, ClipboardList, BookOpen, Workflow, ChevronUp } from 'lucide-react';
+import { Moon, Sun, LogOut, Shield, Eye, EyeOff, Star, ClipboardList, BookOpen, Workflow, ChevronUp, GraduationCap } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useSectionTitles } from '@/hooks/useSectionTitles';
@@ -174,6 +174,19 @@ const Index = () => {
                   isAdmin={isAdmin}
                   userViewMode={userViewMode}
                   icon={<img src={logoPrideGold} alt="Pride" className="w-6 h-6 sm:w-7 sm:h-7 object-contain flex-shrink-0" />}
+                />
+              </TabsTrigger>
+              <TabsTrigger 
+                value="treinamentos" 
+                className="flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all"
+              >
+                <EditableTabTitle
+                  sectionKey="tab_treinamentos"
+                  defaultTitle="Treinamentos&#10;de Operadoras"
+                  defaultShortTitle="Treinamentos"
+                  isAdmin={isAdmin}
+                  userViewMode={userViewMode}
+                  icon={<GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />}
                 />
               </TabsTrigger>
               <TabsTrigger 
@@ -445,6 +458,18 @@ const Index = () => {
                 >
                   🔥 Se está desmotivado - CLIQUE AQUI
                 </button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="treinamentos" className="mt-0">
+              <div className="bg-card rounded-lg shadow-xl p-12 text-center border-2 border-border">
+                <div className="inline-block bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full p-6 mb-6 shadow-2xl">
+                  <GraduationCap className="w-20 h-20 text-white" />
+                </div>
+                <h2 className="text-4xl font-black text-primary mb-4">🎓 Treinamentos de Operadoras</h2>
+                <p className="text-xl text-muted-foreground">
+                  Esta seção está sendo desenvolvida e estará disponível em breve!
+                </p>
               </div>
             </TabsContent>
 
