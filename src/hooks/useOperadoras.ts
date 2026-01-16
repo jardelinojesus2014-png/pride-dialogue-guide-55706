@@ -213,9 +213,26 @@ export const useOperadoraContent = (operadoraId: string | null) => {
     }
   };
 
+  const updateContent = async (id: string, title: string, description: string | null) => {
+    try {
+      const { error } = await supabase
+        .from('operadora_content')
+        .update({ title, description })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success('Conteúdo atualizado com sucesso!');
+      fetchContent();
+    } catch (error) {
+      console.error('Error updating content:', error);
+      toast.error('Erro ao atualizar conteúdo');
+    }
+  };
+
   useEffect(() => {
     fetchContent();
   }, [operadoraId]);
 
-  return { content, loading, addContent, deleteContent, refetch: fetchContent };
+  return { content, loading, addContent, deleteContent, updateContent, refetch: fetchContent };
 };
