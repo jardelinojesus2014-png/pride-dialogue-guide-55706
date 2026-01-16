@@ -14,8 +14,20 @@ serve(async (req: Request) => {
   }
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    
+    console.log("Starting delete-user function");
+    console.log("SUPABASE_URL available:", !!supabaseUrl);
+    console.log("SUPABASE_SERVICE_ROLE_KEY available:", !!supabaseServiceKey);
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error("Missing environment variables");
+      return new Response(
+        JSON.stringify({ error: "Server configuration error" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
     
     // Create admin client with service role key
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
@@ -27,6 +39,8 @@ serve(async (req: Request) => {
 
     // Get the authorization header to verify the requesting user
     const authHeader = req.headers.get("Authorization");
+    console.log("Auth header present:", !!authHeader);
+    
     if (!authHeader) {
       return new Response(
         JSON.stringify({ error: "No authorization header" }),
@@ -36,22 +50,32 @@ serve(async (req: Request) => {
 
     // Verify the requesting user is an admin
     const token = authHeader.replace("Bearer ", "");
-    const { data: { user: requestingUser }, error: authError } = await supabaseAdmin.auth.getUser(token);
+    console.log("Token length:", token.length);
     
-    if (authError || !requestingUser) {
+    const { data: userData, error: authError } = await supabaseAdmin.auth.getUser(token);
+    
+    console.log("Auth error:", authError?.message);
+    console.log("User data:", userData?.user?.id);
+    
+    if (authError || !userData?.user) {
+      console.error("Auth verification failed:", authError?.message || "No user found");
       return new Response(
-        JSON.stringify({ error: "Invalid token" }),
+        JSON.stringify({ error: authError?.message || "Invalid token" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
+    const requestingUser = userData.user;
+
     // Check if requesting user is admin
-    const { data: adminRole } = await supabaseAdmin
+    const { data: adminRole, error: roleError } = await supabaseAdmin
       .from("user_roles")
       .select("role")
       .eq("user_id", requestingUser.id)
       .eq("role", "admin")
       .maybeSingle();
+
+    console.log("Admin role check:", adminRole, roleError?.message);
 
     if (!adminRole) {
       return new Response(
@@ -61,7 +85,10 @@ serve(async (req: Request) => {
     }
 
     // Get the user ID to delete from request body
-    const { userId } = await req.json();
+    const body = await req.json();
+    const { userId } = body;
+    
+    console.log("User ID to delete:", userId);
     
     if (!userId) {
       return new Response(
@@ -79,6 +106,7 @@ serve(async (req: Request) => {
     }
 
     // Delete the user using admin API
+    console.log("Attempting to delete user:", userId);
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId);
 
     if (deleteError) {
@@ -89,6 +117,7 @@ serve(async (req: Request) => {
       );
     }
 
+    console.log("User deleted successfully:", userId);
     return new Response(
       JSON.stringify({ success: true, message: "User deleted successfully" }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
