@@ -20,6 +20,7 @@ import { MissionVisionValuesSection } from '@/components/MissionVisionValuesSect
 import { WebsiteSection } from '@/components/WebsiteSection';
 import { GoogleReviewsSection } from '@/components/GoogleReviewsSection';
 import { UserPurposeAnswersSection } from '@/components/UserPurposeAnswersSection';
+import { OperadorasSection } from '@/components/OperadorasSection';
 import { EditableSectionHeader } from '@/components/EditableSectionHeader';
 import { EditableTabTitle } from '@/components/EditableTabTitle';
 import { EditableAccordionTitle } from '@/components/EditableAccordionTitle';
@@ -462,15 +463,7 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="treinamentos" className="mt-0">
-              <div className="bg-card rounded-lg shadow-xl p-12 text-center border-2 border-border">
-                <div className="inline-block bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full p-6 mb-6 shadow-2xl">
-                  <GraduationCap className="w-20 h-20 text-white" />
-                </div>
-                <h2 className="text-4xl font-black text-primary mb-4">🎓 Treinamentos de Operadoras</h2>
-                <p className="text-xl text-muted-foreground">
-                  Esta seção está sendo desenvolvida e estará disponível em breve!
-                </p>
-              </div>
+              <OperadorasSection isAdmin={isAdmin} userViewMode={userViewMode} />
             </TabsContent>
 
             <TabsContent value="avaliacoes" className="mt-0">
