@@ -160,7 +160,7 @@ export const sectionsData: Section[] = [
     id: 'agendamento',
     title: '4. AGENDAMENTO DA REUNIÃO',
     subtitle: 'DIRECIONAR/CONDUZIR o agendamento da reunião via Google Meet',
-    colorClass: 'bg-accent/10',
+    colorClass: 'bg-amber-400/25 dark:bg-amber-500/20',
     items: [
       {
         id: 'proximo_passo',
@@ -188,7 +188,7 @@ export const sectionsData: Section[] = [
     id: 'assentamento',
     title: '5. ASSENTAMENTO DA REUNIÃO',
     subtitle: 'Garantir o compromisso do cliente',
-    colorClass: 'bg-accent/10',
+    colorClass: 'bg-amber-400/25 dark:bg-amber-500/20',
     items: [
       {
         id: 'compromisso',
