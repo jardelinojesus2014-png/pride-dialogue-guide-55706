@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useOperadoras, useOperadoraContent, Operadora } from '@/hooks/useOperadoras';
 import { OperadoraContentDialog } from './OperadoraContentDialog';
+import { UnderConstructionBanner } from './UnderConstructionBanner';
 
 interface OperadorasSectionProps {
   isAdmin: boolean;
@@ -46,6 +47,7 @@ export const OperadorasSection = ({ isAdmin, userViewMode }: OperadorasSectionPr
 
   return (
     <div className="bg-card rounded-lg shadow-xl p-6 border-2 border-border">
+      <UnderConstructionBanner />
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-black text-primary">🎓 Treinamentos de Operadoras</h2>
         {showAdminControls && (
