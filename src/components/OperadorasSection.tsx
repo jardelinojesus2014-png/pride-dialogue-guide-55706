@@ -286,14 +286,14 @@ const ExpandedOperadoraContent = ({ operadoraId, operadoraName, showAdminControl
                   )}
                   
                   {/* Content Preview */}
-                  <div className="mt-3">
+                  <div className="mt-3 flex justify-center">
                     {item.content_type === 'video' && isEmbeddable(item.file_url) ? (
                       <div className="aspect-video w-full max-w-2xl rounded-lg overflow-hidden">
                         <iframe
-                          src={formatVideoUrl(item.file_url)}
+                          src={`${formatVideoUrl(item.file_url)}?rel=0&modestbranding=1&showinfo=0`}
                           className="w-full h-full"
                           allowFullScreen
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                         />
                       </div>
                     ) : item.content_type === 'video' ? (
