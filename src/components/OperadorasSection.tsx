@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { Plus, Trash2, ChevronDown, ChevronUp, Video, FileText, Image, Music, ExternalLink, Download } from 'lucide-react';
+import { Plus, Trash2, ChevronDown, ChevronUp, Video, FileText, Image, Music, ExternalLink, Download, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { useOperadoras, useOperadoraContent, Operadora } from '@/hooks/useOperadoras';
+import { useOperadoras, useOperadoraContent, Operadora, OperadoraContent } from '@/hooks/useOperadoras';
 import { OperadoraContentDialog } from './OperadoraContentDialog';
 import { UnderConstructionBanner } from './UnderConstructionBanner';
-
 interface OperadorasSectionProps {
   isAdmin: boolean;
   userViewMode: boolean;
@@ -185,8 +185,23 @@ interface ExpandedOperadoraContentProps {
 }
 
 const ExpandedOperadoraContent = ({ operadoraId, operadoraName, showAdminControls, onClose }: ExpandedOperadoraContentProps) => {
-  const { content, loading, addContent, deleteContent } = useOperadoraContent(operadoraId);
+  const { content, loading, addContent, deleteContent, updateContent } = useOperadoraContent(operadoraId);
   const [showContentDialog, setShowContentDialog] = useState(false);
+  const [editingItem, setEditingItem] = useState<OperadoraContent | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+
+  const handleEditClick = (item: OperadoraContent) => {
+    setEditingItem(item);
+    setEditTitle(item.title);
+    setEditDescription(item.description || '');
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingItem) return;
+    await updateContent(editingItem.id, editTitle, editDescription || null);
+    setEditingItem(null);
+  };
 
   const getContentIcon = (type: string) => {
     switch (type) {
@@ -254,6 +269,37 @@ const ExpandedOperadoraContent = ({ operadoraId, operadoraName, showAdminControl
           </>
         )}
       </div>
+
+      {/* Edit Dialog */}
+      <Dialog open={!!editingItem} onOpenChange={(open) => !open && setEditingItem(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Conteúdo</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="edit-title">Título</Label>
+              <Input
+                id="edit-title"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-description">Descrição</Label>
+              <Textarea
+                id="edit-description"
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                rows={3}
+              />
+            </div>
+            <Button onClick={handleSaveEdit} disabled={!editTitle.trim()} className="w-full">
+              Salvar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {loading ? (
         <p className="text-muted-foreground">Carregando conteúdos...</p>
@@ -325,16 +371,24 @@ const ExpandedOperadoraContent = ({ operadoraId, operadoraName, showAdminControl
                 </div>
 
                 {showAdminControls && (
-                  <button
-                    onClick={() => {
-                      if (confirm('Tem certeza que deseja excluir este conteúdo?')) {
-                        deleteContent(item.id, item.file_path);
-                      }
-                    }}
-                    className="flex-shrink-0 p-2 text-destructive hover:bg-destructive/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <div className="flex-shrink-0 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => handleEditClick(item)}
+                      className="p-2 text-accent hover:bg-accent/10 rounded-lg"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (confirm('Tem certeza que deseja excluir este conteúdo?')) {
+                          deleteContent(item.id, item.file_path);
+                        }
+                      }}
+                      className="p-2 text-destructive hover:bg-destructive/10 rounded-lg"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
