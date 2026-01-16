@@ -288,20 +288,15 @@ const ExpandedOperadoraContent = ({ operadoraId, operadoraName, showAdminControl
                   {/* Content Preview */}
                   <div className="mt-3 flex justify-center">
                     {item.content_type === 'video' && isEmbeddable(item.file_url) ? (
-                      <div className="aspect-video w-full max-w-2xl rounded-lg overflow-hidden relative group/video">
+                      <div className="aspect-video w-full max-w-2xl rounded-lg overflow-hidden relative">
                         <iframe
-                          src={`${formatVideoUrl(item.file_url)}?rel=0&modestbranding=1&showinfo=0&iv_load_policy=3&fs=1`}
+                          src={`${formatVideoUrl(item.file_url)}?rel=0&modestbranding=1&showinfo=0&iv_load_policy=3&disablekb=0`}
                           className="w-full h-full"
                           allowFullScreen
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                         />
-                        {/* Overlays para esconder botões do YouTube */}
-                        {/* Cobre "Ver no YouTube" (canto inferior esquerdo) */}
-                        <div className="absolute bottom-0 left-0 w-40 h-14 pointer-events-none" style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #1a1a2e 60%, transparent 100%)' }} />
-                        {/* Cobre "Copiar link" (canto superior direito) */}
-                        <div className="absolute top-0 right-0 w-28 h-20 pointer-events-none" style={{ background: 'linear-gradient(225deg, #1a1a2e 0%, #1a1a2e 60%, transparent 100%)' }} />
-                        {/* Cobre título e canal (canto superior esquerdo) */}
-                        <div className="absolute top-0 left-0 right-28 h-16 pointer-events-none" style={{ background: 'linear-gradient(180deg, #1a1a2e 0%, #1a1a2e 40%, transparent 100%)' }} />
+                        {/* Overlay para esconder o botão "Ver no YouTube" */}
+                        <div className="absolute bottom-0 left-0 w-32 h-12 bg-transparent pointer-events-none" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.8) 0%, transparent 100%)' }} />
                       </div>
                     ) : item.content_type === 'video' ? (
                       <video 
