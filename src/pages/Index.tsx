@@ -178,7 +178,7 @@ const Index = () => {
               </TabsTrigger>
               <TabsTrigger 
                 value="avaliacoes" 
-                className="flex-none min-w-[110px] text-sm sm:text-base font-black py-2.5 px-3 bg-accent text-primary dark:bg-primary dark:text-accent hover:bg-accent/90 dark:hover:bg-primary/90 data-[state=active]:bg-accent data-[state=active]:text-primary dark:data-[state=active]:bg-accent dark:data-[state=active]:text-primary rounded-lg transition-all"
+                className="flex-none min-w-[110px] text-sm sm:text-base font-black py-2.5 px-3 bg-accent text-primary dark:bg-secondary dark:text-accent hover:bg-accent/90 dark:hover:bg-secondary/90 data-[state=active]:bg-accent data-[state=active]:text-primary rounded-lg transition-all"
               >
                 <EditableTabTitle
                   sectionKey="tab_avaliacoes"
