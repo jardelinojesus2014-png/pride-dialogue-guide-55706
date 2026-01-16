@@ -209,12 +209,12 @@ const ExpandedOperadoraContent = ({ operadoraId, operadoraName, showAdminControl
   };
 
   const formatVideoUrl = (url: string) => {
-    // YouTube - usando youtube-nocookie.com para remover botão de "Assistir no YouTube"
+    // YouTube
     if (url.includes('youtube.com') || url.includes('youtu.be')) {
       const videoId = url.includes('youtu.be') 
         ? url.split('/').pop()?.split('?')[0]
         : url.split('v=')[1]?.split('&')[0];
-      return `https://www.youtube-nocookie.com/embed/${videoId}`;
+      return `https://www.youtube.com/embed/${videoId}`;
     }
     // Google Drive
     if (url.includes('drive.google.com')) {
@@ -288,15 +288,13 @@ const ExpandedOperadoraContent = ({ operadoraId, operadoraName, showAdminControl
                   {/* Content Preview */}
                   <div className="mt-3 flex justify-center">
                     {item.content_type === 'video' && isEmbeddable(item.file_url) ? (
-                      <div className="aspect-video w-full max-w-2xl rounded-lg overflow-hidden relative">
+                      <div className="aspect-video w-full max-w-2xl rounded-lg overflow-hidden">
                         <iframe
-                          src={`${formatVideoUrl(item.file_url)}?rel=0&modestbranding=1&showinfo=0&iv_load_policy=3&disablekb=0`}
+                          src={`${formatVideoUrl(item.file_url)}?rel=0&modestbranding=1&showinfo=0`}
                           className="w-full h-full"
                           allowFullScreen
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                         />
-                        {/* Overlay para esconder o botão "Ver no YouTube" */}
-                        <div className="absolute bottom-0 left-0 w-32 h-12 bg-transparent pointer-events-none" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.8) 0%, transparent 100%)' }} />
                       </div>
                     ) : item.content_type === 'video' ? (
                       <video 
