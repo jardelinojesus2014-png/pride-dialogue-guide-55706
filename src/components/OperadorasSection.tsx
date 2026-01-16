@@ -209,12 +209,12 @@ const ExpandedOperadoraContent = ({ operadoraId, operadoraName, showAdminControl
   };
 
   const formatVideoUrl = (url: string) => {
-    // YouTube
+    // YouTube - usando youtube-nocookie.com para remover botão de "Assistir no YouTube"
     if (url.includes('youtube.com') || url.includes('youtu.be')) {
       const videoId = url.includes('youtu.be') 
         ? url.split('/').pop()?.split('?')[0]
         : url.split('v=')[1]?.split('&')[0];
-      return `https://www.youtube.com/embed/${videoId}`;
+      return `https://www.youtube-nocookie.com/embed/${videoId}`;
     }
     // Google Drive
     if (url.includes('drive.google.com')) {
