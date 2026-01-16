@@ -57,13 +57,13 @@ export const ScriptSections = ({ darkMode, userViewMode = false }: ScriptSection
   return (
     <>
       {/* Banner de alerta antes da etapa 1 */}
-      <div className="mb-6 bg-red-600 dark:bg-red-700 rounded-xl p-4 border-2 border-red-700 dark:border-red-500 shadow-lg">
+      <div className="mb-6 bg-red-600 dark:bg-red-700 rounded-xl p-4 border-2 border-red-700 dark:border-red-500 shadow-lg shadow-red-500/20">
         <div className="flex items-center justify-center gap-3">
-          <AlertTriangle className="w-5 h-5 text-white flex-shrink-0" />
-          <p className="text-white font-bold text-sm sm:text-base text-center">
+          <AlertTriangle className="w-5 h-5 text-accent flex-shrink-0 drop-shadow-[0_0_6px_rgba(212,175,55,0.6)]" />
+          <p className="text-accent font-bold text-sm sm:text-base text-center uppercase tracking-wide drop-shadow-[0_0_8px_rgba(212,175,55,0.5)]">
             A ordem dos fatores altera o resultado
           </p>
-          <AlertTriangle className="w-5 h-5 text-white flex-shrink-0" />
+          <AlertTriangle className="w-5 h-5 text-accent flex-shrink-0 drop-shadow-[0_0_6px_rgba(212,175,55,0.6)]" />
         </div>
       </div>
 
