@@ -36,7 +36,7 @@ export const useOperadoras = () => {
       const { data, error } = await supabase
         .from('operadoras')
         .select('*')
-        .order('display_order', { ascending: true });
+        .order('name', { ascending: true });
 
       if (error) throw error;
       setOperadoras(data || []);
