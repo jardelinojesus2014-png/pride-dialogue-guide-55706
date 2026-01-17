@@ -7,6 +7,8 @@ interface SectionTitle {
   section_key: string;
   title: string;
   subtitle: string | null;
+  show_banner: boolean;
+  banner_subtitle: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -39,11 +41,15 @@ export const useUpdateSectionTitle = () => {
     mutationFn: async ({ 
       sectionKey, 
       title, 
-      subtitle 
+      subtitle,
+      showBanner,
+      bannerSubtitle
     }: { 
       sectionKey: string; 
       title: string; 
       subtitle?: string;
+      showBanner?: boolean;
+      bannerSubtitle?: string;
     }) => {
       const { data, error } = await supabase
         .from('section_titles')
@@ -51,6 +57,8 @@ export const useUpdateSectionTitle = () => {
           section_key: sectionKey,
           title,
           subtitle: subtitle || null,
+          show_banner: showBanner ?? false,
+          banner_subtitle: bannerSubtitle || null,
         }, {
           onConflict: 'section_key'
         })
@@ -70,6 +78,74 @@ export const useUpdateSectionTitle = () => {
     onError: (error: any) => {
       toast({
         title: 'Erro ao atualizar título',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+};
+
+export const useUpdateSectionBanner = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ 
+      sectionKey, 
+      showBanner,
+      bannerSubtitle
+    }: { 
+      sectionKey: string; 
+      showBanner: boolean;
+      bannerSubtitle?: string;
+    }) => {
+      // First check if the section exists
+      const { data: existing } = await supabase
+        .from('section_titles')
+        .select('*')
+        .eq('section_key', sectionKey)
+        .single();
+
+      if (existing) {
+        // Update existing
+        const { data, error } = await supabase
+          .from('section_titles')
+          .update({
+            show_banner: showBanner,
+            banner_subtitle: bannerSubtitle || null,
+          })
+          .eq('section_key', sectionKey)
+          .select()
+          .single();
+
+        if (error) throw error;
+        return data;
+      } else {
+        // Create new with banner settings
+        const { data, error } = await supabase
+          .from('section_titles')
+          .insert({
+            section_key: sectionKey,
+            title: sectionKey,
+            show_banner: showBanner,
+            banner_subtitle: bannerSubtitle || null,
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        return data;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['section-titles'] });
+      toast({
+        title: 'Banner atualizado',
+        description: 'As configurações do banner foram atualizadas.',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Erro ao atualizar banner',
         description: error.message,
         variant: 'destructive',
       });
