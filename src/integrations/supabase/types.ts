@@ -761,6 +761,7 @@ export type Database = {
       }
       training_categories: {
         Row: {
+          banner_subtitle: string | null
           created_at: string
           created_by: string | null
           description: string | null
@@ -768,10 +769,12 @@ export type Database = {
           icon: string | null
           id: string
           is_operadoras_section: boolean
+          show_banner: boolean
           title: string
           updated_at: string
         }
         Insert: {
+          banner_subtitle?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -779,10 +782,12 @@ export type Database = {
           icon?: string | null
           id?: string
           is_operadoras_section?: boolean
+          show_banner?: boolean
           title: string
           updated_at?: string
         }
         Update: {
+          banner_subtitle?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -790,6 +795,7 @@ export type Database = {
           icon?: string | null
           id?: string
           is_operadoras_section?: boolean
+          show_banner?: boolean
           title?: string
           updated_at?: string
         }
