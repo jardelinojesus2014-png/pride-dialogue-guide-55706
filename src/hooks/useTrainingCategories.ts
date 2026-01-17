@@ -9,6 +9,8 @@ export interface TrainingCategory {
   icon: string;
   display_order: number;
   is_operadoras_section: boolean;
+  show_banner: boolean;
+  banner_subtitle: string | null;
   created_at: string;
   updated_at: string;
   created_by: string | null;
@@ -49,7 +51,7 @@ export const useTrainingCategories = () => {
     }
   };
 
-  const addCategory = async (title: string, description: string, icon: string) => {
+  const addCategory = async (title: string, description: string, icon: string, showBanner: boolean = false, bannerSubtitle: string = '') => {
     try {
       const { error } = await supabase
         .from('training_categories')
@@ -58,7 +60,9 @@ export const useTrainingCategories = () => {
           description: description || null,
           icon,
           display_order: categories.length,
-          is_operadoras_section: false
+          is_operadoras_section: false,
+          show_banner: showBanner,
+          banner_subtitle: bannerSubtitle || null
         });
 
       if (error) throw error;
@@ -71,11 +75,17 @@ export const useTrainingCategories = () => {
     }
   };
 
-  const updateCategory = async (id: string, title: string, description: string, icon: string) => {
+  const updateCategory = async (id: string, title: string, description: string, icon: string, showBanner: boolean, bannerSubtitle: string) => {
     try {
       const { error } = await supabase
         .from('training_categories')
-        .update({ title, description: description || null, icon })
+        .update({ 
+          title, 
+          description: description || null, 
+          icon,
+          show_banner: showBanner,
+          banner_subtitle: bannerSubtitle || null
+        })
         .eq('id', id);
 
       if (error) throw error;

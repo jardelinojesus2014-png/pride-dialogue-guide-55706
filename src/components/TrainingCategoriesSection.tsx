@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Plus, Trash2, Edit2, ChevronUp, FolderOpen, Building2, BookOpen, Video, FileText, Headphones, Image, X, Save, GraduationCap } from 'lucide-react';
+import { Plus, Trash2, Edit2, ChevronUp, FolderOpen, Building2, BookOpen, Video, FileText, Headphones, Image, X, Save, GraduationCap, Construction } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { useTrainingCategories, useTrainingCategoryContent, TrainingCategory } from '@/hooks/useTrainingCategories';
 import { OperadorasSection } from './OperadorasSection';
 
@@ -36,25 +38,31 @@ export const TrainingCategoriesSection = ({ isAdmin, userViewMode }: TrainingCat
   const [newTitle, setNewTitle] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const [newIcon, setNewIcon] = useState('folder');
+  const [newShowBanner, setNewShowBanner] = useState(false);
+  const [newBannerSubtitle, setNewBannerSubtitle] = useState('');
 
   const showAdminControls = isAdmin && !userViewMode;
 
   const handleAddCategory = async () => {
     if (!newTitle.trim()) return;
-    await addCategory(newTitle, newDescription, newIcon);
+    await addCategory(newTitle, newDescription, newIcon, newShowBanner, newBannerSubtitle);
+    resetForm();
+    setIsAddDialogOpen(false);
+  };
+
+  const resetForm = () => {
     setNewTitle('');
     setNewDescription('');
     setNewIcon('folder');
-    setIsAddDialogOpen(false);
+    setNewShowBanner(false);
+    setNewBannerSubtitle('');
   };
 
   const handleUpdateCategory = async () => {
     if (!editingCategory || !newTitle.trim()) return;
-    await updateCategory(editingCategory.id, newTitle, newDescription, newIcon);
+    await updateCategory(editingCategory.id, newTitle, newDescription, newIcon, newShowBanner, newBannerSubtitle);
     setEditingCategory(null);
-    setNewTitle('');
-    setNewDescription('');
-    setNewIcon('folder');
+    resetForm();
   };
 
   const handleDeleteCategory = async (category: TrainingCategory) => {
@@ -71,6 +79,8 @@ export const TrainingCategoriesSection = ({ isAdmin, userViewMode }: TrainingCat
     setNewTitle(category.title);
     setNewDescription(category.description || '');
     setNewIcon(category.icon);
+    setNewShowBanner(category.show_banner);
+    setNewBannerSubtitle(category.banner_subtitle || '');
   };
 
   if (loading) {
@@ -135,6 +145,29 @@ export const TrainingCategoriesSection = ({ isAdmin, userViewMode }: TrainingCat
                     </SelectContent>
                   </Select>
                 </div>
+                <div className="flex items-center justify-between py-2 px-3 bg-muted/50 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <Construction className="w-4 h-4 text-orange-500" />
+                    <Label htmlFor="show-banner-add" className="text-sm font-medium">
+                      Exibir banner "Em Construção"
+                    </Label>
+                  </div>
+                  <Switch
+                    id="show-banner-add"
+                    checked={newShowBanner}
+                    onCheckedChange={setNewShowBanner}
+                  />
+                </div>
+                {newShowBanner && (
+                  <div>
+                    <label className="text-sm font-medium">Subtítulo do Banner</label>
+                    <Input
+                      value={newBannerSubtitle}
+                      onChange={(e) => setNewBannerSubtitle(e.target.value)}
+                      placeholder="Ex: Essa seção está sendo desenvolvida..."
+                    />
+                  </div>
+                )}
                 <Button onClick={handleAddCategory} className="w-full">
                   Adicionar Categoria
                 </Button>
@@ -188,6 +221,29 @@ export const TrainingCategoriesSection = ({ isAdmin, userViewMode }: TrainingCat
                 </SelectContent>
               </Select>
             </div>
+            <div className="flex items-center justify-between py-2 px-3 bg-muted/50 rounded-lg">
+              <div className="flex items-center gap-2">
+                <Construction className="w-4 h-4 text-orange-500" />
+                <Label htmlFor="show-banner-edit" className="text-sm font-medium">
+                  Exibir banner "Em Construção"
+                </Label>
+              </div>
+              <Switch
+                id="show-banner-edit"
+                checked={newShowBanner}
+                onCheckedChange={setNewShowBanner}
+              />
+            </div>
+            {newShowBanner && (
+              <div>
+                <label className="text-sm font-medium">Subtítulo do Banner</label>
+                <Input
+                  value={newBannerSubtitle}
+                  onChange={(e) => setNewBannerSubtitle(e.target.value)}
+                  placeholder="Ex: Essa seção está sendo desenvolvida..."
+                />
+              </div>
+            )}
             <Button onClick={handleUpdateCategory} className="w-full">
               <Save className="w-4 h-4 mr-2" />
               Salvar Alterações
@@ -258,20 +314,38 @@ export const TrainingCategoriesSection = ({ isAdmin, userViewMode }: TrainingCat
       </div>
 
       {/* Expanded Category Content */}
-      {expandedCategory && (
-        <div className="mt-6">
-          {categories.find(c => c.id === expandedCategory)?.is_operadoras_section ? (
-            <OperadorasSection isAdmin={isAdmin} userViewMode={userViewMode} />
-          ) : (
-            <CategoryContentSection
-              categoryId={expandedCategory}
-              categoryName={categories.find(c => c.id === expandedCategory)?.title || ''}
-              showAdminControls={showAdminControls}
-              onClose={() => setExpandedCategory(null)}
-            />
-          )}
-        </div>
-      )}
+      {expandedCategory && (() => {
+        const expandedCat = categories.find(c => c.id === expandedCategory);
+        return (
+          <div className="mt-6 space-y-4">
+            {/* Under Construction Banner */}
+            {expandedCat?.show_banner && (
+              <div className="bg-card rounded-lg shadow-xl p-8 text-center border-2 border-border">
+                <div className="inline-block bg-gradient-to-r from-orange-500 to-red-600 rounded-full p-4 mb-4 shadow-2xl">
+                  <Construction className="w-10 h-10 text-white" />
+                </div>
+                <h2 className="text-2xl font-black text-primary mb-2">🚧 Em Construção</h2>
+                {expandedCat.banner_subtitle && (
+                  <p className="text-lg text-muted-foreground">
+                    {expandedCat.banner_subtitle}
+                  </p>
+                )}
+              </div>
+            )}
+            
+            {expandedCat?.is_operadoras_section ? (
+              <OperadorasSection isAdmin={isAdmin} userViewMode={userViewMode} />
+            ) : (
+              <CategoryContentSection
+                categoryId={expandedCategory}
+                categoryName={expandedCat?.title || ''}
+                showAdminControls={showAdminControls}
+                onClose={() => setExpandedCategory(null)}
+              />
+            )}
+          </div>
+        );
+      })()}
 
       {/* Minimize Button */}
       {expandedCategory && (
