@@ -20,7 +20,7 @@ import { MissionVisionValuesSection } from '@/components/MissionVisionValuesSect
 import { WebsiteSection } from '@/components/WebsiteSection';
 import { GoogleReviewsSection } from '@/components/GoogleReviewsSection';
 import { UserPurposeAnswersSection } from '@/components/UserPurposeAnswersSection';
-import { OperadorasSection } from '@/components/OperadorasSection';
+import { TrainingCategoriesSection } from '@/components/TrainingCategoriesSection';
 import { EditableSectionHeader } from '@/components/EditableSectionHeader';
 import { EditableTabTitle } from '@/components/EditableTabTitle';
 import { EditableAccordionTitle } from '@/components/EditableAccordionTitle';
@@ -463,7 +463,7 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="treinamentos" className="mt-0">
-              <OperadorasSection isAdmin={isAdmin} userViewMode={userViewMode} />
+              <TrainingCategoriesSection isAdmin={isAdmin} userViewMode={userViewMode} />
             </TabsContent>
 
             <TabsContent value="avaliacoes" className="mt-0">
