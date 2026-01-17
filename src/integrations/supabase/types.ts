@@ -734,25 +734,31 @@ export type Database = {
       }
       section_titles: {
         Row: {
+          banner_subtitle: string | null
           created_at: string
           id: string
           section_key: string
+          show_banner: boolean
           subtitle: string | null
           title: string
           updated_at: string
         }
         Insert: {
+          banner_subtitle?: string | null
           created_at?: string
           id?: string
           section_key: string
+          show_banner?: boolean
           subtitle?: string | null
           title: string
           updated_at?: string
         }
         Update: {
+          banner_subtitle?: string | null
           created_at?: string
           id?: string
           section_key?: string
+          show_banner?: boolean
           subtitle?: string | null
           title?: string
           updated_at?: string

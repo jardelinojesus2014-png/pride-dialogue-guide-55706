@@ -24,7 +24,7 @@ import { TrainingCategoriesSection } from '@/components/TrainingCategoriesSectio
 import { EditableSectionHeader } from '@/components/EditableSectionHeader';
 import { EditableTabTitle } from '@/components/EditableTabTitle';
 import { EditableAccordionTitle } from '@/components/EditableAccordionTitle';
-import { UnderConstructionBanner } from '@/components/UnderConstructionBanner';
+import { EditableBanner } from '@/components/EditableBanner';
 
 import { MotivationalPopup } from '@/components/MotivationalPopup';
 import { PurposePopup } from '@/components/PurposePopup';
@@ -206,6 +206,8 @@ const Index = () => {
             </TabsList>
 
             <TabsContent value="prospeccao" className="mt-0" data-section="prospeccao-tab">
+              <EditableBanner sectionKey="banner_prospeccao" isAdmin={isAdmin} userViewMode={userViewMode} />
+              
               {/* Golden Rule */}
               <div data-section="golden-rule">
               <GoldenRule darkMode={darkMode} />
@@ -268,7 +270,7 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="cadencia" className="mt-0">
-              <UnderConstructionBanner />
+              <EditableBanner sectionKey="banner_cadencia" isAdmin={isAdmin} userViewMode={userViewMode} />
               
               <div className="mb-6 bg-gradient-hero rounded-xl shadow-lg p-6">
                 <EditableSectionHeader
@@ -288,6 +290,8 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="pride" className="mt-0">
+              <EditableBanner sectionKey="banner_pride" isAdmin={isAdmin} userViewMode={userViewMode} />
+              
               <Accordion type="multiple" className="w-full space-y-4">
                 <AccordionItem value="website" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="website">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
@@ -359,7 +363,7 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="fluxo" className="mt-0">
-              <UnderConstructionBanner />
+              <EditableBanner sectionKey="banner_fluxo" isAdmin={isAdmin} userViewMode={userViewMode} />
               
               <Accordion 
                 type="multiple" 
@@ -463,20 +467,15 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="treinamentos" className="mt-0">
+              <EditableBanner sectionKey="banner_treinamentos" isAdmin={isAdmin} userViewMode={userViewMode} />
               <TrainingCategoriesSection isAdmin={isAdmin} userViewMode={userViewMode} />
             </TabsContent>
 
             <TabsContent value="avaliacoes" className="mt-0">
-              <div className="bg-card rounded-lg shadow-xl p-12 text-center border-2 border-border">
-                <div className="inline-block bg-gradient-to-r from-orange-500 to-red-600 rounded-full p-6 mb-6 shadow-2xl">
-                  <svg className="w-20 h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                  </svg>
-                </div>
-                <h2 className="text-4xl font-black text-primary mb-4">🚧 Em Construção</h2>
-                <p className="text-xl text-muted-foreground">
-                  Esta seção está sendo desenvolvida e estará disponível em breve!
-                </p>
+              <EditableBanner sectionKey="banner_avaliacoes" isAdmin={isAdmin} userViewMode={userViewMode} />
+              
+              <div className="text-center text-muted-foreground py-8">
+                <p>Conteúdo da seção de avaliações será adicionado aqui.</p>
               </div>
             </TabsContent>
           </Tabs>
