@@ -226,7 +226,7 @@ export const TrainingCategoriesSection = ({ isAdmin, userViewMode }: TrainingCat
               </button>
 
               {/* Admin actions */}
-              {showAdminControls && !category.is_operadoras_section && (
+              {showAdminControls && (
                 <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={(e) => {
@@ -234,18 +234,22 @@ export const TrainingCategoriesSection = ({ isAdmin, userViewMode }: TrainingCat
                       openEditDialog(category);
                     }}
                     className="p-1.5 bg-blue-500 text-white rounded-full hover:bg-blue-600"
+                    title="Editar categoria"
                   >
                     <Edit2 className="w-3 h-3" />
                   </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteCategory(category);
-                    }}
-                    className="p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </button>
+                  {!category.is_operadoras_section && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteCategory(category);
+                      }}
+                      className="p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600"
+                      title="Excluir categoria"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  )}
                 </div>
               )}
             </div>
