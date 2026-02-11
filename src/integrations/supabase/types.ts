@@ -41,6 +41,56 @@ export type Database = {
         }
         Relationships: []
       }
+      cadencia_item_attachments: {
+        Row: {
+          attachment_type: string
+          cadencia_item_id: string
+          created_at: string
+          created_by: string | null
+          display_order: number | null
+          duration_seconds: number | null
+          file_path: string | null
+          file_url: string
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          attachment_type: string
+          cadencia_item_id: string
+          created_at?: string
+          created_by?: string | null
+          display_order?: number | null
+          duration_seconds?: number | null
+          file_path?: string | null
+          file_url: string
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          attachment_type?: string
+          cadencia_item_id?: string
+          created_at?: string
+          created_by?: string | null
+          display_order?: number | null
+          duration_seconds?: number | null
+          file_path?: string | null
+          file_url?: string
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cadencia_item_attachments_cadencia_item_id_fkey"
+            columns: ["cadencia_item_id"]
+            isOneToOne: false
+            referencedRelation: "cadencia_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cadencia_items: {
         Row: {
           collect: string[] | null

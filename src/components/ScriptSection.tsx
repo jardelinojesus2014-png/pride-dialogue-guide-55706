@@ -34,6 +34,7 @@ interface ScriptSectionProps {
   showNotes: Record<string, boolean>;
   onToggleNotes: (sectionId: string, itemId: string) => void;
   userViewMode?: boolean;
+  isCadenciaItem?: boolean;
 }
 
 export const ScriptSection = ({
@@ -48,6 +49,7 @@ export const ScriptSection = ({
   showNotes,
   onToggleNotes,
   userViewMode = false,
+  isCadenciaItem = false,
 }: ScriptSectionProps) => {
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [showAudioList, setShowAudioList] = useState(false);
@@ -199,6 +201,7 @@ export const ScriptSection = ({
                     onNoteChange={(value) => onNoteChange(section.id, itemIdentifier, value)}
                     showNote={showNotes[key] || false}
                     onToggleNote={() => onToggleNotes(section.id, itemIdentifier)}
+                    isCadenciaItem={isCadenciaItem}
                   />
                 );
               })}
