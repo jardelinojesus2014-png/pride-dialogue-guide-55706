@@ -132,6 +132,7 @@ export const CadenciaSections = ({ darkMode, userViewMode = false }: CadenciaSec
                 showNotes={showNotes}
                 onToggleNotes={toggleNotes}
                 userViewMode={userViewMode}
+                isCadenciaItem={true}
               />
             </div>
           );

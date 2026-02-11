@@ -1,5 +1,7 @@
 import { CheckCircle2, StickyNote } from 'lucide-react';
 import { ScriptItem as ScriptItemType, ResponseOption } from '@/hooks/useScriptItems';
+import { CadenciaItemAttachments } from './CadenciaItemAttachments';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 
 interface ScriptItemProps {
   item: ScriptItemType;
@@ -10,6 +12,7 @@ interface ScriptItemProps {
   onNoteChange: (value: string) => void;
   showNote: boolean;
   onToggleNote: () => void;
+  isCadenciaItem?: boolean;
 }
 
 export const ScriptItem = ({
@@ -21,7 +24,9 @@ export const ScriptItem = ({
   onNoteChange,
   showNote,
   onToggleNote,
+  isCadenciaItem = false,
 }: ScriptItemProps) => {
+  const { isAdmin } = useIsAdmin();
   return (
     <div className="border-l-2 border-border pl-4 py-2">
       <div className="flex items-start gap-3">
@@ -141,6 +146,14 @@ export const ScriptItem = ({
                 </div>
               ))}
             </div>
+          )}
+
+          {/* Anexos do Item (Cadência) */}
+          {isCadenciaItem && (
+            <CadenciaItemAttachments
+              cadenciaItemId={item.id}
+              isAdmin={isAdmin}
+            />
           )}
         </div>
       </div>
