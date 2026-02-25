@@ -91,15 +91,6 @@ const Index = () => {
                   </button>
                 )}
 
-                <button
-                  onClick={() => navigate('/artes-campanhas')}
-                  className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
-                  title="Artes e Campanhas"
-                >
-                  <Palette className="w-5 h-5" />
-                  <span className="hidden sm:inline">Artes e Campanhas</span>
-                </button>
-                
                 {isAdmin && (
                   <button
                     onClick={toggleUserViewMode}
@@ -212,6 +203,14 @@ const Index = () => {
                   showShortOnMobile={false}
                 />
               </TabsTrigger>
+              <button
+                onClick={() => navigate('/artes-campanhas')}
+                className="flex-none min-w-[110px] text-sm sm:text-base font-black py-2.5 px-3 bg-accent text-primary hover:bg-accent/90 rounded-lg transition-all flex items-center justify-center gap-2"
+              >
+                <Palette className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                <span className="hidden sm:inline">Artes e Campanhas</span>
+                <span className="sm:hidden">Artes</span>
+              </button>
             </TabsList>
 
             <TabsContent value="prospeccao" className="mt-0" data-section="prospeccao-tab">
