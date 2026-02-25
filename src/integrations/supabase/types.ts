@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      artes: {
+        Row: {
+          category: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          display_order: number | null
+          file_path: string | null
+          file_url: string
+          id: string
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          display_order?: number | null
+          file_path?: string | null
+          file_url: string
+          id?: string
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          display_order?: number | null
+          file_path?: string | null
+          file_url?: string
+          id?: string
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cadencia_days: {
         Row: {
           created_at: string
@@ -129,6 +171,75 @@ export type Database = {
           note?: string | null
           script?: string
           tip?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      campaigns: {
+        Row: {
+          banner_image_path: string | null
+          banner_image_url: string | null
+          campaign_type: string
+          created_at: string
+          created_by: string | null
+          creative_file_names: string[] | null
+          creative_file_paths: string[] | null
+          creative_file_urls: string[] | null
+          description: string | null
+          details_content: string | null
+          display_order: number | null
+          end_date: string | null
+          id: string
+          operadora_logo_url: string | null
+          operadora_name: string
+          start_date: string | null
+          status: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          banner_image_path?: string | null
+          banner_image_url?: string | null
+          campaign_type?: string
+          created_at?: string
+          created_by?: string | null
+          creative_file_names?: string[] | null
+          creative_file_paths?: string[] | null
+          creative_file_urls?: string[] | null
+          description?: string | null
+          details_content?: string | null
+          display_order?: number | null
+          end_date?: string | null
+          id?: string
+          operadora_logo_url?: string | null
+          operadora_name: string
+          start_date?: string | null
+          status?: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          banner_image_path?: string | null
+          banner_image_url?: string | null
+          campaign_type?: string
+          created_at?: string
+          created_by?: string | null
+          creative_file_names?: string[] | null
+          creative_file_paths?: string[] | null
+          creative_file_urls?: string[] | null
+          description?: string | null
+          details_content?: string | null
+          display_order?: number | null
+          end_date?: string | null
+          id?: string
+          operadora_logo_url?: string | null
+          operadora_name?: string
+          start_date?: string | null
+          status?: string
+          tags?: string[] | null
+          title?: string
           updated_at?: string
         }
         Relationships: []
