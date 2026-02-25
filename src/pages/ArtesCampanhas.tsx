@@ -20,7 +20,7 @@ import logoPride from '@/assets/Logo_Pride.png';
 const ArtesCampanhas = () => {
   const navigate = useNavigate();
   const { isAdmin } = useIsAdmin();
-  const { campaigns, loading: loadingCampaigns, addCampaign, deleteCampaign } = useCampaigns();
+  const { campaigns, loading: loadingCampaigns, addCampaign, updateCampaign, deleteCampaign, addCreativeFiles } = useCampaigns();
   const { artes, loading: loadingArtes, addArte, deleteArte } = useArtes();
   
   const [searchCampaign, setSearchCampaign] = useState('');
@@ -155,13 +155,15 @@ const ArtesCampanhas = () => {
                 <p>Nenhuma campanha encontrada</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {filteredCampaigns.map(campaign => (
                   <CampaignCard
                     key={campaign.id}
                     campaign={campaign}
                     isAdmin={isAdmin}
                     onDelete={deleteCampaign}
+                    onUpdate={updateCampaign}
+                    onAddCreatives={addCreativeFiles}
                   />
                 ))}
               </div>
