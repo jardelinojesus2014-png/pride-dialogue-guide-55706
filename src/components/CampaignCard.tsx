@@ -251,64 +251,66 @@ export const CampaignCard = ({ campaign, isAdmin, onDelete, onUpdate, onAddCreat
 
       {/* Details Dialog */}
       <Dialog open={showDetails} onOpenChange={setShowDetails}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl">{campaign.title}</DialogTitle>
-          </DialogHeader>
+        <DialogContent className="max-w-4xl w-[95vw] p-0 overflow-hidden">
+          <div className="flex flex-col md:flex-row h-auto md:max-h-[75vh]">
+            {/* Left: Creative Image */}
+            {previewImage && (
+              <div className="md:w-1/2 flex-shrink-0 bg-muted flex items-center justify-center p-4">
+                <img src={previewImage} alt={campaign.title} className="max-w-full max-h-[65vh] object-contain rounded-lg" />
+              </div>
+            )}
 
-          {previewImage && (
-            <img src={previewImage} alt={campaign.title} className="w-full rounded-lg" />
-          )}
+            {/* Right: Info */}
+            <div className={`flex-1 p-6 flex flex-col gap-3 justify-center ${!previewImage ? 'w-full' : ''}`}>
+              <DialogHeader className="p-0 space-y-1">
+                <DialogTitle className="text-xl font-bold">{campaign.title}</DialogTitle>
+              </DialogHeader>
 
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 flex-wrap">
-              <Badge className={statusColor}>{statusLabel}</Badge>
-              {campaign.operadora_logo_url && (
-                <img src={campaign.operadora_logo_url} alt={campaign.operadora_name} className="w-6 h-6 object-contain" />
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge className={statusColor}>{statusLabel}</Badge>
+                {campaign.operadora_logo_url && (
+                  <img src={campaign.operadora_logo_url} alt={campaign.operadora_name} className="w-6 h-6 object-contain" />
+                )}
+                <span className="text-sm text-muted-foreground">{campaign.operadora_name}</span>
+              </div>
+
+              {campaign.description && <p className="text-sm text-foreground">{campaign.description}</p>}
+
+              {campaign.details_content && (
+                <div className="bg-muted rounded-lg p-3">
+                  <h4 className="font-semibold text-xs mb-1.5 text-foreground">Regras da Campanha</h4>
+                  <p className="text-xs whitespace-pre-wrap text-muted-foreground leading-relaxed">{campaign.details_content}</p>
+                </div>
               )}
-              <span className="text-sm text-muted-foreground">{campaign.operadora_name}</span>
-            </div>
 
-            {campaign.description && <p className="text-foreground">{campaign.description}</p>}
+              {(campaign.start_date || campaign.end_date) && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Calendar className="w-4 h-4" />
+                  <span>Vigência: {formatDate(campaign.start_date)} — {formatDate(campaign.end_date)}</span>
+                </div>
+              )}
 
-            {campaign.details_content && (
-              <div className="bg-muted rounded-lg p-4">
-                <h4 className="font-semibold text-sm mb-2">Regras da Campanha</h4>
-                <p className="text-sm whitespace-pre-wrap">{campaign.details_content}</p>
-              </div>
-            )}
-
-            {(campaign.start_date || campaign.end_date) && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Calendar className="w-4 h-4" />
-                <span>Vigência: {formatDate(campaign.start_date)} — {formatDate(campaign.end_date)}</span>
-              </div>
-            )}
-
-            {campaign.tags && campaign.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1">
-                {campaign.tags.map((tag, i) => (
-                  <Badge key={i} variant="outline">{tag}</Badge>
-                ))}
-              </div>
-            )}
-
-            {campaign.creative_file_urls && campaign.creative_file_urls.length > 0 && (
-              <div>
-                <h4 className="font-semibold mb-2">Criativos</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  {campaign.creative_file_urls.map((url, i) => (
-                    <div key={i} className="space-y-1">
-                      <img src={url} alt={`Criativo ${i + 1}`} className="w-full aspect-video object-cover rounded border" />
-                      <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs flex items-center gap-1">
-                        <Download className="w-3 h-3" />
-                        {campaign.creative_file_names?.[i] || `Arquivo ${i + 1}`}
-                      </a>
-                    </div>
+              {campaign.tags && campaign.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {campaign.tags.map((tag, i) => (
+                    <Badge key={i} variant="outline" className="text-xs rounded-full">{tag}</Badge>
                   ))}
                 </div>
-              </div>
-            )}
+              )}
+
+              {campaign.creative_file_urls && campaign.creative_file_urls.length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {campaign.creative_file_urls.map((url, i) => (
+                    <Button key={i} size="sm" variant="outline" className="text-xs h-8 rounded-lg" asChild>
+                      <a href={url} target="_blank" rel="noopener noreferrer" download>
+                        <Download className="w-3 h-3 mr-1.5" />
+                        {campaign.creative_file_names?.[i] || `Arquivo ${i + 1}`}
+                      </a>
+                    </Button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>
