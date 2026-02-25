@@ -84,7 +84,7 @@ export const CampaignCard = ({ campaign, isAdmin, onDelete, onUpdate, onAddCreat
 
   return (
     <>
-      <Card className="overflow-hidden border border-border hover:border-primary/40 transition-all hover:shadow-lg group flex flex-col">
+      <Card className="overflow-hidden border border-border hover:border-primary/40 transition-all hover:shadow-lg group flex flex-col rounded-xl">
         {/* Creative Preview */}
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
           {previewImage ? (
@@ -98,78 +98,74 @@ export const CampaignCard = ({ campaign, isAdmin, onDelete, onUpdate, onAddCreat
               <Image className="w-12 h-12 text-muted-foreground/30" />
             </div>
           )}
-          {/* Status badge overlay */}
-          <Badge className={`absolute top-2 left-2 ${statusColor} text-xs`}>
-            {statusLabel}
-          </Badge>
           {/* Admin actions overlay */}
           {isAdmin && (
             <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button size="icon" variant="secondary" className="h-7 w-7" onClick={() => setEditing(true)}>
+              <Button size="icon" variant="secondary" className="h-7 w-7 rounded-full shadow" onClick={() => setEditing(true)}>
                 <Edit2 className="w-3.5 h-3.5" />
               </Button>
               {onDelete && (
-                <Button size="icon" variant="destructive" className="h-7 w-7" onClick={() => onDelete(campaign.id, campaign.banner_image_path)}>
+                <Button size="icon" variant="destructive" className="h-7 w-7 rounded-full shadow" onClick={() => onDelete(campaign.id, campaign.banner_image_path)}>
                   <Trash2 className="w-3.5 h-3.5" />
                 </Button>
               )}
             </div>
           )}
-          {/* Creative count */}
-          {campaign.creative_file_urls && campaign.creative_file_urls.length > 1 && (
-            <Badge variant="secondary" className="absolute bottom-2 right-2 text-xs">
-              +{campaign.creative_file_urls.length - 1} criativos
-            </Badge>
-          )}
         </div>
 
-        <CardContent className="p-3 space-y-2 flex-1 flex flex-col">
-          {/* Operadora */}
-          <div className="flex items-center gap-1.5">
-            {campaign.operadora_logo_url && (
-              <img src={campaign.operadora_logo_url} alt={campaign.operadora_name} className="w-5 h-5 object-contain flex-shrink-0" />
-            )}
-            <span className="text-xs font-medium text-muted-foreground truncate">{campaign.operadora_name}</span>
+        <CardContent className="p-4 space-y-2.5 flex-1 flex flex-col">
+          {/* Operadora + Status */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 min-w-0">
+              {campaign.operadora_logo_url && (
+                <img src={campaign.operadora_logo_url} alt={campaign.operadora_name} className="w-5 h-5 object-contain flex-shrink-0" />
+              )}
+              <span className="text-xs font-medium text-muted-foreground truncate">{campaign.operadora_name}</span>
+            </div>
+            <Badge className={`${statusColor} text-[10px] px-2 py-0.5 flex-shrink-0 rounded-full`}>
+              {statusLabel}
+            </Badge>
           </div>
 
           {/* Title */}
           <h3 className="font-bold text-foreground text-sm leading-tight line-clamp-2">{campaign.title}</h3>
 
-          {/* Dates */}
-          {(campaign.start_date || campaign.end_date) && (
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Calendar className="w-3 h-3 flex-shrink-0" />
-              <span className="truncate">{formatDate(campaign.start_date)} — {formatDate(campaign.end_date)}</span>
-            </div>
+          {/* Description */}
+          {campaign.description && (
+            <p className="text-xs text-muted-foreground line-clamp-1">{campaign.description}</p>
           )}
 
-          {/* Rules summary */}
-          {campaign.details_content && (
-            <p className="text-xs text-muted-foreground line-clamp-2">{campaign.details_content}</p>
+          {/* Dates */}
+          {(campaign.start_date || campaign.end_date) && (
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
+              <span>{formatDate(campaign.start_date)} — {formatDate(campaign.end_date)}</span>
+            </div>
           )}
 
           {/* Tags */}
           {campaign.tags && campaign.tags.length > 0 && (
             <div className="flex flex-wrap gap-1">
-              {campaign.tags.slice(0, 3).map((tag, i) => (
-                <Badge key={i} variant="outline" className="text-[10px] px-1.5 py-0">{tag}</Badge>
+              {campaign.tags.slice(0, 4).map((tag, i) => (
+                <Badge key={i} variant="outline" className="text-[10px] px-2 py-0.5 rounded-full font-normal">{tag}</Badge>
               ))}
-              {campaign.tags.length > 3 && (
-                <Badge variant="outline" className="text-[10px] px-1.5 py-0">+{campaign.tags.length - 3}</Badge>
+              {campaign.tags.length > 4 && (
+                <Badge variant="outline" className="text-[10px] px-2 py-0.5 rounded-full font-normal">+{campaign.tags.length - 4}</Badge>
               )}
             </div>
           )}
 
           {/* Actions */}
-          <div className="flex gap-1.5 pt-1 mt-auto">
-            <Button size="sm" onClick={() => setShowDetails(true)} className="flex-1 text-xs h-8">
-              <Eye className="w-3 h-3 mr-1" />
-              Detalhes
+          <div className="flex gap-2 pt-2 mt-auto">
+            <Button size="sm" onClick={() => setShowDetails(true)} className="flex-1 text-xs h-9 rounded-lg">
+              <Eye className="w-3.5 h-3.5 mr-1.5" />
+              Ver detalhes
             </Button>
             {campaign.creative_file_urls && campaign.creative_file_urls.length > 0 && (
-              <Button size="sm" variant="outline" className="text-xs h-8" asChild>
+              <Button size="sm" variant="outline" className="flex-1 text-xs h-9 rounded-lg" asChild>
                 <a href={campaign.creative_file_urls[0]} target="_blank" rel="noopener noreferrer">
-                  <Download className="w-3 h-3" />
+                  <Download className="w-3.5 h-3.5 mr-1.5" />
+                  Criativos
                 </a>
               </Button>
             )}
