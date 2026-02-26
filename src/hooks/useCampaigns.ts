@@ -37,7 +37,24 @@ export const useCampaigns = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setCampaigns((data || []) as Campaign[]);
+      const allCampaigns = (data || []) as Campaign[];
+
+      // Auto-archive campaigns past their end_date
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const toArchive = allCampaigns.filter(c => 
+        c.status !== 'arquivada' && c.end_date && new Date(c.end_date) < today
+      );
+
+      if (toArchive.length > 0) {
+        const ids = toArchive.map(c => c.id);
+        await supabase.from('campaigns').update({ status: 'arquivada' }).in('id', ids);
+        allCampaigns.forEach(c => {
+          if (ids.includes(c.id)) c.status = 'arquivada';
+        });
+      }
+
+      setCampaigns(allCampaigns);
     } catch (error) {
       console.error('Error fetching campaigns:', error);
       toast.error('Erro ao carregar campanhas');
