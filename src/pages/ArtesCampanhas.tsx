@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Palette, Megaphone, Plus, Trash2, Search, Upload, Download } from 'lucide-react';
+import { ArrowLeft, Palette, Megaphone, Plus, Trash2, Search, Upload, Download, Archive } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useAuth } from '@/hooks/useAuth';
@@ -26,6 +26,7 @@ const ArtesCampanhas = () => {
   const [searchCampaign, setSearchCampaign] = useState('');
   const [filterOperadora, setFilterOperadora] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [campanhasSubTab, setCampanhasSubTab] = useState<'ativas' | 'arquivadas'>('ativas');
 
   // Arte form
   const [arteOpen, setArteOpen] = useState(false);
@@ -51,12 +52,22 @@ const ArtesCampanhas = () => {
   const operadoras = [...new Set(campaigns.map(c => c.operadora_name))];
 
   const filteredCampaigns = campaigns.filter(c => {
+    const isArchived = c.status === 'arquivada';
+    if (campanhasSubTab === 'ativas' && isArchived) return false;
+    if (campanhasSubTab === 'arquivadas' && !isArchived) return false;
     const matchSearch = c.title.toLowerCase().includes(searchCampaign.toLowerCase()) ||
       c.operadora_name.toLowerCase().includes(searchCampaign.toLowerCase());
     const matchOperadora = filterOperadora === 'all' || c.operadora_name === filterOperadora;
     const matchStatus = filterStatus === 'all' || c.status === filterStatus;
     return matchSearch && matchOperadora && matchStatus;
   });
+
+  const handleArchive = (id: string) => {
+    const campaign = campaigns.find(c => c.id === id);
+    if (!campaign) return;
+    const newStatus = campaign.status === 'arquivada' ? 'ativa' : 'arquivada';
+    updateCampaign(id, { status: newStatus });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-subtle p-4 sm:p-6">
@@ -107,6 +118,28 @@ const ArtesCampanhas = () => {
 
           {/* Campanhas Tab */}
           <TabsContent value="campanhas" className="mt-0">
+            {/* Sub-tabs: Ativas / Arquivadas */}
+            <div className="flex gap-2 mb-4">
+              <Button
+                variant={campanhasSubTab === 'ativas' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setCampanhasSubTab('ativas')}
+                className="rounded-lg"
+              >
+                <Megaphone className="w-4 h-4 mr-1.5" />
+                Ativas
+              </Button>
+              <Button
+                variant={campanhasSubTab === 'arquivadas' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setCampanhasSubTab('arquivadas')}
+                className="rounded-lg"
+              >
+                <Archive className="w-4 h-4 mr-1.5" />
+                Arquivadas
+              </Button>
+            </div>
+
             {/* Filters */}
             <div className="flex flex-wrap gap-3 mb-6">
               <div className="flex-1 min-w-[200px]">
@@ -131,17 +164,19 @@ const ArtesCampanhas = () => {
                   ))}
                 </SelectContent>
               </Select>
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="Todos status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos status</SelectItem>
-                  <SelectItem value="ativa">Ativa</SelectItem>
-                  <SelectItem value="vencendo">Vencendo</SelectItem>
-                  <SelectItem value="encerrada">Encerrada</SelectItem>
-                </SelectContent>
-              </Select>
+              {campanhasSubTab === 'ativas' && (
+                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <SelectTrigger className="w-[150px]">
+                    <SelectValue placeholder="Todos status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos status</SelectItem>
+                    <SelectItem value="ativa">Ativa</SelectItem>
+                    <SelectItem value="vencendo">Vencendo</SelectItem>
+                    <SelectItem value="encerrada">Encerrada</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
               {isAdmin && <AddCampaignDialog onAdd={addCampaign} />}
             </div>
 
@@ -152,7 +187,7 @@ const ArtesCampanhas = () => {
             ) : filteredCampaigns.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
                 <Megaphone className="w-12 h-12 mx-auto mb-3 opacity-40" />
-                <p>Nenhuma campanha encontrada</p>
+                <p>{campanhasSubTab === 'arquivadas' ? 'Nenhuma campanha arquivada' : 'Nenhuma campanha encontrada'}</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -164,6 +199,7 @@ const ArtesCampanhas = () => {
                     onDelete={deleteCampaign}
                     onUpdate={updateCampaign}
                     onAddCreatives={addCreativeFiles}
+                    onArchive={isAdmin ? handleArchive : undefined}
                   />
                 ))}
               </div>
