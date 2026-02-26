@@ -39,11 +39,11 @@ export const useCampaigns = () => {
       if (error) throw error;
       const allCampaigns = (data || []) as Campaign[];
 
-      // Auto-archive campaigns past their end_date
+      // Auto-archive campaigns past their end_date (only 'ativa' or 'vencendo', not manually unarchived 'encerrada')
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const toArchive = allCampaigns.filter(c => 
-        c.status !== 'arquivada' && c.end_date && new Date(c.end_date) < today
+        (c.status === 'ativa' || c.status === 'vencendo') && c.end_date && new Date(c.end_date) < today
       );
 
       if (toArchive.length > 0) {
