@@ -175,11 +175,11 @@ export const CampaignCard = ({ campaign, isAdmin, onDelete, onUpdate, onAddCreat
               <Eye className="w-3.5 h-3.5 mr-1.5" />
               Ver detalhes
             </Button>
-            {campaign.creative_file_urls && campaign.creative_file_urls.length > 0 && (
+            {(campaign.creative_file_urls?.length > 0 || campaign.banner_image_url) && (
               <Button size="sm" variant="outline" className="flex-1 text-xs h-9 rounded-lg" asChild>
-                <a href={campaign.creative_file_urls[0]} target="_blank" rel="noopener noreferrer">
+                <a href={campaign.creative_file_urls?.[0] || campaign.banner_image_url!} target="_blank" rel="noopener noreferrer" download>
                   <Download className="w-3.5 h-3.5 mr-1.5" />
-                  Criativos
+                  Baixar
                 </a>
               </Button>
             )}
