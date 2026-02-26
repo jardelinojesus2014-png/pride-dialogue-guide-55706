@@ -312,16 +312,37 @@ export const CampaignCard = ({ campaign, isAdmin, onDelete, onUpdate, onAddCreat
                 </div>
               )}
 
-              {campaign.creative_file_urls && campaign.creative_file_urls.length > 0 && (
+              {(campaign.creative_file_urls?.length > 0 || campaign.banner_image_url) && (
                 <div className="flex flex-wrap gap-2 pt-1">
-                  {campaign.creative_file_urls.map((url, i) => (
-                    <Button key={i} size="sm" variant="outline" className="text-xs h-8 rounded-lg" asChild>
-                      <a href={url} target="_blank" rel="noopener noreferrer" download>
+                  {campaign.creative_file_urls?.length > 0 ? (
+                    campaign.creative_file_urls.map((url, i) => (
+                      <Button key={i} size="sm" variant="outline" className="text-xs h-8 rounded-lg" onClick={() => {
+                        fetch(url).then(res => res.blob()).then(blob => {
+                          const a = document.createElement('a');
+                          a.href = URL.createObjectURL(blob);
+                          a.download = campaign.creative_file_names?.[i] || `criativo-${i + 1}`;
+                          a.click();
+                          URL.revokeObjectURL(a.href);
+                        });
+                      }}>
                         <Download className="w-3 h-3 mr-1.5" />
                         {campaign.creative_file_names?.[i] || `Arquivo ${i + 1}`}
-                      </a>
+                      </Button>
+                    ))
+                  ) : (
+                    <Button size="sm" variant="outline" className="text-xs h-8 rounded-lg" onClick={() => {
+                      fetch(campaign.banner_image_url!).then(res => res.blob()).then(blob => {
+                        const a = document.createElement('a');
+                        a.href = URL.createObjectURL(blob);
+                        a.download = `${campaign.title}.png`;
+                        a.click();
+                        URL.revokeObjectURL(a.href);
+                      });
+                    }}>
+                      <Download className="w-3 h-3 mr-1.5" />
+                      Baixar Criativo
                     </Button>
-                  ))}
+                  )}
                 </div>
               )}
             </div>
