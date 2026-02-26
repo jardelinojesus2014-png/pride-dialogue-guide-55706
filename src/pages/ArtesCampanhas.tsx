@@ -65,7 +65,16 @@ const ArtesCampanhas = () => {
   const handleArchive = (id: string) => {
     const campaign = campaigns.find(c => c.id === id);
     if (!campaign) return;
-    const newStatus = campaign.status === 'arquivada' ? 'ativa' : 'arquivada';
+    // When unarchiving, set to 'encerrada' if end_date has passed, otherwise 'ativa'
+    let newStatus: string;
+    if (campaign.status === 'arquivada') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const isPast = campaign.end_date && new Date(campaign.end_date) < today;
+      newStatus = isPast ? 'encerrada' : 'ativa';
+    } else {
+      newStatus = 'arquivada';
+    }
     updateCampaign(id, { status: newStatus });
   };
 
