@@ -1,81 +1,179 @@
 import { useState } from 'react';
-import { ArrowLeft, Palette, Megaphone, Plus, Trash2, Search, Upload, Download, Archive } from 'lucide-react';
+import { ArrowLeft, Megaphone, Search, Archive, FileText, Palette } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
-import { useAuth } from '@/hooks/useAuth';
 import { useCampaigns } from '@/hooks/useCampaigns';
-import { useArtes, Arte } from '@/hooks/useArtes';
+import { useInformativos } from '@/hooks/useInformativos';
+import { useArtes } from '@/hooks/useArtes';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CampaignCard } from '@/components/CampaignCard';
 import { AddCampaignDialog } from '@/components/AddCampaignDialog';
+import { AddGenericItemDialog } from '@/components/AddGenericItemDialog';
+import { GenericItemCard } from '@/components/GenericItemCard';
 import logoPride from '@/assets/Logo_Pride.png';
 
-const ArtesCampanhas = () => {
-  const navigate = useNavigate();
-  const { isAdmin } = useIsAdmin();
-  const { campaigns, loading: loadingCampaigns, addCampaign, updateCampaign, deleteCampaign, addCreativeFiles } = useCampaigns();
-  const { artes, loading: loadingArtes, addArte, deleteArte } = useArtes();
-  
-  const [searchCampaign, setSearchCampaign] = useState('');
-  const [filterOperadora, setFilterOperadora] = useState('all');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [campanhasSubTab, setCampanhasSubTab] = useState<'ativas' | 'arquivadas'>('ativas');
+// Reusable tab content component
+interface TabSectionProps {
+  items: any[];
+  loading: boolean;
+  isAdmin: boolean;
+  label: string;
+  emptyIcon: React.ReactNode;
+  subTab: 'ativas' | 'arquivadas';
+  setSubTab: (v: 'ativas' | 'arquivadas') => void;
+  search: string;
+  setSearch: (v: string) => void;
+  filterOperadora: string;
+  setFilterOperadora: (v: string) => void;
+  filterStatus: string;
+  setFilterStatus: (v: string) => void;
+  onDelete: (id: string, bannerPath: string | null) => void;
+  onUpdate: (id: string, updates: any) => void;
+  onAddCreatives: (id: string, files: File[]) => void;
+  onArchive: (id: string) => void;
+  addDialog: React.ReactNode;
+  renderCard: (item: any) => React.ReactNode;
+}
 
-  // Arte form
-  const [arteOpen, setArteOpen] = useState(false);
-  const [arteTitle, setArteTitle] = useState('');
-  const [arteDesc, setArteDesc] = useState('');
-  const [arteCategory, setArteCategory] = useState('');
-  const [arteFile, setArteFile] = useState<File | null>(null);
-  const [arteSaving, setArteSaving] = useState(false);
+const TabSection = ({
+  items, loading, isAdmin, label, emptyIcon, subTab, setSubTab,
+  search, setSearch, filterOperadora, setFilterOperadora, filterStatus, setFilterStatus,
+  onArchive, addDialog, renderCard,
+}: TabSectionProps) => {
+  const operadoras = [...new Set(items.map((c: any) => c.operadora_name).filter(Boolean))];
 
-  const handleAddArte = async () => {
-    if (!arteTitle || !arteFile) return;
-    setArteSaving(true);
-    try {
-      await addArte(arteTitle, arteDesc, arteCategory, arteFile);
-      setArteOpen(false);
-      setArteTitle(''); setArteDesc(''); setArteCategory(''); setArteFile(null);
-    } finally {
-      setArteSaving(false);
-    }
-  };
-
-  // Get unique operadoras for filter
-  const operadoras = [...new Set(campaigns.map(c => c.operadora_name))];
-
-  const filteredCampaigns = campaigns.filter(c => {
+  const filtered = items.filter((c: any) => {
     const isArchived = c.status === 'arquivada';
-    if (campanhasSubTab === 'ativas' && isArchived) return false;
-    if (campanhasSubTab === 'arquivadas' && !isArchived) return false;
-    const matchSearch = c.title.toLowerCase().includes(searchCampaign.toLowerCase()) ||
-      c.operadora_name.toLowerCase().includes(searchCampaign.toLowerCase());
+    if (subTab === 'ativas' && isArchived) return false;
+    if (subTab === 'arquivadas' && !isArchived) return false;
+    const matchSearch = (c.title?.toLowerCase() || '').includes(search.toLowerCase()) ||
+      (c.operadora_name?.toLowerCase() || '').includes(search.toLowerCase());
     const matchOperadora = filterOperadora === 'all' || c.operadora_name === filterOperadora;
     const matchStatus = filterStatus === 'all' || c.status === filterStatus;
     return matchSearch && matchOperadora && matchStatus;
   });
 
-  const handleArchive = (id: string) => {
+  return (
+    <>
+      <div className="flex gap-2 mb-4">
+        <Button variant={subTab === 'ativas' ? 'default' : 'outline'} size="sm" onClick={() => setSubTab('ativas')} className="rounded-lg">
+          <Megaphone className="w-4 h-4 mr-1.5" />
+          Ativ{label === 'Arte' ? 'a' : 'o'}s
+        </Button>
+        <Button variant={subTab === 'arquivadas' ? 'default' : 'outline'} size="sm" onClick={() => setSubTab('arquivadas')} className="rounded-lg">
+          <Archive className="w-4 h-4 mr-1.5" />
+          Arquivad{label === 'Arte' ? 'a' : 'o'}s
+        </Button>
+      </div>
+
+      <div className="flex flex-wrap gap-3 mb-6">
+        <div className="flex-1 min-w-[200px]">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input placeholder="Buscar por nome, operadora..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
+          </div>
+        </div>
+        <Select value={filterOperadora} onValueChange={setFilterOperadora}>
+          <SelectTrigger className="w-[180px]"><SelectValue placeholder="Todas operadoras" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas operadoras</SelectItem>
+            {operadoras.map(op => <SelectItem key={op} value={op}>{op}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        {subTab === 'ativas' && (
+          <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <SelectTrigger className="w-[150px]"><SelectValue placeholder="Todos status" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos status</SelectItem>
+              <SelectItem value="ativa">Ativa</SelectItem>
+              <SelectItem value="vencendo">Vencendo</SelectItem>
+              <SelectItem value="encerrada">Encerrada</SelectItem>
+            </SelectContent>
+          </Select>
+        )}
+        {isAdmin && addDialog}
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground">
+          {emptyIcon}
+          <p>{subTab === 'arquivadas' ? `Nenhum${label === 'Arte' ? 'a' : ''} ${label.toLowerCase()} arquivad${label === 'Arte' ? 'a' : 'o'}` : `Nenhum${label === 'Arte' ? 'a' : ''} ${label.toLowerCase()} encontrad${label === 'Arte' ? 'a' : 'o'}`}</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {filtered.map((item: any) => renderCard(item))}
+        </div>
+      )}
+    </>
+  );
+};
+
+const ArtesCampanhas = () => {
+  const navigate = useNavigate();
+  const { isAdmin } = useIsAdmin();
+  const { campaigns, loading: loadingCampaigns, addCampaign, updateCampaign, deleteCampaign, addCreativeFiles } = useCampaigns();
+  const { informativos, loading: loadingInformativos, addInformativo, updateInformativo, deleteInformativo, addCreativeFiles: addInformativoCreatives } = useInformativos();
+  const { artes, loading: loadingArtes, addArte, updateArte, deleteArte, addCreativeFiles: addArteCreatives } = useArtes();
+
+  // Campanhas state
+  const [searchCampaign, setSearchCampaign] = useState('');
+  const [filterOperadoraCampaign, setFilterOperadoraCampaign] = useState('all');
+  const [filterStatusCampaign, setFilterStatusCampaign] = useState('all');
+  const [subTabCampaign, setSubTabCampaign] = useState<'ativas' | 'arquivadas'>('ativas');
+
+  // Informativos state
+  const [searchInfo, setSearchInfo] = useState('');
+  const [filterOperadoraInfo, setFilterOperadoraInfo] = useState('all');
+  const [filterStatusInfo, setFilterStatusInfo] = useState('all');
+  const [subTabInfo, setSubTabInfo] = useState<'ativas' | 'arquivadas'>('ativas');
+
+  // Artes state
+  const [searchArte, setSearchArte] = useState('');
+  const [filterOperadoraArte, setFilterOperadoraArte] = useState('all');
+  const [filterStatusArte, setFilterStatusArte] = useState('all');
+  const [subTabArte, setSubTabArte] = useState<'ativas' | 'arquivadas'>('ativas');
+
+  const handleArchiveCampaign = (id: string) => {
     const campaign = campaigns.find(c => c.id === id);
     if (!campaign) return;
-    // When unarchiving, set to 'encerrada' if end_date has passed, otherwise 'ativa'
     let newStatus: string;
     if (campaign.status === 'arquivada') {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const today = new Date(); today.setHours(0, 0, 0, 0);
       const isPast = campaign.end_date && new Date(campaign.end_date) < today;
       newStatus = isPast ? 'encerrada' : 'ativa';
-    } else {
-      newStatus = 'arquivada';
-    }
+    } else { newStatus = 'arquivada'; }
     updateCampaign(id, { status: newStatus });
+  };
+
+  const handleArchiveInformativo = (id: string) => {
+    const item = informativos.find(c => c.id === id);
+    if (!item) return;
+    let newStatus: string;
+    if (item.status === 'arquivada') {
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const isPast = item.end_date && new Date(item.end_date) < today;
+      newStatus = isPast ? 'encerrada' : 'ativa';
+    } else { newStatus = 'arquivada'; }
+    updateInformativo(id, { status: newStatus });
+  };
+
+  const handleArchiveArte = (id: string) => {
+    const item = artes.find(c => c.id === id);
+    if (!item) return;
+    let newStatus: string;
+    if (item.status === 'arquivada') {
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const isPast = item.end_date && new Date(item.end_date) < today;
+      newStatus = isPast ? 'encerrada' : 'ativa';
+    } else { newStatus = 'arquivada'; }
+    updateArte(id, { status: newStatus });
   };
 
   return (
@@ -91,15 +189,11 @@ const ArtesCampanhas = () => {
                   ARTES E CAMPANHAS
                 </h1>
                 <p className="text-accent/80 font-semibold text-sm sm:text-base mt-1">
-                  Encontre campanhas, regras e criativos das operadoras.
+                  Encontre campanhas, informativos, regras e criativos das operadoras.
                 </p>
               </div>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => navigate('/')}
-              className="bg-accent/10 border-accent/30 text-accent hover:bg-accent/20"
-            >
+            <Button variant="outline" onClick={() => navigate('/')} className="bg-accent/10 border-accent/30 text-accent hover:bg-accent/20">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Voltar
             </Button>
@@ -117,6 +211,13 @@ const ArtesCampanhas = () => {
               Campanhas
             </TabsTrigger>
             <TabsTrigger
+              value="informativos"
+              className="flex-1 text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all"
+            >
+              <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+              Informativos
+            </TabsTrigger>
+            <TabsTrigger
               value="artes"
               className="flex-1 text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 rounded-lg transition-all"
             >
@@ -127,185 +228,133 @@ const ArtesCampanhas = () => {
 
           {/* Campanhas Tab */}
           <TabsContent value="campanhas" className="mt-0">
-            {/* Sub-tabs: Ativas / Arquivadas */}
-            <div className="flex gap-2 mb-4">
-              <Button
-                variant={campanhasSubTab === 'ativas' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setCampanhasSubTab('ativas')}
-                className="rounded-lg"
-              >
-                <Megaphone className="w-4 h-4 mr-1.5" />
-                Ativas
-              </Button>
-              <Button
-                variant={campanhasSubTab === 'arquivadas' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setCampanhasSubTab('arquivadas')}
-                className="rounded-lg"
-              >
-                <Archive className="w-4 h-4 mr-1.5" />
-                Arquivadas
-              </Button>
-            </div>
-
-            {/* Filters */}
-            <div className="flex flex-wrap gap-3 mb-6">
-              <div className="flex-1 min-w-[200px]">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Buscar por nome, operadora..."
-                    value={searchCampaign}
-                    onChange={e => setSearchCampaign(e.target.value)}
-                    className="pl-9"
-                  />
-                </div>
-              </div>
-              <Select value={filterOperadora} onValueChange={setFilterOperadora}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Todas operadoras" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas operadoras</SelectItem>
-                  {operadoras.map(op => (
-                    <SelectItem key={op} value={op}>{op}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {campanhasSubTab === 'ativas' && (
-                <Select value={filterStatus} onValueChange={setFilterStatus}>
-                  <SelectTrigger className="w-[150px]">
-                    <SelectValue placeholder="Todos status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos status</SelectItem>
-                    <SelectItem value="ativa">Ativa</SelectItem>
-                    <SelectItem value="vencendo">Vencendo</SelectItem>
-                    <SelectItem value="encerrada">Encerrada</SelectItem>
-                  </SelectContent>
-                </Select>
+            <TabSection
+              items={campaigns}
+              loading={loadingCampaigns}
+              isAdmin={isAdmin}
+              label="Campanha"
+              emptyIcon={<Megaphone className="w-12 h-12 mx-auto mb-3 opacity-40" />}
+              subTab={subTabCampaign}
+              setSubTab={setSubTabCampaign}
+              search={searchCampaign}
+              setSearch={setSearchCampaign}
+              filterOperadora={filterOperadoraCampaign}
+              setFilterOperadora={setFilterOperadoraCampaign}
+              filterStatus={filterStatusCampaign}
+              setFilterStatus={setFilterStatusCampaign}
+              onDelete={deleteCampaign}
+              onUpdate={updateCampaign}
+              onAddCreatives={addCreativeFiles}
+              onArchive={handleArchiveCampaign}
+              addDialog={<AddCampaignDialog onAdd={addCampaign} />}
+              renderCard={(campaign) => (
+                <CampaignCard
+                  key={campaign.id}
+                  campaign={campaign}
+                  isAdmin={isAdmin}
+                  onDelete={deleteCampaign}
+                  onUpdate={updateCampaign}
+                  onAddCreatives={addCreativeFiles}
+                  onArchive={isAdmin ? handleArchiveCampaign : undefined}
+                />
               )}
-              {isAdmin && <AddCampaignDialog onAdd={addCampaign} />}
-            </div>
+            />
+          </TabsContent>
 
-            {loadingCampaigns ? (
-              <div className="flex justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-              </div>
-            ) : filteredCampaigns.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground">
-                <Megaphone className="w-12 h-12 mx-auto mb-3 opacity-40" />
-                <p>{campanhasSubTab === 'arquivadas' ? 'Nenhuma campanha arquivada' : 'Nenhuma campanha encontrada'}</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {filteredCampaigns.map(campaign => (
-                  <CampaignCard
-                    key={campaign.id}
-                    campaign={campaign}
-                    isAdmin={isAdmin}
-                    onDelete={deleteCampaign}
-                    onUpdate={updateCampaign}
-                    onAddCreatives={addCreativeFiles}
-                    onArchive={isAdmin ? handleArchive : undefined}
-                  />
-                ))}
-              </div>
-            )}
+          {/* Informativos Tab */}
+          <TabsContent value="informativos" className="mt-0">
+            <TabSection
+              items={informativos}
+              loading={loadingInformativos}
+              isAdmin={isAdmin}
+              label="Informativo"
+              emptyIcon={<FileText className="w-12 h-12 mx-auto mb-3 opacity-40" />}
+              subTab={subTabInfo}
+              setSubTab={setSubTabInfo}
+              search={searchInfo}
+              setSearch={setSearchInfo}
+              filterOperadora={filterOperadoraInfo}
+              setFilterOperadora={setFilterOperadoraInfo}
+              filterStatus={filterStatusInfo}
+              setFilterStatus={setFilterStatusInfo}
+              onDelete={deleteInformativo}
+              onUpdate={updateInformativo}
+              onAddCreatives={addInformativoCreatives}
+              onArchive={handleArchiveInformativo}
+              addDialog={
+                <AddGenericItemDialog
+                  label="Informativo"
+                  onAdd={addInformativo}
+                  typeOptions={[
+                    { value: 'informativo', label: 'Informativo' },
+                    { value: 'comunicado', label: 'Comunicado' },
+                    { value: 'aviso', label: 'Aviso' },
+                  ]}
+                />
+              }
+              renderCard={(item) => (
+                <GenericItemCard
+                  key={item.id}
+                  item={item}
+                  isAdmin={isAdmin}
+                  label="Informativo"
+                  onDelete={deleteInformativo}
+                  onUpdate={updateInformativo}
+                  onAddCreatives={addInformativoCreatives}
+                  onArchive={isAdmin ? handleArchiveInformativo : undefined}
+                />
+              )}
+            />
           </TabsContent>
 
           {/* Artes Tab */}
           <TabsContent value="artes" className="mt-0">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-foreground">Artes Disponíveis</h2>
-              {isAdmin && (
-                <Dialog open={arteOpen} onOpenChange={setArteOpen}>
-                  <DialogTrigger asChild>
-                    <Button className="gap-2">
-                      <Plus className="w-4 h-4" />
-                      Nova Arte
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Adicionar Arte</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <Label>Título *</Label>
-                        <Input value={arteTitle} onChange={e => setArteTitle(e.target.value)} placeholder="Nome da arte" />
-                      </div>
-                      <div>
-                        <Label>Descrição</Label>
-                        <Textarea value={arteDesc} onChange={e => setArteDesc(e.target.value)} placeholder="Descrição" />
-                      </div>
-                      <div>
-                        <Label>Categoria</Label>
-                        <Input value={arteCategory} onChange={e => setArteCategory(e.target.value)} placeholder="Ex: Banner, Post, Story" />
-                      </div>
-                      <div>
-                        <Label>Arquivo *</Label>
-                        <Input type="file" accept="image/*,.pdf" onChange={e => setArteFile(e.target.files?.[0] || null)} />
-                      </div>
-                      <Button onClick={handleAddArte} disabled={arteSaving || !arteTitle || !arteFile} className="w-full">
-                        {arteSaving ? 'Salvando...' : 'Adicionar Arte'}
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
+            <TabSection
+              items={artes}
+              loading={loadingArtes}
+              isAdmin={isAdmin}
+              label="Arte"
+              emptyIcon={<Palette className="w-12 h-12 mx-auto mb-3 opacity-40" />}
+              subTab={subTabArte}
+              setSubTab={setSubTabArte}
+              search={searchArte}
+              setSearch={setSearchArte}
+              filterOperadora={filterOperadoraArte}
+              setFilterOperadora={setFilterOperadoraArte}
+              filterStatus={filterStatusArte}
+              setFilterStatus={setFilterStatusArte}
+              onDelete={deleteArte}
+              onUpdate={updateArte}
+              onAddCreatives={addArteCreatives}
+              onArchive={handleArchiveArte}
+              addDialog={
+                <AddGenericItemDialog
+                  label="Arte"
+                  onAdd={addArte}
+                  typeOptions={[
+                    { value: 'arte', label: 'Arte' },
+                    { value: 'banner', label: 'Banner' },
+                    { value: 'post', label: 'Post' },
+                    { value: 'story', label: 'Story' },
+                  ]}
+                />
+              }
+              renderCard={(item) => (
+                <GenericItemCard
+                  key={item.id}
+                  item={{
+                    ...item,
+                    banner_image_url: item.banner_image_url || item.file_url,
+                  }}
+                  isAdmin={isAdmin}
+                  label="Arte"
+                  onDelete={deleteArte}
+                  onUpdate={updateArte}
+                  onAddCreatives={addArteCreatives}
+                  onArchive={isAdmin ? handleArchiveArte : undefined}
+                />
               )}
-            </div>
-
-            {loadingArtes ? (
-              <div className="flex justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-              </div>
-            ) : artes.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground">
-                <Palette className="w-12 h-12 mx-auto mb-3 opacity-40" />
-                <p>Nenhuma arte disponível</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {artes.map(arte => (
-                  <Card key={arte.id} className="overflow-hidden group">
-                    <div className="relative aspect-square overflow-hidden bg-muted">
-                      <img 
-                        src={arte.file_url} 
-                        alt={arte.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      {isAdmin && (
-                        <Button
-                          size="icon"
-                          variant="destructive"
-                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => deleteArte(arte.id, arte.file_path)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      )}
-                    </div>
-                    <CardContent className="p-3">
-                      <h3 className="font-semibold text-sm text-foreground">{arte.title}</h3>
-                      {arte.description && <p className="text-xs text-muted-foreground mt-1">{arte.description}</p>}
-                      {arte.category && (
-                        <span className="inline-block mt-2 text-xs bg-muted px-2 py-0.5 rounded">{arte.category}</span>
-                      )}
-                      <div className="mt-2">
-                        <Button size="sm" variant="outline" className="w-full text-xs" asChild>
-                          <a href={arte.file_url} target="_blank" rel="noopener noreferrer" download>
-                            <Download className="w-3 h-3 mr-1" />
-                            Baixar
-                          </a>
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
+            />
           </TabsContent>
         </Tabs>
       </div>
