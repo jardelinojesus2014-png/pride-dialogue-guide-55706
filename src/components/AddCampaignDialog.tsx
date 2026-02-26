@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Plus, Upload } from 'lucide-react';
+import { Plus, Sparkles, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface AddCampaignDialogProps {
   onAdd: (campaign: {
@@ -23,6 +25,18 @@ interface AddCampaignDialogProps {
   }) => Promise<void>;
 }
 
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      resolve(result.split(',')[1]);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
 export const AddCampaignDialog = ({ onAdd }: AddCampaignDialogProps) => {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
@@ -37,6 +51,44 @@ export const AddCampaignDialog = ({ onAdd }: AddCampaignDialogProps) => {
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+
+  const handleBannerChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setBannerFile(file);
+    if (file) {
+      await analyzeImage(file);
+    }
+  };
+
+  const analyzeImage = async (file: File) => {
+    setAnalyzing(true);
+    try {
+      const base64 = await fileToBase64(file);
+      const { data, error } = await supabase.functions.invoke('analyze-campaign-image', {
+        body: { imageBase64: base64 },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      if (data.title) setTitle(data.title);
+      if (data.description) setDescription(data.description);
+      if (data.operadora_name) setOperadoraName(data.operadora_name);
+      if (data.campaign_type) setCampaignType(data.campaign_type);
+      if (data.start_date) setStartDate(data.start_date);
+      if (data.end_date) setEndDate(data.end_date);
+      if (data.details_content) setDetailsContent(data.details_content);
+      if (data.tags && data.tags.length > 0) setTagsStr(data.tags.join(', '));
+
+      toast.success('Informações extraídas do criativo com sucesso!');
+    } catch (err) {
+      console.error('Error analyzing image:', err);
+      toast.error('Não foi possível extrair informações da imagem. Preencha manualmente.');
+    } finally {
+      setAnalyzing(false);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!title || !operadoraName) return;
@@ -81,6 +133,24 @@ export const AddCampaignDialog = ({ onAdd }: AddCampaignDialogProps) => {
           <DialogTitle>Adicionar Campanha</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
+          {/* Banner upload - FIRST, triggers AI analysis */}
+          <div className="border-2 border-dashed border-primary/30 rounded-lg p-4 bg-primary/5">
+            <Label className="flex items-center gap-2 text-primary font-semibold mb-2">
+              <Sparkles className="w-4 h-4" />
+              Criativo da Campanha *
+            </Label>
+            <p className="text-xs text-muted-foreground mb-2">
+              Suba o criativo e as informações serão preenchidas automaticamente via IA
+            </p>
+            <Input type="file" accept="image/*" onChange={handleBannerChange} />
+            {analyzing && (
+              <div className="flex items-center gap-2 mt-2 text-sm text-primary">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Analisando criativo com IA...
+              </div>
+            )}
+          </div>
+
           <div>
             <Label>Título *</Label>
             <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="Nome da campanha" />
@@ -136,14 +206,10 @@ export const AddCampaignDialog = ({ onAdd }: AddCampaignDialogProps) => {
             <Textarea value={detailsContent} onChange={e => setDetailsContent(e.target.value)} placeholder="Regras e detalhes da campanha..." rows={4} />
           </div>
           <div>
-            <Label>Banner da Campanha</Label>
-            <Input type="file" accept="image/*" onChange={e => setBannerFile(e.target.files?.[0] || null)} />
-          </div>
-          <div>
             <Label>Logo da Operadora</Label>
             <Input type="file" accept="image/*" onChange={e => setLogoFile(e.target.files?.[0] || null)} />
           </div>
-          <Button onClick={handleSubmit} disabled={saving || !title || !operadoraName} className="w-full">
+          <Button onClick={handleSubmit} disabled={saving || analyzing || !title || !operadoraName} className="w-full">
             {saving ? 'Salvando...' : 'Adicionar Campanha'}
           </Button>
         </div>
