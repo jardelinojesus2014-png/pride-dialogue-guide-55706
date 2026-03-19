@@ -16,6 +16,7 @@ interface ArtesFolderDialogProps {
   onOpenChange: (open: boolean) => void;
   folderName: string;
   isAdmin: boolean;
+  folderId?: string;
 }
 
 const fileToBase64 = (file: File): Promise<string> => {
