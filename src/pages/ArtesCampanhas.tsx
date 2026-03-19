@@ -13,6 +13,7 @@ import { CampaignCard } from '@/components/CampaignCard';
 import { AddCampaignDialog } from '@/components/AddCampaignDialog';
 import { AddGenericItemDialog } from '@/components/AddGenericItemDialog';
 import { GenericItemCard } from '@/components/GenericItemCard';
+import { ArtesFolderCard } from '@/components/ArtesFolderCard';
 import logoPride from '@/assets/Logo_Pride.png';
 
 // Reusable tab content component
