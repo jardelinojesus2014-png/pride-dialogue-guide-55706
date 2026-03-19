@@ -37,12 +37,13 @@ interface TabSectionProps {
   onArchive: (id: string) => void;
   addDialog: React.ReactNode;
   renderCard: (item: any) => React.ReactNode;
+  prependElement?: React.ReactNode;
 }
 
 const TabSection = ({
   items, loading, isAdmin, label, emptyIcon, subTab, setSubTab,
   search, setSearch, filterOperadora, setFilterOperadora, filterStatus, setFilterStatus,
-  onArchive, addDialog, renderCard,
+  onArchive, addDialog, renderCard, prependElement,
 }: TabSectionProps) => {
   const operadoras = [...new Set(items.map((c: any) => c.operadora_name).filter(Boolean))];
 
