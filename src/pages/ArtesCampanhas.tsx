@@ -193,6 +193,24 @@ const ArtesCampanhas = () => {
     updateArte(id, { status: newStatus });
   };
 
+  const handleTogglePinCampaign = (id: string) => {
+    const c = campaigns.find(c => c.id === id);
+    if (!c) return;
+    updateCampaign(id, { is_pinned: !(c as any).is_pinned } as any);
+  };
+
+  const handleTogglePinInformativo = (id: string) => {
+    const c = informativos.find(c => c.id === id);
+    if (!c) return;
+    updateInformativo(id, { is_pinned: !(c as any).is_pinned } as any);
+  };
+
+  const handleTogglePinArte = (id: string) => {
+    const c = artes.find(c => c.id === id);
+    if (!c) return;
+    updateArte(id, { is_pinned: !(c as any).is_pinned } as any);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-subtle p-4 sm:p-6">
       <div className="max-w-6xl mx-auto">
