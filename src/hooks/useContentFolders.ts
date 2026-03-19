@@ -90,5 +90,5 @@ export const useContentFolders = (tabType: string) => {
     fetchFolders();
   }, [tabType]);
 
-  return { folders, loading, addFolder, updateFolder, deleteFolder, refetch: fetchFolders };
+  return { folders, loading, addFolder, updateFolder, deleteFolder, togglePinFolder, refetch: fetchFolders };
 };
