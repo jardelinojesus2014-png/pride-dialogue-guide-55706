@@ -58,6 +58,10 @@ const TabSection = ({
     const matchOperadora = filterOperadora === 'all' || c.operadora_name === filterOperadora;
     const matchStatus = filterStatus === 'all' || c.status === filterStatus;
     return matchSearch && matchOperadora && matchStatus;
+  }).sort((a: any, b: any) => {
+    if (a.is_pinned && !b.is_pinned) return -1;
+    if (!a.is_pinned && b.is_pinned) return 1;
+    return 0;
   });
 
   return (
