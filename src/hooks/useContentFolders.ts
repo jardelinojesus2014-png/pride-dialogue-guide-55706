@@ -6,6 +6,7 @@ export interface ContentFolder {
   id: string;
   name: string;
   tab_type: string;
+  is_pinned: boolean;
   created_by: string | null;
   created_at: string;
   updated_at: string;
