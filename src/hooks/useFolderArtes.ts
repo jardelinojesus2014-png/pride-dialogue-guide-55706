@@ -27,17 +27,24 @@ export interface FolderArte {
   updated_at: string;
 }
 
-export const useFolderArtes = () => {
+export const useFolderArtes = (folderId?: string) => {
   const [artes, setArtes] = useState<FolderArte[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchArtes = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('folder_artes')
         .select('*')
         .order('created_at', { ascending: false });
 
+      if (folderId) {
+        query = query.eq('folder_id', folderId);
+      } else {
+        query = query.is('folder_id', null);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       setArtes((data || []) as FolderArte[]);
     } catch (error) {
