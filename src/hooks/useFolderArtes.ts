@@ -187,7 +187,7 @@ export const useFolderArtes = (folderId?: string) => {
 
   useEffect(() => {
     fetchArtes();
-  }, []);
+  }, [folderId]);
 
   return { artes, loading, addArte, updateArte, deleteArte, addCreativeFiles, refetch: fetchArtes };
 };
