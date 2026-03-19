@@ -41,8 +41,11 @@ const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
-export const AddGenericItemDialog = ({ label, onAdd, typeOptions }: AddGenericItemDialogProps) => {
-  const [open, setOpen] = useState(false);
+export const AddGenericItemDialog = ({ label, onAdd, typeOptions, externalOpen, onExternalOpenChange }: AddGenericItemDialogProps) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = externalOpen !== undefined;
+  const open = isControlled ? externalOpen : internalOpen;
+  const setOpen = isControlled ? (v: boolean) => onExternalOpenChange?.(v) : setInternalOpen;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [operadoraName, setOperadoraName] = useState('');
