@@ -5,6 +5,7 @@ import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useInformativos } from '@/hooks/useInformativos';
 import { useArtes } from '@/hooks/useArtes';
+import { useContentFolders } from '@/hooks/useContentFolders';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +14,8 @@ import { CampaignCard } from '@/components/CampaignCard';
 import { AddCampaignDialog } from '@/components/AddCampaignDialog';
 import { AddGenericItemDialog } from '@/components/AddGenericItemDialog';
 import { GenericItemCard } from '@/components/GenericItemCard';
-import { ArtesFolderCard } from '@/components/ArtesFolderCard';
+import { ContentFolderCard } from '@/components/ContentFolderCard';
+import { AddContentDropdown } from '@/components/AddContentDropdown';
 import logoPride from '@/assets/Logo_Pride.png';
 
 // Reusable tab content component
@@ -35,15 +37,15 @@ interface TabSectionProps {
   onUpdate: (id: string, updates: any) => void;
   onAddCreatives: (id: string, files: File[]) => void;
   onArchive: (id: string) => void;
-  addDialog: React.ReactNode;
+  addDropdown: React.ReactNode;
   renderCard: (item: any) => React.ReactNode;
-  prependElement?: React.ReactNode;
+  folderElements?: React.ReactNode;
 }
 
 const TabSection = ({
   items, loading, isAdmin, label, emptyIcon, subTab, setSubTab,
   search, setSearch, filterOperadora, setFilterOperadora, filterStatus, setFilterStatus,
-  onArchive, addDialog, renderCard, prependElement,
+  onArchive, addDropdown, renderCard, folderElements,
 }: TabSectionProps) => {
   const operadoras = [...new Set(items.map((c: any) => c.operadora_name).filter(Boolean))];
 
@@ -96,21 +98,21 @@ const TabSection = ({
             </SelectContent>
           </Select>
         )}
-        {isAdmin && addDialog}
+        {addDropdown}
       </div>
 
       {loading ? (
         <div className="flex justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         </div>
-      ) : filtered.length === 0 ? (
+      ) : filtered.length === 0 && !folderElements ? (
         <div className="text-center py-12 text-muted-foreground">
           {emptyIcon}
           <p>{subTab === 'arquivadas' ? `Nenhum${label === 'Arte' ? 'a' : ''} ${label.toLowerCase()} arquivad${label === 'Arte' ? 'a' : 'o'}` : `Nenhum${label === 'Arte' ? 'a' : ''} ${label.toLowerCase()} encontrad${label === 'Arte' ? 'a' : 'o'}`}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {prependElement}
+          {folderElements}
           {filtered.map((item: any) => renderCard(item))}
         </div>
       )}
@@ -125,23 +127,31 @@ const ArtesCampanhas = () => {
   const { informativos, loading: loadingInformativos, addInformativo, updateInformativo, deleteInformativo, addCreativeFiles: addInformativoCreatives } = useInformativos();
   const { artes, loading: loadingArtes, addArte, updateArte, deleteArte, addCreativeFiles: addArteCreatives } = useArtes();
 
+  // Folders per tab
+  const { folders: campaignFolders, addFolder: addCampaignFolder, updateFolder: updateCampaignFolder, deleteFolder: deleteCampaignFolder } = useContentFolders('campanhas');
+  const { folders: informativoFolders, addFolder: addInformativoFolder, updateFolder: updateInformativoFolder, deleteFolder: deleteInformativoFolder } = useContentFolders('informativos');
+  const { folders: arteFolders, addFolder: addArteFolder, updateFolder: updateArteFolder, deleteFolder: deleteArteFolder } = useContentFolders('artes');
+
   // Campanhas state
   const [searchCampaign, setSearchCampaign] = useState('');
   const [filterOperadoraCampaign, setFilterOperadoraCampaign] = useState('all');
   const [filterStatusCampaign, setFilterStatusCampaign] = useState('all');
   const [subTabCampaign, setSubTabCampaign] = useState<'ativas' | 'arquivadas'>('ativas');
+  const [addCampaignOpen, setAddCampaignOpen] = useState(false);
 
   // Informativos state
   const [searchInfo, setSearchInfo] = useState('');
   const [filterOperadoraInfo, setFilterOperadoraInfo] = useState('all');
   const [filterStatusInfo, setFilterStatusInfo] = useState('all');
   const [subTabInfo, setSubTabInfo] = useState<'ativas' | 'arquivadas'>('ativas');
+  const [addInfoOpen, setAddInfoOpen] = useState(false);
 
   // Artes state
   const [searchArte, setSearchArte] = useState('');
   const [filterOperadoraArte, setFilterOperadoraArte] = useState('all');
   const [filterStatusArte, setFilterStatusArte] = useState('all');
   const [subTabArte, setSubTabArte] = useState<'ativas' | 'arquivadas'>('ativas');
+  const [addArteOpen, setAddArteOpen] = useState(false);
 
   const handleArchiveCampaign = (id: string) => {
     const campaign = campaigns.find(c => c.id === id);
@@ -249,7 +259,27 @@ const ArtesCampanhas = () => {
               onUpdate={updateCampaign}
               onAddCreatives={addCreativeFiles}
               onArchive={handleArchiveCampaign}
-              addDialog={<AddCampaignDialog onAdd={addCampaign} />}
+              addDropdown={
+                isAdmin ? (
+                  <AddContentDropdown
+                    label="Campanha"
+                    onAddItem={() => setAddCampaignOpen(true)}
+                    onAddFolder={() => addCampaignFolder()}
+                    itemIcon={<Megaphone className="w-4 h-4" />}
+                  />
+                ) : null
+              }
+              folderElements={
+                campaignFolders.map(folder => (
+                  <ContentFolderCard
+                    key={folder.id}
+                    folder={folder}
+                    isAdmin={isAdmin}
+                    onRename={updateCampaignFolder}
+                    onDelete={deleteCampaignFolder}
+                  />
+                ))
+              }
               renderCard={(campaign) => (
                 <CampaignCard
                   key={campaign.id}
@@ -261,6 +291,11 @@ const ArtesCampanhas = () => {
                   onArchive={isAdmin ? handleArchiveCampaign : undefined}
                 />
               )}
+            />
+            <AddCampaignDialog
+              onAdd={addCampaign}
+              externalOpen={addCampaignOpen}
+              onExternalOpenChange={setAddCampaignOpen}
             />
           </TabsContent>
 
@@ -284,16 +319,26 @@ const ArtesCampanhas = () => {
               onUpdate={updateInformativo}
               onAddCreatives={addInformativoCreatives}
               onArchive={handleArchiveInformativo}
-              addDialog={
-                <AddGenericItemDialog
-                  label="Informativo"
-                  onAdd={addInformativo}
-                  typeOptions={[
-                    { value: 'informativo', label: 'Informativo' },
-                    { value: 'comunicado', label: 'Comunicado' },
-                    { value: 'aviso', label: 'Aviso' },
-                  ]}
-                />
+              addDropdown={
+                isAdmin ? (
+                  <AddContentDropdown
+                    label="Informativo"
+                    onAddItem={() => setAddInfoOpen(true)}
+                    onAddFolder={() => addInformativoFolder()}
+                    itemIcon={<FileText className="w-4 h-4" />}
+                  />
+                ) : null
+              }
+              folderElements={
+                informativoFolders.map(folder => (
+                  <ContentFolderCard
+                    key={folder.id}
+                    folder={folder}
+                    isAdmin={isAdmin}
+                    onRename={updateInformativoFolder}
+                    onDelete={deleteInformativoFolder}
+                  />
+                ))
               }
               renderCard={(item) => (
                 <GenericItemCard
@@ -307,6 +352,17 @@ const ArtesCampanhas = () => {
                   onArchive={isAdmin ? handleArchiveInformativo : undefined}
                 />
               )}
+            />
+            <AddGenericItemDialog
+              label="Informativo"
+              onAdd={addInformativo}
+              typeOptions={[
+                { value: 'informativo', label: 'Informativo' },
+                { value: 'comunicado', label: 'Comunicado' },
+                { value: 'aviso', label: 'Aviso' },
+              ]}
+              externalOpen={addInfoOpen}
+              onExternalOpenChange={setAddInfoOpen}
             />
           </TabsContent>
 
@@ -330,18 +386,26 @@ const ArtesCampanhas = () => {
               onUpdate={updateArte}
               onAddCreatives={addArteCreatives}
               onArchive={handleArchiveArte}
-              prependElement={<ArtesFolderCard isAdmin={isAdmin} />}
-              addDialog={
-                <AddGenericItemDialog
-                  label="Arte"
-                  onAdd={addArte}
-                  typeOptions={[
-                    { value: 'arte', label: 'Arte' },
-                    { value: 'banner', label: 'Banner' },
-                    { value: 'post', label: 'Post' },
-                    { value: 'story', label: 'Story' },
-                  ]}
-                />
+              addDropdown={
+                isAdmin ? (
+                  <AddContentDropdown
+                    label="Arte"
+                    onAddItem={() => setAddArteOpen(true)}
+                    onAddFolder={() => addArteFolder()}
+                    itemIcon={<Palette className="w-4 h-4" />}
+                  />
+                ) : null
+              }
+              folderElements={
+                arteFolders.map(folder => (
+                  <ContentFolderCard
+                    key={folder.id}
+                    folder={folder}
+                    isAdmin={isAdmin}
+                    onRename={updateArteFolder}
+                    onDelete={deleteArteFolder}
+                  />
+                ))
               }
               renderCard={(item) => (
                 <GenericItemCard
@@ -358,6 +422,18 @@ const ArtesCampanhas = () => {
                   onArchive={isAdmin ? handleArchiveArte : undefined}
                 />
               )}
+            />
+            <AddGenericItemDialog
+              label="Arte"
+              onAdd={addArte}
+              typeOptions={[
+                { value: 'arte', label: 'Arte' },
+                { value: 'banner', label: 'Banner' },
+                { value: 'post', label: 'Post' },
+                { value: 'story', label: 'Story' },
+              ]}
+              externalOpen={addArteOpen}
+              onExternalOpenChange={setAddArteOpen}
             />
           </TabsContent>
         </Tabs>
