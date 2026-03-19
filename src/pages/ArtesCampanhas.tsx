@@ -361,6 +361,7 @@ const ArtesCampanhas = () => {
                     isAdmin={isAdmin}
                     onRename={updateInformativoFolder}
                     onDelete={deleteInformativoFolder}
+                    onTogglePin={isAdmin ? togglePinInformativoFolder : undefined}
                   />
                 ))
               }
@@ -374,6 +375,7 @@ const ArtesCampanhas = () => {
                   onUpdate={updateInformativo}
                   onAddCreatives={addInformativoCreatives}
                   onArchive={isAdmin ? handleArchiveInformativo : undefined}
+                  onTogglePin={isAdmin ? handleTogglePinInformativo : undefined}
                 />
               )}
             />
