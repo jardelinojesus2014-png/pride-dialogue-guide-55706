@@ -41,9 +41,14 @@ export const ContentFolderCard = ({ folder, isAdmin, onRename, onDelete, onToggl
   return (
     <>
       <div
-        className="group relative bg-card border border-border rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col items-center justify-center p-6 min-h-[180px]"
+        className={`group relative bg-card border ${folder.is_pinned ? 'border-primary/60 ring-1 ring-primary/30' : 'border-border'} rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col items-center justify-center p-6 min-h-[180px]`}
         onClick={!editing ? () => setDialogOpen(true) : undefined}
       >
+        {folder.is_pinned && (
+          <div className="absolute top-2 left-2 z-10">
+            <Pin className="w-4 h-4 text-primary fill-primary" />
+          </div>
+        )}
         {isAdmin && !editing && (
           <button
             className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-destructive/10"
