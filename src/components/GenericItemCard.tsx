@@ -106,7 +106,12 @@ export const GenericItemCard = ({ item, isAdmin, label, onDelete, onUpdate, onAd
 
   return (
     <>
-      <Card className="overflow-hidden border border-border hover:border-primary/40 transition-all hover:shadow-lg group flex flex-col rounded-xl">
+      <Card className={`overflow-hidden border ${(item as any).is_pinned ? 'border-primary/60 ring-1 ring-primary/30' : 'border-border'} hover:border-primary/40 transition-all hover:shadow-lg group flex flex-col rounded-xl relative`}>
+        {(item as any).is_pinned && (
+          <div className="absolute top-2 left-2 z-10">
+            <Pin className="w-4 h-4 text-primary fill-primary" />
+          </div>
+        )}
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
           {previewImage ? (
             <img src={previewImage} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
