@@ -13,6 +13,7 @@ import { CampaignCard } from '@/components/CampaignCard';
 import { AddCampaignDialog } from '@/components/AddCampaignDialog';
 import { AddGenericItemDialog } from '@/components/AddGenericItemDialog';
 import { GenericItemCard } from '@/components/GenericItemCard';
+import { ArtesFolderCard } from '@/components/ArtesFolderCard';
 import logoPride from '@/assets/Logo_Pride.png';
 
 // Reusable tab content component
@@ -36,12 +37,13 @@ interface TabSectionProps {
   onArchive: (id: string) => void;
   addDialog: React.ReactNode;
   renderCard: (item: any) => React.ReactNode;
+  prependElement?: React.ReactNode;
 }
 
 const TabSection = ({
   items, loading, isAdmin, label, emptyIcon, subTab, setSubTab,
   search, setSearch, filterOperadora, setFilterOperadora, filterStatus, setFilterStatus,
-  onArchive, addDialog, renderCard,
+  onArchive, addDialog, renderCard, prependElement,
 }: TabSectionProps) => {
   const operadoras = [...new Set(items.map((c: any) => c.operadora_name).filter(Boolean))];
 
@@ -108,6 +110,7 @@ const TabSection = ({
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {prependElement}
           {filtered.map((item: any) => renderCard(item))}
         </div>
       )}
@@ -327,6 +330,7 @@ const ArtesCampanhas = () => {
               onUpdate={updateArte}
               onAddCreatives={addArteCreatives}
               onArchive={handleArchiveArte}
+              prependElement={<ArtesFolderCard isAdmin={isAdmin} />}
               addDialog={
                 <AddGenericItemDialog
                   label="Arte"
