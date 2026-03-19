@@ -22,6 +22,7 @@ export const useContentFolders = (tabType: string) => {
         .from('content_folders')
         .select('*')
         .eq('tab_type', tabType)
+        .order('is_pinned', { ascending: false })
         .order('created_at', { ascending: true });
 
       if (error) throw error;
