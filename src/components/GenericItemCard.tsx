@@ -121,7 +121,12 @@ export const GenericItemCard = ({ item, isAdmin, label, onDelete, onUpdate, onAd
             </div>
           )}
           {isAdmin && (
-            <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+              {onTogglePin && (
+                <Button size="icon" variant="secondary" className="h-7 w-7 rounded-full shadow" title={(item as any).is_pinned ? 'Desafixar' : 'Fixar'} onClick={() => onTogglePin(item.id)}>
+                  <Pin className={`w-3.5 h-3.5 ${(item as any).is_pinned ? 'fill-primary text-primary' : ''}`} />
+                </Button>
+              )
               <Button size="icon" variant="secondary" className="h-7 w-7 rounded-full shadow" onClick={() => setEditing(true)}>
                 <Edit2 className="w-3.5 h-3.5" />
               </Button>
