@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Folder, Pencil, Check, X, Trash2 } from 'lucide-react';
+import { Folder, Pencil, Check, X, Trash2, Pin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ArtesFolderDialog } from '@/components/ArtesFolderDialog';
@@ -10,6 +10,7 @@ interface ContentFolderCardProps {
   isAdmin: boolean;
   onRename: (id: string, name: string) => void;
   onDelete: (id: string) => void;
+  onTogglePin?: (id: string) => void;
 }
 
 export const ContentFolderCard = ({ folder, isAdmin, onRename, onDelete }: ContentFolderCardProps) => {
