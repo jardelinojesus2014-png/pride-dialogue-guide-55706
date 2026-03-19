@@ -349,6 +349,81 @@ export type Database = {
         }
         Relationships: []
       }
+      folder_artes: {
+        Row: {
+          banner_image_path: string | null
+          banner_image_url: string | null
+          campaign_type: string
+          created_at: string
+          created_by: string | null
+          creative_file_names: string[] | null
+          creative_file_paths: string[] | null
+          creative_file_urls: string[] | null
+          description: string | null
+          details_content: string | null
+          display_order: number | null
+          end_date: string | null
+          file_path: string | null
+          file_url: string
+          id: string
+          operadora_logo_url: string | null
+          operadora_name: string
+          start_date: string | null
+          status: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          banner_image_path?: string | null
+          banner_image_url?: string | null
+          campaign_type?: string
+          created_at?: string
+          created_by?: string | null
+          creative_file_names?: string[] | null
+          creative_file_paths?: string[] | null
+          creative_file_urls?: string[] | null
+          description?: string | null
+          details_content?: string | null
+          display_order?: number | null
+          end_date?: string | null
+          file_path?: string | null
+          file_url: string
+          id?: string
+          operadora_logo_url?: string | null
+          operadora_name?: string
+          start_date?: string | null
+          status?: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          banner_image_path?: string | null
+          banner_image_url?: string | null
+          campaign_type?: string
+          created_at?: string
+          created_by?: string | null
+          creative_file_names?: string[] | null
+          creative_file_paths?: string[] | null
+          creative_file_urls?: string[] | null
+          description?: string | null
+          details_content?: string | null
+          display_order?: number | null
+          end_date?: string | null
+          file_path?: string | null
+          file_url?: string
+          id?: string
+          operadora_logo_url?: string | null
+          operadora_name?: string
+          start_date?: string | null
+          status?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       google_review_settings: {
         Row: {
           average_rating: number
