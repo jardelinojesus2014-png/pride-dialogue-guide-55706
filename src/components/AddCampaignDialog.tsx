@@ -39,8 +39,11 @@ const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
-export const AddCampaignDialog = ({ onAdd }: AddCampaignDialogProps) => {
-  const [open, setOpen] = useState(false);
+export const AddCampaignDialog = ({ onAdd, externalOpen, onExternalOpenChange }: AddCampaignDialogProps) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = externalOpen !== undefined;
+  const open = isControlled ? externalOpen : internalOpen;
+  const setOpen = isControlled ? (v: boolean) => onExternalOpenChange?.(v) : setInternalOpen;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [operadoraName, setOperadoraName] = useState('');
