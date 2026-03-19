@@ -299,6 +299,7 @@ const ArtesCampanhas = () => {
                     isAdmin={isAdmin}
                     onRename={updateCampaignFolder}
                     onDelete={deleteCampaignFolder}
+                    onTogglePin={isAdmin ? togglePinCampaignFolder : undefined}
                   />
                 ))
               }
@@ -311,6 +312,7 @@ const ArtesCampanhas = () => {
                   onUpdate={updateCampaign}
                   onAddCreatives={addCreativeFiles}
                   onArchive={isAdmin ? handleArchiveCampaign : undefined}
+                  onTogglePin={isAdmin ? handleTogglePinCampaign : undefined}
                 />
               )}
             />
