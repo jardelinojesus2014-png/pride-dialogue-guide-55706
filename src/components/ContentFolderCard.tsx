@@ -69,7 +69,6 @@ export const ContentFolderCard = ({ folder, isAdmin, onRename, onDelete, onToggl
             </button>
           </div>
         )}
-        )}
 
         <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center mb-3">
           <Folder className="w-9 h-9 text-primary" />
