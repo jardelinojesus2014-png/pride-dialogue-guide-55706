@@ -32,6 +32,7 @@ export type Database = {
           file_path: string | null
           file_url: string
           id: string
+          is_pinned: boolean
           operadora_logo_url: string | null
           operadora_name: string
           start_date: string | null
@@ -58,6 +59,7 @@ export type Database = {
           file_path?: string | null
           file_url: string
           id?: string
+          is_pinned?: boolean
           operadora_logo_url?: string | null
           operadora_name?: string
           start_date?: string | null
@@ -84,6 +86,7 @@ export type Database = {
           file_path?: string | null
           file_url?: string
           id?: string
+          is_pinned?: boolean
           operadora_logo_url?: string | null
           operadora_name?: string
           start_date?: string | null
@@ -229,6 +232,7 @@ export type Database = {
           display_order: number | null
           end_date: string | null
           id: string
+          is_pinned: boolean
           operadora_logo_url: string | null
           operadora_name: string
           start_date: string | null
@@ -251,6 +255,7 @@ export type Database = {
           display_order?: number | null
           end_date?: string | null
           id?: string
+          is_pinned?: boolean
           operadora_logo_url?: string | null
           operadora_name: string
           start_date?: string | null
@@ -273,6 +278,7 @@ export type Database = {
           display_order?: number | null
           end_date?: string | null
           id?: string
+          is_pinned?: boolean
           operadora_logo_url?: string | null
           operadora_name?: string
           start_date?: string | null
@@ -288,6 +294,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          is_pinned: boolean
           name: string
           tab_type: string
           updated_at: string
@@ -296,6 +303,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          is_pinned?: boolean
           name?: string
           tab_type: string
           updated_at?: string
@@ -304,6 +312,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          is_pinned?: boolean
           name?: string
           tab_type?: string
           updated_at?: string
@@ -394,6 +403,7 @@ export type Database = {
           file_url: string
           folder_id: string | null
           id: string
+          is_pinned: boolean
           operadora_logo_url: string | null
           operadora_name: string
           start_date: string | null
@@ -419,6 +429,7 @@ export type Database = {
           file_url: string
           folder_id?: string | null
           id?: string
+          is_pinned?: boolean
           operadora_logo_url?: string | null
           operadora_name?: string
           start_date?: string | null
@@ -444,6 +455,7 @@ export type Database = {
           file_url?: string
           folder_id?: string | null
           id?: string
+          is_pinned?: boolean
           operadora_logo_url?: string | null
           operadora_name?: string
           start_date?: string | null
@@ -573,6 +585,7 @@ export type Database = {
           display_order: number | null
           end_date: string | null
           id: string
+          is_pinned: boolean
           operadora_logo_url: string | null
           operadora_name: string
           start_date: string | null
@@ -595,6 +608,7 @@ export type Database = {
           display_order?: number | null
           end_date?: string | null
           id?: string
+          is_pinned?: boolean
           operadora_logo_url?: string | null
           operadora_name?: string
           start_date?: string | null
@@ -617,6 +631,7 @@ export type Database = {
           display_order?: number | null
           end_date?: string | null
           id?: string
+          is_pinned?: boolean
           operadora_logo_url?: string | null
           operadora_name?: string
           start_date?: string | null

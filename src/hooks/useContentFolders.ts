@@ -6,6 +6,7 @@ export interface ContentFolder {
   id: string;
   name: string;
   tab_type: string;
+  is_pinned: boolean;
   created_by: string | null;
   created_at: string;
   updated_at: string;
@@ -21,6 +22,7 @@ export const useContentFolders = (tabType: string) => {
         .from('content_folders')
         .select('*')
         .eq('tab_type', tabType)
+        .order('is_pinned', { ascending: false })
         .order('created_at', { ascending: true });
 
       if (error) throw error;
@@ -71,9 +73,23 @@ export const useContentFolders = (tabType: string) => {
     }
   };
 
+  const togglePinFolder = async (id: string) => {
+    try {
+      const folder = folders.find(f => f.id === id);
+      if (!folder) return;
+      const { error } = await supabase.from('content_folders').update({ is_pinned: !folder.is_pinned }).eq('id', id);
+      if (error) throw error;
+      toast.success(folder.is_pinned ? 'Pasta desafixada!' : 'Pasta fixada!');
+      fetchFolders();
+    } catch (error) {
+      console.error('Error toggling pin:', error);
+      toast.error('Erro ao fixar/desafixar pasta');
+    }
+  };
+
   useEffect(() => {
     fetchFolders();
   }, [tabType]);
 
-  return { folders, loading, addFolder, updateFolder, deleteFolder, refetch: fetchFolders };
+  return { folders, loading, addFolder, updateFolder, deleteFolder, togglePinFolder, refetch: fetchFolders };
 };

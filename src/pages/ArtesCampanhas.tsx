@@ -58,6 +58,10 @@ const TabSection = ({
     const matchOperadora = filterOperadora === 'all' || c.operadora_name === filterOperadora;
     const matchStatus = filterStatus === 'all' || c.status === filterStatus;
     return matchSearch && matchOperadora && matchStatus;
+  }).sort((a: any, b: any) => {
+    if (a.is_pinned && !b.is_pinned) return -1;
+    if (!a.is_pinned && b.is_pinned) return 1;
+    return 0;
   });
 
   return (
@@ -128,9 +132,9 @@ const ArtesCampanhas = () => {
   const { artes, loading: loadingArtes, addArte, updateArte, deleteArte, addCreativeFiles: addArteCreatives } = useArtes();
 
   // Folders per tab
-  const { folders: campaignFolders, addFolder: addCampaignFolder, updateFolder: updateCampaignFolder, deleteFolder: deleteCampaignFolder } = useContentFolders('campanhas');
-  const { folders: informativoFolders, addFolder: addInformativoFolder, updateFolder: updateInformativoFolder, deleteFolder: deleteInformativoFolder } = useContentFolders('informativos');
-  const { folders: arteFolders, addFolder: addArteFolder, updateFolder: updateArteFolder, deleteFolder: deleteArteFolder } = useContentFolders('artes');
+  const { folders: campaignFolders, addFolder: addCampaignFolder, updateFolder: updateCampaignFolder, deleteFolder: deleteCampaignFolder, togglePinFolder: togglePinCampaignFolder } = useContentFolders('campanhas');
+  const { folders: informativoFolders, addFolder: addInformativoFolder, updateFolder: updateInformativoFolder, deleteFolder: deleteInformativoFolder, togglePinFolder: togglePinInformativoFolder } = useContentFolders('informativos');
+  const { folders: arteFolders, addFolder: addArteFolder, updateFolder: updateArteFolder, deleteFolder: deleteArteFolder, togglePinFolder: togglePinArteFolder } = useContentFolders('artes');
 
   // Campanhas state
   const [searchCampaign, setSearchCampaign] = useState('');
@@ -187,6 +191,24 @@ const ArtesCampanhas = () => {
       newStatus = isPast ? 'encerrada' : 'ativa';
     } else { newStatus = 'arquivada'; }
     updateArte(id, { status: newStatus });
+  };
+
+  const handleTogglePinCampaign = (id: string) => {
+    const c = campaigns.find(c => c.id === id);
+    if (!c) return;
+    updateCampaign(id, { is_pinned: !(c as any).is_pinned } as any);
+  };
+
+  const handleTogglePinInformativo = (id: string) => {
+    const c = informativos.find(c => c.id === id);
+    if (!c) return;
+    updateInformativo(id, { is_pinned: !(c as any).is_pinned } as any);
+  };
+
+  const handleTogglePinArte = (id: string) => {
+    const c = artes.find(c => c.id === id);
+    if (!c) return;
+    updateArte(id, { is_pinned: !(c as any).is_pinned } as any);
   };
 
   return (
@@ -277,6 +299,7 @@ const ArtesCampanhas = () => {
                     isAdmin={isAdmin}
                     onRename={updateCampaignFolder}
                     onDelete={deleteCampaignFolder}
+                    onTogglePin={isAdmin ? togglePinCampaignFolder : undefined}
                   />
                 ))
               }
@@ -289,6 +312,7 @@ const ArtesCampanhas = () => {
                   onUpdate={updateCampaign}
                   onAddCreatives={addCreativeFiles}
                   onArchive={isAdmin ? handleArchiveCampaign : undefined}
+                  onTogglePin={isAdmin ? handleTogglePinCampaign : undefined}
                 />
               )}
             />
@@ -337,6 +361,7 @@ const ArtesCampanhas = () => {
                     isAdmin={isAdmin}
                     onRename={updateInformativoFolder}
                     onDelete={deleteInformativoFolder}
+                    onTogglePin={isAdmin ? togglePinInformativoFolder : undefined}
                   />
                 ))
               }
@@ -350,6 +375,7 @@ const ArtesCampanhas = () => {
                   onUpdate={updateInformativo}
                   onAddCreatives={addInformativoCreatives}
                   onArchive={isAdmin ? handleArchiveInformativo : undefined}
+                  onTogglePin={isAdmin ? handleTogglePinInformativo : undefined}
                 />
               )}
             />
@@ -404,6 +430,7 @@ const ArtesCampanhas = () => {
                     isAdmin={isAdmin}
                     onRename={updateArteFolder}
                     onDelete={deleteArteFolder}
+                    onTogglePin={isAdmin ? togglePinArteFolder : undefined}
                   />
                 ))
               }
@@ -420,6 +447,7 @@ const ArtesCampanhas = () => {
                   onUpdate={updateArte}
                   onAddCreatives={addArteCreatives}
                   onArchive={isAdmin ? handleArchiveArte : undefined}
+                  onTogglePin={isAdmin ? handleTogglePinArte : undefined}
                 />
               )}
             />

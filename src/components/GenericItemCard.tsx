@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Eye, Download, Trash2, Calendar, Edit2, Save, X, Archive, Image } from 'lucide-react';
+import { Eye, Download, Trash2, Calendar, Edit2, Save, X, Archive, Image, Pin } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -36,9 +36,10 @@ interface GenericItemCardProps {
   onUpdate?: (id: string, updates: Partial<GenericItem>) => void;
   onAddCreatives?: (itemId: string, files: File[]) => void;
   onArchive?: (id: string) => void;
+  onTogglePin?: (id: string) => void;
 }
 
-export const GenericItemCard = ({ item, isAdmin, label, onDelete, onUpdate, onAddCreatives, onArchive }: GenericItemCardProps) => {
+export const GenericItemCard = ({ item, isAdmin, label, onDelete, onUpdate, onAddCreatives, onArchive, onTogglePin }: GenericItemCardProps) => {
   const [showDetails, setShowDetails] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(item.title);
@@ -105,7 +106,12 @@ export const GenericItemCard = ({ item, isAdmin, label, onDelete, onUpdate, onAd
 
   return (
     <>
-      <Card className="overflow-hidden border border-border hover:border-primary/40 transition-all hover:shadow-lg group flex flex-col rounded-xl">
+      <Card className={`overflow-hidden border ${(item as any).is_pinned ? 'border-primary/60 ring-1 ring-primary/30' : 'border-border'} hover:border-primary/40 transition-all hover:shadow-lg group flex flex-col rounded-xl relative`}>
+        {(item as any).is_pinned && (
+          <div className="absolute top-2 left-2 z-10">
+            <Pin className="w-4 h-4 text-primary fill-primary" />
+          </div>
+        )}
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
           {previewImage ? (
             <img src={previewImage} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -115,7 +121,12 @@ export const GenericItemCard = ({ item, isAdmin, label, onDelete, onUpdate, onAd
             </div>
           )}
           {isAdmin && (
-            <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+              {onTogglePin && (
+                <Button size="icon" variant="secondary" className="h-7 w-7 rounded-full shadow" title={(item as any).is_pinned ? 'Desafixar' : 'Fixar'} onClick={() => onTogglePin(item.id)}>
+                  <Pin className={`w-3.5 h-3.5 ${(item as any).is_pinned ? 'fill-primary text-primary' : ''}`} />
+                </Button>
+              )}
               <Button size="icon" variant="secondary" className="h-7 w-7 rounded-full shadow" onClick={() => setEditing(true)}>
                 <Edit2 className="w-3.5 h-3.5" />
               </Button>

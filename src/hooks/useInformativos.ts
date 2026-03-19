@@ -20,6 +20,7 @@ export interface Informativo {
   creative_file_paths: string[];
   creative_file_names: string[];
   display_order: number;
+  is_pinned: boolean;
   created_by: string | null;
   created_at: string;
   updated_at: string;

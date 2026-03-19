@@ -11,6 +11,7 @@ export interface Arte {
   file_path: string | null;
   thumbnail_url: string | null;
   display_order: number;
+  is_pinned: boolean;
   created_by: string | null;
   created_at: string;
   updated_at: string;
