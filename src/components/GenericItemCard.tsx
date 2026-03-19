@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Eye, Download, Trash2, Calendar, Edit2, Save, X, Archive, Image } from 'lucide-react';
+import { Eye, Download, Trash2, Calendar, Edit2, Save, X, Archive, Image, Pin } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
