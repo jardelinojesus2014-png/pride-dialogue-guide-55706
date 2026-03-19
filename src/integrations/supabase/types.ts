@@ -283,6 +283,33 @@ export type Database = {
         }
         Relationships: []
       }
+      content_folders: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          tab_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          tab_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          tab_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       fluxo_audio_files: {
         Row: {
           created_at: string
@@ -365,6 +392,7 @@ export type Database = {
           end_date: string | null
           file_path: string | null
           file_url: string
+          folder_id: string | null
           id: string
           operadora_logo_url: string | null
           operadora_name: string
@@ -389,6 +417,7 @@ export type Database = {
           end_date?: string | null
           file_path?: string | null
           file_url: string
+          folder_id?: string | null
           id?: string
           operadora_logo_url?: string | null
           operadora_name?: string
@@ -413,6 +442,7 @@ export type Database = {
           end_date?: string | null
           file_path?: string | null
           file_url?: string
+          folder_id?: string | null
           id?: string
           operadora_logo_url?: string | null
           operadora_name?: string
@@ -422,7 +452,15 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "folder_artes_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "content_folders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       google_review_settings: {
         Row: {

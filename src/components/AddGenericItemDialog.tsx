@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface AddGenericItemDialogProps {
-  label: string; // "Campanha", "Informativo", "Arte"
+  label: string;
   onAdd: (item: {
     title: string;
     description: string;
@@ -25,6 +25,8 @@ interface AddGenericItemDialogProps {
     operadoraLogoFile?: File;
   }) => Promise<void>;
   typeOptions?: { value: string; label: string }[];
+  externalOpen?: boolean;
+  onExternalOpenChange?: (open: boolean) => void;
 }
 
 const fileToBase64 = (file: File): Promise<string> => {
@@ -39,8 +41,11 @@ const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
-export const AddGenericItemDialog = ({ label, onAdd, typeOptions }: AddGenericItemDialogProps) => {
-  const [open, setOpen] = useState(false);
+export const AddGenericItemDialog = ({ label, onAdd, typeOptions, externalOpen, onExternalOpenChange }: AddGenericItemDialogProps) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = externalOpen !== undefined;
+  const open = isControlled ? externalOpen : internalOpen;
+  const setOpen = isControlled ? (v: boolean) => onExternalOpenChange?.(v) : setInternalOpen;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [operadoraName, setOperadoraName] = useState('');
@@ -124,12 +129,14 @@ export const AddGenericItemDialog = ({ label, onAdd, typeOptions }: AddGenericIt
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="gap-2">
-          <Plus className="w-4 h-4" />
-          Nov{label === 'Arte' ? 'a' : 'o'} {label}
-        </Button>
-      </DialogTrigger>
+      {!isControlled && (
+        <DialogTrigger asChild>
+          <Button className="gap-2">
+            <Plus className="w-4 h-4" />
+            Nov{label === 'Arte' ? 'a' : 'o'} {label}
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Adicionar {label}</DialogTitle>

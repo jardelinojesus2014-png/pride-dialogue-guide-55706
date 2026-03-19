@@ -23,6 +23,8 @@ interface AddCampaignDialogProps {
     bannerFile?: File;
     operadoraLogoFile?: File;
   }) => Promise<void>;
+  externalOpen?: boolean;
+  onExternalOpenChange?: (open: boolean) => void;
 }
 
 const fileToBase64 = (file: File): Promise<string> => {
@@ -37,8 +39,11 @@ const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
-export const AddCampaignDialog = ({ onAdd }: AddCampaignDialogProps) => {
-  const [open, setOpen] = useState(false);
+export const AddCampaignDialog = ({ onAdd, externalOpen, onExternalOpenChange }: AddCampaignDialogProps) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = externalOpen !== undefined;
+  const open = isControlled ? externalOpen : internalOpen;
+  const setOpen = isControlled ? (v: boolean) => onExternalOpenChange?.(v) : setInternalOpen;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [operadoraName, setOperadoraName] = useState('');
@@ -122,12 +127,14 @@ export const AddCampaignDialog = ({ onAdd }: AddCampaignDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="gap-2">
-          <Plus className="w-4 h-4" />
-          Nova Campanha
-        </Button>
-      </DialogTrigger>
+      {!isControlled && (
+        <DialogTrigger asChild>
+          <Button className="gap-2">
+            <Plus className="w-4 h-4" />
+            Nova Campanha
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Adicionar Campanha</DialogTitle>
