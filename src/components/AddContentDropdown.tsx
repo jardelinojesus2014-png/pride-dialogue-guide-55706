@@ -11,10 +11,10 @@ interface AddContentDropdownProps {
   label: string;
   onAddItem: () => void;
   onAddFolder: () => void;
-  addItemDialog?: React.ReactNode;
+  itemIcon?: React.ReactNode;
 }
 
-export const AddContentDropdown = ({ label, onAddFolder, addItemDialog }: AddContentDropdownProps) => {
+export const AddContentDropdown = ({ label, onAddItem, onAddFolder, itemIcon }: AddContentDropdownProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -24,8 +24,9 @@ export const AddContentDropdown = ({ label, onAddFolder, addItemDialog }: AddCon
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem className="gap-2 cursor-pointer" onSelect={(e) => e.preventDefault()}>
-          {addItemDialog}
+        <DropdownMenuItem className="gap-2 cursor-pointer" onClick={onAddItem}>
+          {itemIcon || <Plus className="w-4 h-4" />}
+          Nov{label === 'Arte' ? 'a' : 'o'} {label}
         </DropdownMenuItem>
         <DropdownMenuItem className="gap-2 cursor-pointer" onClick={onAddFolder}>
           <FolderPlus className="w-4 h-4" />

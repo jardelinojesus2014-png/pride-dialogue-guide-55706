@@ -31,8 +31,8 @@ const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
-export const ArtesFolderDialog = ({ open, onOpenChange, folderName, isAdmin }: ArtesFolderDialogProps) => {
-  const { artes, loading, addArte, updateArte, deleteArte, addCreativeFiles } = useFolderArtes();
+export const ArtesFolderDialog = ({ open, onOpenChange, folderName, isAdmin, folderId }: ArtesFolderDialogProps) => {
+  const { artes, loading, addArte, updateArte, deleteArte, addCreativeFiles } = useFolderArtes(folderId);
   const [showAddForm, setShowAddForm] = useState(false);
 
   // Add form state
