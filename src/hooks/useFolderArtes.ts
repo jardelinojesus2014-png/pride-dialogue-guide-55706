@@ -112,6 +112,7 @@ export const useFolderArtes = (folderId?: string) => {
         tags: item.tags,
         details_content: item.details_content || null,
         display_order: artes.length,
+        folder_id: folderId || null,
       });
 
       if (error) throw error;
