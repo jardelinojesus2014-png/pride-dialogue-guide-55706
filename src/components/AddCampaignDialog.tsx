@@ -23,6 +23,8 @@ interface AddCampaignDialogProps {
     bannerFile?: File;
     operadoraLogoFile?: File;
   }) => Promise<void>;
+  externalOpen?: boolean;
+  onExternalOpenChange?: (open: boolean) => void;
 }
 
 const fileToBase64 = (file: File): Promise<string> => {
