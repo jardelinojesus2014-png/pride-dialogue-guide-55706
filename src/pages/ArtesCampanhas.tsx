@@ -132,9 +132,9 @@ const ArtesCampanhas = () => {
   const { artes, loading: loadingArtes, addArte, updateArte, deleteArte, addCreativeFiles: addArteCreatives } = useArtes();
 
   // Folders per tab
-  const { folders: campaignFolders, addFolder: addCampaignFolder, updateFolder: updateCampaignFolder, deleteFolder: deleteCampaignFolder } = useContentFolders('campanhas');
-  const { folders: informativoFolders, addFolder: addInformativoFolder, updateFolder: updateInformativoFolder, deleteFolder: deleteInformativoFolder } = useContentFolders('informativos');
-  const { folders: arteFolders, addFolder: addArteFolder, updateFolder: updateArteFolder, deleteFolder: deleteArteFolder } = useContentFolders('artes');
+  const { folders: campaignFolders, addFolder: addCampaignFolder, updateFolder: updateCampaignFolder, deleteFolder: deleteCampaignFolder, togglePinFolder: togglePinCampaignFolder } = useContentFolders('campanhas');
+  const { folders: informativoFolders, addFolder: addInformativoFolder, updateFolder: updateInformativoFolder, deleteFolder: deleteInformativoFolder, togglePinFolder: togglePinInformativoFolder } = useContentFolders('informativos');
+  const { folders: arteFolders, addFolder: addArteFolder, updateFolder: updateArteFolder, deleteFolder: deleteArteFolder, togglePinFolder: togglePinArteFolder } = useContentFolders('artes');
 
   // Campanhas state
   const [searchCampaign, setSearchCampaign] = useState('');
