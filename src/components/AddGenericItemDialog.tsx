@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface AddGenericItemDialogProps {
-  label: string; // "Campanha", "Informativo", "Arte"
+  label: string;
   onAdd: (item: {
     title: string;
     description: string;
@@ -25,6 +25,8 @@ interface AddGenericItemDialogProps {
     operadoraLogoFile?: File;
   }) => Promise<void>;
   typeOptions?: { value: string; label: string }[];
+  externalOpen?: boolean;
+  onExternalOpenChange?: (open: boolean) => void;
 }
 
 const fileToBase64 = (file: File): Promise<string> => {
