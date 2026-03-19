@@ -72,6 +72,20 @@ export const useContentFolders = (tabType: string) => {
     }
   };
 
+  const togglePinFolder = async (id: string) => {
+    try {
+      const folder = folders.find(f => f.id === id);
+      if (!folder) return;
+      const { error } = await supabase.from('content_folders').update({ is_pinned: !folder.is_pinned }).eq('id', id);
+      if (error) throw error;
+      toast.success(folder.is_pinned ? 'Pasta desafixada!' : 'Pasta fixada!');
+      fetchFolders();
+    } catch (error) {
+      console.error('Error toggling pin:', error);
+      toast.error('Erro ao fixar/desafixar pasta');
+    }
+  };
+
   useEffect(() => {
     fetchFolders();
   }, [tabType]);
