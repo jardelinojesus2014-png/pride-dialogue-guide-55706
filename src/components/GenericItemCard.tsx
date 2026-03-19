@@ -36,9 +36,10 @@ interface GenericItemCardProps {
   onUpdate?: (id: string, updates: Partial<GenericItem>) => void;
   onAddCreatives?: (itemId: string, files: File[]) => void;
   onArchive?: (id: string) => void;
+  onTogglePin?: (id: string) => void;
 }
 
-export const GenericItemCard = ({ item, isAdmin, label, onDelete, onUpdate, onAddCreatives, onArchive }: GenericItemCardProps) => {
+export const GenericItemCard = ({ item, isAdmin, label, onDelete, onUpdate, onAddCreatives, onArchive, onTogglePin }: GenericItemCardProps) => {
   const [showDetails, setShowDetails] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(item.title);
