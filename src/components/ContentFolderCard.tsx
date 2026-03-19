@@ -13,7 +13,7 @@ interface ContentFolderCardProps {
   onTogglePin?: (id: string) => void;
 }
 
-export const ContentFolderCard = ({ folder, isAdmin, onRename, onDelete }: ContentFolderCardProps) => {
+export const ContentFolderCard = ({ folder, isAdmin, onRename, onDelete, onTogglePin }: ContentFolderCardProps) => {
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
