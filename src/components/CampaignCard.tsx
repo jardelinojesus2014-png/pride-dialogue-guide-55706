@@ -17,9 +17,10 @@ interface CampaignCardProps {
   onUpdate?: (id: string, updates: Partial<Campaign>) => void;
   onAddCreatives?: (campaignId: string, files: File[]) => void;
   onArchive?: (id: string) => void;
+  onTogglePin?: (id: string) => void;
 }
 
-export const CampaignCard = ({ campaign, isAdmin, onDelete, onUpdate, onAddCreatives, onArchive }: CampaignCardProps) => {
+export const CampaignCard = ({ campaign, isAdmin, onDelete, onUpdate, onAddCreatives, onArchive, onTogglePin }: CampaignCardProps) => {
   const [showDetails, setShowDetails] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(campaign.title);
