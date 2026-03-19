@@ -430,6 +430,7 @@ const ArtesCampanhas = () => {
                     isAdmin={isAdmin}
                     onRename={updateArteFolder}
                     onDelete={deleteArteFolder}
+                    onTogglePin={isAdmin ? togglePinArteFolder : undefined}
                   />
                 ))
               }
@@ -446,6 +447,7 @@ const ArtesCampanhas = () => {
                   onUpdate={updateArte}
                   onAddCreatives={addArteCreatives}
                   onArchive={isAdmin ? handleArchiveArte : undefined}
+                  onTogglePin={isAdmin ? handleTogglePinArte : undefined}
                 />
               )}
             />
