@@ -129,12 +129,14 @@ export const AddGenericItemDialog = ({ label, onAdd, typeOptions, externalOpen, 
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="gap-2">
-          <Plus className="w-4 h-4" />
-          Nov{label === 'Arte' ? 'a' : 'o'} {label}
-        </Button>
-      </DialogTrigger>
+      {!isControlled && (
+        <DialogTrigger asChild>
+          <Button className="gap-2">
+            <Plus className="w-4 h-4" />
+            Nov{label === 'Arte' ? 'a' : 'o'} {label}
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Adicionar {label}</DialogTitle>
