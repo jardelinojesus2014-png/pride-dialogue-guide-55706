@@ -50,13 +50,25 @@ export const ContentFolderCard = ({ folder, isAdmin, onRename, onDelete, onToggl
           </div>
         )}
         {isAdmin && !editing && (
-          <button
-            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-destructive/10"
-            onClick={e => { e.stopPropagation(); onDelete(folder.id); }}
-            title="Excluir pasta"
-          >
-            <Trash2 className="w-4 h-4 text-destructive" />
-          </button>
+          <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            {onTogglePin && (
+              <button
+                className="p-1.5 rounded-lg hover:bg-muted"
+                onClick={e => { e.stopPropagation(); onTogglePin(folder.id); }}
+                title={folder.is_pinned ? 'Desafixar' : 'Fixar'}
+              >
+                <Pin className={`w-4 h-4 ${folder.is_pinned ? 'text-primary fill-primary' : 'text-muted-foreground'}`} />
+              </button>
+            )}
+            <button
+              className="p-1.5 rounded-lg hover:bg-destructive/10"
+              onClick={e => { e.stopPropagation(); onDelete(folder.id); }}
+              title="Excluir pasta"
+            >
+              <Trash2 className="w-4 h-4 text-destructive" />
+            </button>
+          </div>
+        )}
         )}
 
         <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center mb-3">
