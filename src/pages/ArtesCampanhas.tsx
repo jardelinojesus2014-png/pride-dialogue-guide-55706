@@ -330,6 +330,7 @@ const ArtesCampanhas = () => {
               onUpdate={updateArte}
               onAddCreatives={addArteCreatives}
               onArchive={handleArchiveArte}
+              prependElement={<ArtesFolderCard isAdmin={isAdmin} />}
               addDialog={
                 <AddGenericItemDialog
                   label="Arte"
