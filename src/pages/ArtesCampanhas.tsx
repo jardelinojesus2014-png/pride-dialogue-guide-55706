@@ -132,9 +132,9 @@ const ArtesCampanhas = () => {
   const { artes, loading: loadingArtes, addArte, updateArte, deleteArte, addCreativeFiles: addArteCreatives } = useArtes();
 
   // Folders per tab
-  const { folders: campaignFolders, addFolder: addCampaignFolder, updateFolder: updateCampaignFolder, deleteFolder: deleteCampaignFolder, togglePinFolder: togglePinCampaignFolder } = useContentFolders('campanhas');
-  const { folders: informativoFolders, addFolder: addInformativoFolder, updateFolder: updateInformativoFolder, deleteFolder: deleteInformativoFolder, togglePinFolder: togglePinInformativoFolder } = useContentFolders('informativos');
-  const { folders: arteFolders, addFolder: addArteFolder, updateFolder: updateArteFolder, deleteFolder: deleteArteFolder, togglePinFolder: togglePinArteFolder } = useContentFolders('artes');
+  const { folders: campaignFolders, addFolder: addCampaignFolder, updateFolder: updateCampaignFolder, deleteFolder: deleteCampaignFolder, togglePinFolder: togglePinCampaignFolder, archiveFolder: archiveCampaignFolder } = useContentFolders('campanhas');
+  const { folders: informativoFolders, addFolder: addInformativoFolder, updateFolder: updateInformativoFolder, deleteFolder: deleteInformativoFolder, togglePinFolder: togglePinInformativoFolder, archiveFolder: archiveInformativoFolder } = useContentFolders('informativos');
+  const { folders: arteFolders, addFolder: addArteFolder, updateFolder: updateArteFolder, deleteFolder: deleteArteFolder, togglePinFolder: togglePinArteFolder, archiveFolder: archiveArteFolder } = useContentFolders('artes');
 
   // Campanhas state
   const [searchCampaign, setSearchCampaign] = useState('');
