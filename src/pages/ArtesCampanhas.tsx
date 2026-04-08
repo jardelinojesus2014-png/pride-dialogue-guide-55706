@@ -109,7 +109,7 @@ const TabSection = ({
         <div className="flex justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         </div>
-      ) : filtered.length === 0 && !folderElements ? (
+      ) : filtered.length === 0 && (!folderElements || (Array.isArray(folderElements) && folderElements.length === 0)) ? (
         <div className="text-center py-12 text-muted-foreground">
           {emptyIcon}
           <p>{subTab === 'arquivadas' ? `Nenhum${label === 'Arte' ? 'a' : ''} ${label.toLowerCase()} arquivad${label === 'Arte' ? 'a' : 'o'}` : `Nenhum${label === 'Arte' ? 'a' : ''} ${label.toLowerCase()} encontrad${label === 'Arte' ? 'a' : 'o'}`}</p>
@@ -132,9 +132,9 @@ const ArtesCampanhas = () => {
   const { artes, loading: loadingArtes, addArte, updateArte, deleteArte, addCreativeFiles: addArteCreatives } = useArtes();
 
   // Folders per tab
-  const { folders: campaignFolders, addFolder: addCampaignFolder, updateFolder: updateCampaignFolder, deleteFolder: deleteCampaignFolder, togglePinFolder: togglePinCampaignFolder } = useContentFolders('campanhas');
-  const { folders: informativoFolders, addFolder: addInformativoFolder, updateFolder: updateInformativoFolder, deleteFolder: deleteInformativoFolder, togglePinFolder: togglePinInformativoFolder } = useContentFolders('informativos');
-  const { folders: arteFolders, addFolder: addArteFolder, updateFolder: updateArteFolder, deleteFolder: deleteArteFolder, togglePinFolder: togglePinArteFolder } = useContentFolders('artes');
+  const { folders: campaignFolders, addFolder: addCampaignFolder, updateFolder: updateCampaignFolder, deleteFolder: deleteCampaignFolder, togglePinFolder: togglePinCampaignFolder, archiveFolder: archiveCampaignFolder } = useContentFolders('campanhas');
+  const { folders: informativoFolders, addFolder: addInformativoFolder, updateFolder: updateInformativoFolder, deleteFolder: deleteInformativoFolder, togglePinFolder: togglePinInformativoFolder, archiveFolder: archiveInformativoFolder } = useContentFolders('informativos');
+  const { folders: arteFolders, addFolder: addArteFolder, updateFolder: updateArteFolder, deleteFolder: deleteArteFolder, togglePinFolder: togglePinArteFolder, archiveFolder: archiveArteFolder } = useContentFolders('artes');
 
   // Campanhas state
   const [searchCampaign, setSearchCampaign] = useState('');
@@ -292,7 +292,9 @@ const ArtesCampanhas = () => {
                 ) : null
               }
               folderElements={
-                campaignFolders.map(folder => (
+                campaignFolders
+                  .filter(f => subTabCampaign === 'ativas' ? f.status !== 'arquivada' : f.status === 'arquivada')
+                  .map(folder => (
                   <ContentFolderCard
                     key={folder.id}
                     folder={folder}
@@ -300,6 +302,7 @@ const ArtesCampanhas = () => {
                     onRename={updateCampaignFolder}
                     onDelete={deleteCampaignFolder}
                     onTogglePin={isAdmin ? togglePinCampaignFolder : undefined}
+                    onArchive={isAdmin ? archiveCampaignFolder : undefined}
                   />
                 ))
               }
@@ -354,7 +357,9 @@ const ArtesCampanhas = () => {
                 ) : null
               }
               folderElements={
-                informativoFolders.map(folder => (
+                informativoFolders
+                  .filter(f => subTabInfo === 'ativas' ? f.status !== 'arquivada' : f.status === 'arquivada')
+                  .map(folder => (
                   <ContentFolderCard
                     key={folder.id}
                     folder={folder}
@@ -362,6 +367,7 @@ const ArtesCampanhas = () => {
                     onRename={updateInformativoFolder}
                     onDelete={deleteInformativoFolder}
                     onTogglePin={isAdmin ? togglePinInformativoFolder : undefined}
+                    onArchive={isAdmin ? archiveInformativoFolder : undefined}
                   />
                 ))
               }
@@ -423,7 +429,9 @@ const ArtesCampanhas = () => {
                 ) : null
               }
               folderElements={
-                arteFolders.map(folder => (
+                arteFolders
+                  .filter(f => subTabArte === 'ativas' ? f.status !== 'arquivada' : f.status === 'arquivada')
+                  .map(folder => (
                   <ContentFolderCard
                     key={folder.id}
                     folder={folder}
@@ -431,6 +439,7 @@ const ArtesCampanhas = () => {
                     onRename={updateArteFolder}
                     onDelete={deleteArteFolder}
                     onTogglePin={isAdmin ? togglePinArteFolder : undefined}
+                    onArchive={isAdmin ? archiveArteFolder : undefined}
                   />
                 ))
               }

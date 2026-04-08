@@ -7,6 +7,7 @@ export interface ContentFolder {
   name: string;
   tab_type: string;
   is_pinned: boolean;
+  status: string;
   created_by: string | null;
   created_at: string;
   updated_at: string;
@@ -87,9 +88,24 @@ export const useContentFolders = (tabType: string) => {
     }
   };
 
+  const archiveFolder = async (id: string) => {
+    try {
+      const folder = folders.find(f => f.id === id);
+      if (!folder) return;
+      const newStatus = folder.status === 'arquivada' ? 'ativa' : 'arquivada';
+      const { error } = await supabase.from('content_folders').update({ status: newStatus }).eq('id', id);
+      if (error) throw error;
+      toast.success(newStatus === 'arquivada' ? 'Pasta arquivada!' : 'Pasta desarquivada!');
+      fetchFolders();
+    } catch (error) {
+      console.error('Error archiving folder:', error);
+      toast.error('Erro ao arquivar/desarquivar pasta');
+    }
+  };
+
   useEffect(() => {
     fetchFolders();
   }, [tabType]);
 
-  return { folders, loading, addFolder, updateFolder, deleteFolder, togglePinFolder, refetch: fetchFolders };
+  return { folders, loading, addFolder, updateFolder, deleteFolder, togglePinFolder, archiveFolder, refetch: fetchFolders };
 };

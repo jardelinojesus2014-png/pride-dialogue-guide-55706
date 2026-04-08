@@ -296,6 +296,7 @@ export type Database = {
           id: string
           is_pinned: boolean
           name: string
+          status: string
           tab_type: string
           updated_at: string
         }
@@ -305,6 +306,7 @@ export type Database = {
           id?: string
           is_pinned?: boolean
           name?: string
+          status?: string
           tab_type: string
           updated_at?: string
         }
@@ -314,6 +316,7 @@ export type Database = {
           id?: string
           is_pinned?: boolean
           name?: string
+          status?: string
           tab_type?: string
           updated_at?: string
         }

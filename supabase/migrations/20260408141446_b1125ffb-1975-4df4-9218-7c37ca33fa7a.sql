@@ -1,0 +1,1 @@
+ALTER TABLE public.content_folders ADD COLUMN status text NOT NULL DEFAULT 'ativa';
