@@ -109,7 +109,7 @@ const TabSection = ({
         <div className="flex justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         </div>
-      ) : filtered.length === 0 && !folderElements ? (
+      ) : filtered.length === 0 && (!folderElements || (Array.isArray(folderElements) && folderElements.length === 0)) ? (
         <div className="text-center py-12 text-muted-foreground">
           {emptyIcon}
           <p>{subTab === 'arquivadas' ? `Nenhum${label === 'Arte' ? 'a' : ''} ${label.toLowerCase()} arquivad${label === 'Arte' ? 'a' : 'o'}` : `Nenhum${label === 'Arte' ? 'a' : ''} ${label.toLowerCase()} encontrad${label === 'Arte' ? 'a' : 'o'}`}</p>
