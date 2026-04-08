@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Folder, Pencil, Check, X, Trash2, Pin } from 'lucide-react';
+import { Folder, Pencil, Check, X, Trash2, Pin, Archive, ArchiveRestore } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ArtesFolderDialog } from '@/components/ArtesFolderDialog';
@@ -11,9 +11,10 @@ interface ContentFolderCardProps {
   onRename: (id: string, name: string) => void;
   onDelete: (id: string) => void;
   onTogglePin?: (id: string) => void;
+  onArchive?: (id: string) => void;
 }
 
-export const ContentFolderCard = ({ folder, isAdmin, onRename, onDelete, onTogglePin }: ContentFolderCardProps) => {
+export const ContentFolderCard = ({ folder, isAdmin, onRename, onDelete, onTogglePin, onArchive }: ContentFolderCardProps) => {
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -58,6 +59,19 @@ export const ContentFolderCard = ({ folder, isAdmin, onRename, onDelete, onToggl
                 title={folder.is_pinned ? 'Desafixar' : 'Fixar'}
               >
                 <Pin className={`w-4 h-4 ${folder.is_pinned ? 'text-primary fill-primary' : 'text-muted-foreground'}`} />
+              </button>
+            )}
+            {onArchive && (
+              <button
+                className="p-1.5 rounded-lg hover:bg-muted"
+                onClick={e => { e.stopPropagation(); onArchive(folder.id); }}
+                title={folder.status === 'arquivada' ? 'Desarquivar pasta' : 'Arquivar pasta'}
+              >
+                {folder.status === 'arquivada' ? (
+                  <ArchiveRestore className="w-4 h-4 text-muted-foreground" />
+                ) : (
+                  <Archive className="w-4 h-4 text-muted-foreground" />
+                )}
               </button>
             )}
             <button
