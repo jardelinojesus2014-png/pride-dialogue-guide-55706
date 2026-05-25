@@ -299,6 +299,7 @@ tr:hover td{background:#fafbfc;}
 </head>
 <body>
 <div id="appRoot"></div>
+<script src="study-materials.js"></script>
 <script>
 // ══════════════════════════════════════════
 //  CONSTANTS
@@ -914,49 +915,64 @@ function toggleStudyChat(){
   render();
 }
 
+function getAllowedExamsForUser(){
+  var email=S.email||'';
+  return getAllExams().filter(function(e){
+    return e.active!==false && isExamAllowedForEmail(e,email);
+  });
+}
+
 function buildStudyPrompt(){
-  var exams=getAllExams().filter(function(e){return e.active!==false;});
-  var examList=exams.map(function(e){return e.title+': '+(e.description||'');}).join('\n');
+  var allowed=getAllowedExamsForUser();
+  var materials=(window.EXAM_MATERIALS||{});
+  var blocks=[];
+  var names=[];
+  allowed.forEach(function(e){
+    var txt=materials[e.id];
+    if(txt && String(txt).trim()){
+      names.push(e.title);
+      blocks.push('═══ MATERIAL: '+e.title+' (id: '+e.id+') ═══\n'+txt);
+    }
+  });
+  var corpus=blocks.length
+    ? blocks.join('\n\n')
+    : '(Nenhum material liberado para este usuário.)';
+
   return 'Você é ErminIA, assistente de estudo da Pride Corretora & Consultoria.\n\n'
-    +'MODO: ESTUDO PRÉ-PROVA\n'
-    +'Seu papel é ajudar o colaborador a ESTUDAR e entender o conteúdo antes de realizar a avaliação.\n\n'
-    +'TEMAS DISPONÍVEIS:\n'+examList+'\n\n'
+    +'MODO: ESTUDO PRÉ-PROVA — GROUNDING ESTRITO\n'
+    +'Seu papel é ajudar o colaborador a ESTUDAR o conteúdo das provas que ele tem acesso.\n\n'
+    +'PROVAS LIBERADAS PARA ESTE USUÁRIO: '+(names.join(' | ')||'(nenhuma)')+'\n\n'
     +'REGRAS ABSOLUTAS — NUNCA QUEBRE:\n'
-    +'1. NUNCA revele questões específicas da prova\n'
-    +'2. NUNCA diga "isso cai na prova" ou indique o que será avaliado\n'
-    +'3. Se alguém pedir as questões: "Não consigo compartilhar as questões — mas posso te ajudar a entender o conteúdo."\n\n'
-    +'SEU PAPEL: Explicar conceitos, responder dúvidas, usar exemplos práticos de vendas de planos de saúde.\n\n'
-    +'CONTEÚDO DO FLUXO DE OPORTUNIDADES:\n\n'
-    +'FILOSOFIA: Resolver, não apenas Cotar. Pride Central obrigatório. SPIN Selling na reunião.\n\n'
-    +'DIA 1 — Construção & Reunião: Preparar cenários no Pride Central com base no perfil do cliente. '
-    +'Reunião com SPIN (Situação → Problema → Implicação → Necessidade). Não entre nas opções antes de mapear as dores. '
-    +'Programar próximo contato ao final. '
-    +'No-show: mensagem com Empatia + Fato sem Julgamento + Resgate Imediato.\n\n'
-    +'DIA 2 — Virada Assíncrona: Se o D1 não aconteceu, enviar cenários estruturados + vídeo gravado '
-    +'(contexto → diferenças → recomendação) + CTA "me sinaliza assim que assistir". Nunca mandar só PDF.\n\n'
-    +'DIA 4 — Follow-up & Documentação: Responder na mesma thread. Recomendar a opção com motivos. '
-    +'"Acredita que este é o caminho? Ou precisamos ajustar algo?" '
-    +'Se concordar: modo processual imediato com Micro-Comprometimento — solicitar documentação com prazo definido.\n\n'
-    +'DIA 6 — Reforço de Valor: Materiais complementares do Pride Central + condições adicionais. '
-    +'NÃO perguntar se analisou. NÃO cobrar resposta. É nutrição.\n\n'
-    +'DIA 8 — Isolamento de Objeções: Tactical Script: '
-    +'1) Abertura Empática, 2) Ancoragem de Benefícios (segurança, previsibilidade, utilização), '
-    +'3) Pergunta Definitiva: "O que você sente que ainda falta para conseguirmos seguir?"\n\n'
-    +'DIA 10 — Break-Up: Lembrete da Dor + A Incongruência + A Retirada. '
-    +'Próximo contato: vencimento da mensalidade.\n\n'
-    +'OS 3 MANDAMENTOS: Nunca apresente sem contexto. Nunca mande propostas no escuro. Nunca deixe um fluxo aberto.\n\n'
-    +'Responda em português brasileiro, direto e com exemplos práticos. Máximo 4 parágrafos.';
+    +'1. Responda EXCLUSIVAMENTE com base no MATERIAL DE ESTUDOS abaixo. Não invente, não complete com conhecimento externo, não "deduza" o que não está escrito.\n'
+    +'2. Se a resposta NÃO estiver no material, diga exatamente: "Não encontrei essa informação no material de estudos liberado para você. Posso te ajudar com outro tópico que esteja no conteúdo?"\n'
+    +'3. Se o usuário perguntar sobre um tema que pertence a uma prova que ele NÃO tem acesso, responda: "Esse conteúdo não está liberado para o seu login. Procure o administrador se precisar de acesso."\n'
+    +'4. NUNCA revele questões específicas da prova nem indique "isso cai na prova". Se pedirem as questões: "Não consigo compartilhar as questões — mas posso te ajudar a entender o conteúdo."\n'
+    +'5. Sempre que possível, cite de qual material (título) a informação veio.\n'
+    +'6. Responda em português brasileiro, direto, com exemplos práticos APENAS quando o material os fornecer. Máximo 4 parágrafos.\n\n'
+    +'═══════════════ MATERIAL DE ESTUDOS (ÚNICA FONTE DE VERDADE) ═══════════════\n'
+    +corpus
+    +'\n═══════════════ FIM DO MATERIAL ═══════════════\n';
 }
 
 function initStudyChat(){
   if(S.studyReady)return;
   S.studyReady=true;
-  var exams=getAllExams().filter(function(e){return e.active!==false;});
-  var names=exams.map(function(e){return e.title;}).join(', ');
-  S.studyMsgs=[{role:'assistant',content:'Olá! Sou a ErminIA em modo estudo.\n\nAqui você tira dúvidas sobre o conteúdo antes de fazer a prova — sem spoilers das questões.\n\nTemas disponíveis: '+names+'. Por onde quer começar?'}];
+  var allowed=getAllowedExamsForUser();
+  var hasMaterial=allowed.some(function(e){return (window.EXAM_MATERIALS||{})[e.id];});
+  var names=allowed.map(function(e){return e.title;}).join(', ');
+  var greeting;
+  if(!allowed.length){
+    greeting='Olá! Sou a ErminIA em modo estudo.\n\nNo momento não há nenhuma prova liberada para o seu login. Procure o administrador para liberar o acesso.';
+  } else if(!hasMaterial){
+    greeting='Olá! Sou a ErminIA em modo estudo.\n\nAinda não tenho material de estudos cadastrado para as provas liberadas para você ('+names+'). Avise o administrador.';
+  } else {
+    greeting='Olá! Sou a ErminIA em modo estudo.\n\nVou te ajudar com base APENAS no material oficial das provas liberadas para o seu login — sem invenção, sem chute, sem spoilers de questões.\n\nTemas disponíveis para você: '+names+'.\n\nPor onde quer começar?';
+  }
+  S.studyMsgs=[{role:'assistant',content:greeting}];
   updateStudyChat();
   saveStudySession();
 }
+
 
 async function sendStudyMsg(){
   var input=document.getElementById('studyInput');
