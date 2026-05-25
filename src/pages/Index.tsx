@@ -222,7 +222,7 @@ const Index = () => {
                   return (
                     <div
                       key={tab.key}
-                      className="flex-none min-w-[110px] text-sm sm:text-base font-black py-2.5 px-3 text-accent/70 hover:bg-accent hover:text-primary rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full text-sm sm:text-base font-black py-2.5 px-3 text-accent/70 hover:bg-accent hover:text-primary rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
                       onClick={tab.onClick}
                     >
                       <EditableTabTitle {...titleProps} />
@@ -231,10 +231,7 @@ const Index = () => {
                   );
                 }
 
-                const isAvaliacoes = tab.value === 'avaliacoes';
-                const triggerClass = isAvaliacoes
-                  ? "flex-none min-w-[110px] text-sm sm:text-base font-black py-2.5 px-3 text-accent/70 hover:bg-accent hover:text-primary data-[state=active]:bg-accent data-[state=active]:text-primary rounded-lg transition-all"
-                  : "flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 data-[state=inactive]:hover:bg-accent/20 rounded-lg transition-all";
+                const triggerClass = "w-full text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 data-[state=inactive]:hover:bg-accent/20 rounded-lg transition-all";
 
                 return (
                   <TabsTrigger key={tab.key} value={tab.value!} className={triggerClass}>
