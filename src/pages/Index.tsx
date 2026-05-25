@@ -36,6 +36,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import logoPride from '@/assets/Logo_Pride.png';
 import logoPrideGold from '@/assets/Logo_Pride-2.png';
+import logoPrideCircle from '@/assets/logo-pride-circle.png';
+
 
 const Index = () => {
   const { signOut, user } = useAuth();
