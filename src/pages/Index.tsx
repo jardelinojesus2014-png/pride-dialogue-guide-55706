@@ -237,7 +237,7 @@ const Index = () => {
             }
             setActiveTab(v);
           }} className="w-full">
-            <TabsList className="w-full grid grid-cols-2 sm:grid-cols-4 mb-6 h-auto p-2 bg-gradient-hero rounded-lg gap-2">
+            <TabsList className="w-full flex flex-nowrap items-center justify-start sm:justify-center mb-6 h-auto p-2 bg-gradient-hero rounded-lg gap-2 overflow-x-auto">
               {orderedTabs.map((tab, position) => {
                 const titleProps = {
                   sectionKey: tab.key,
@@ -278,7 +278,7 @@ const Index = () => {
                   return (
                     <div
                       key={tab.key}
-                      className="w-full text-sm sm:text-base font-black py-2.5 px-3 text-accent/70 hover:bg-accent hover:text-primary rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      className="flex-shrink-0 text-sm sm:text-base font-black py-2.5 px-3 text-accent/70 hover:bg-accent hover:text-primary rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
                       onClick={tab.onClick}
                     >
                       <EditableTabTitle {...titleProps} />
@@ -287,7 +287,8 @@ const Index = () => {
                   );
                 }
 
-                const triggerClass = "w-full text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 data-[state=inactive]:hover:bg-accent/20 rounded-lg transition-all";
+                const triggerClass = "flex-shrink-0 text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 data-[state=inactive]:hover:bg-accent/20 rounded-lg transition-all";
+
 
                 return (
                   <TabsTrigger key={tab.key} value={tab.value!} className={triggerClass}>
