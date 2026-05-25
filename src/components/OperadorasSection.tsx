@@ -47,7 +47,7 @@ export const OperadorasSection = ({ isAdmin, userViewMode }: OperadorasSectionPr
 
   return (
     <div className="bg-card rounded-lg shadow-xl p-6 border-2 border-border">
-      <UnderConstructionBanner />
+      <EditableBanner sectionKey="banner_operadoras" isAdmin={isAdmin} userViewMode={userViewMode} />
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-black text-primary">🎓 Treinamentos de Operadoras</h2>
         {showAdminControls && (
