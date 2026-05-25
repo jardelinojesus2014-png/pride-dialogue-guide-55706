@@ -317,6 +317,7 @@ const ERMINIA_SUPA_KEY = __QS.get('anonKey') || '';
 const ERMINIA_AI_URL = ERMINIA_SUPA_URL ? (ERMINIA_SUPA_URL + '/functions/v1/erminia-chat') : '';
 const PRESET_NAME = __QS.get('userName') || '';
 const PRESET_EMAIL = __QS.get('userEmail') || '';
+const PARENT_IS_ADMIN = __QS.get('isAdmin') === '1';
 
 
 // ══════════════════════════════════════════
@@ -801,7 +802,10 @@ function render(){
   if(v==='exam_select')return renderExamSelect();
   if(v==='quiz')return renderQuiz();
   if(v==='quiz_result')return renderResult();
-  if(v==='adm_login')return renderAdmLogin();
+  if(v==='adm_login'){
+    if(PARENT_IS_ADMIN){ S.admLogged=true; S.view='adm'; S.admView=S.admView||'dashboard'; return renderAdm(); }
+    return renderAdmLogin();
+  }
   if(v==='adm')return renderAdm();
 }
 
