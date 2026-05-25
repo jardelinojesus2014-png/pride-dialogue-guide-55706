@@ -73,7 +73,7 @@ const Index = () => {
                     PRIDE CONSULTORIA
                   </h1>
                   <p className="text-accent/80 font-semibold text-sm sm:text-base mt-1">
-                    Roteiro de Prospecção SDR - Primeira Etapa da Venda
+                    Plataforma de Desenvolvimento
                   </p>
                 </div>
               </div>
