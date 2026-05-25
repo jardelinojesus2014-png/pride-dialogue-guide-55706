@@ -1089,8 +1089,7 @@ function beginQuiz(){
 // ══════════════════════════════════════════
 //  EXAM SELECTION
 // ══════════════════════════════════════════
-function renderExamSelect(){
-  const exams=getAllExams().filter(e=>e.active!==false);
+  const exams=getAllExams().filter(e=>e.active!==false && isExamAllowedForEmail(e,S.email));
   let cardsHtml='';
   exams.forEach(ex=>{
     const ur=userResults(S.email,ex.id);
