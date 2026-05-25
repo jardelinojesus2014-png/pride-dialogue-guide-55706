@@ -183,7 +183,7 @@ const Index = () => {
 
           {/* Tabs Navigation */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full flex flex-wrap mb-6 h-auto p-2 bg-gradient-hero rounded-lg gap-2">
+            <TabsList className="w-full grid grid-cols-2 sm:grid-cols-4 mb-6 h-auto p-2 bg-gradient-hero rounded-lg gap-2">
               {orderedTabs.map((tab, position) => {
                 const titleProps = {
                   sectionKey: tab.key,
@@ -222,7 +222,7 @@ const Index = () => {
                   return (
                     <div
                       key={tab.key}
-                      className="flex-none min-w-[110px] text-sm sm:text-base font-black py-2.5 px-3 text-accent/70 hover:bg-accent hover:text-primary rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full text-sm sm:text-base font-black py-2.5 px-3 text-accent/70 hover:bg-accent hover:text-primary rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
                       onClick={tab.onClick}
                     >
                       <EditableTabTitle {...titleProps} />
@@ -231,10 +231,7 @@ const Index = () => {
                   );
                 }
 
-                const isAvaliacoes = tab.value === 'avaliacoes';
-                const triggerClass = isAvaliacoes
-                  ? "flex-none min-w-[110px] text-sm sm:text-base font-black py-2.5 px-3 text-accent/70 hover:bg-accent hover:text-primary data-[state=active]:bg-accent data-[state=active]:text-primary rounded-lg transition-all"
-                  : "flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 data-[state=inactive]:hover:bg-accent/20 rounded-lg transition-all";
+                const triggerClass = "w-full text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 data-[state=inactive]:hover:bg-accent/20 rounded-lg transition-all";
 
                 return (
                   <TabsTrigger key={tab.key} value={tab.value!} className={triggerClass}>
@@ -263,16 +260,27 @@ const Index = () => {
                 userViewMode={userViewMode}
                 cards={orderedTabs
                   .filter((t) => t.key !== 'tab_dashboard')
-                  .map((t) => ({
-                    key: t.key,
-                    title: sectionTitles[t.key]?.title || t.defaultTitle,
-                    defaultDescription: `Acesse a aba ${(sectionTitles[t.key]?.title || t.defaultTitle).replace(/\n/g, ' ')}.`,
-                    icon: t.icon,
-                    onClick: () => {
-                      if (t.type === 'link' && t.onClick) t.onClick();
-                      else if (t.value) setActiveTab(t.value);
-                    },
-                  }))}
+                  .map((t) => {
+                    const descMap: Record<string, string> = {
+                      tab_prospeccao: 'Roteiro completo de prospecção SDR: regra de ouro, scripts de abordagem por etapa, contornos de objeções, do\'s & don\'ts, áudios e vídeos de treinamento para dominar a primeira etapa da venda.',
+                      tab_cadencia: 'Fluxo de cadência de 4 dias para qualificação de leads: passo a passo de cada dia (ligações, mensagens, follow-ups), scripts, dicas, materiais anexos e acompanhamento do progresso.',
+                      tab_materiais: 'Materiais adicionais de apoio: informações de qualificação (SPIN), PDFs, áudios e vídeos de treinamento, e suas reflexões de propósito para uso no dia a dia.',
+                      tab_pride: 'Conheça a Pride Corretora: site institucional, avaliações no Google, vídeo institucional e nossa missão, visão e valores.',
+                      tab_treinamentos: 'Biblioteca de treinamentos organizada por operadora e por categoria: vídeos, materiais e conteúdos específicos de cada parceiro.',
+                      tab_artes_campanhas: 'Central de Artes, Campanhas e Informativos: pastas organizadas por operadora com downloads diretos de criativos, banners e materiais promocionais.',
+                      tab_avaliacoes: 'Espaço dedicado às avaliações de desempenho e feedbacks da equipe.',
+                    };
+                    return {
+                      key: t.key,
+                      title: sectionTitles[t.key]?.title || t.defaultTitle,
+                      defaultDescription: descMap[t.key] || `Acesse a aba ${(sectionTitles[t.key]?.title || t.defaultTitle).replace(/\n/g, ' ')}.`,
+                      icon: t.icon,
+                      onClick: () => {
+                        if (t.type === 'link' && t.onClick) t.onClick();
+                        else if (t.value) setActiveTab(t.value);
+                      },
+                    };
+                  })}
               />
             </TabsContent>
 
