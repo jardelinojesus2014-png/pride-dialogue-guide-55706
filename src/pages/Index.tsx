@@ -57,6 +57,7 @@ const Index = () => {
   const avaliacoesIframeRef = useRef<HTMLIFrameElement | null>(null);
   const [avaliacoesHeight, setAvaliacoesHeight] = useState<number>(700);
   const [quizActive, setQuizActive] = useState<boolean>(false);
+  const [erminiaOpen, setErminiaOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const onMsg = async (ev: MessageEvent) => {
@@ -67,6 +68,9 @@ const Index = () => {
       }
       if (data.type === 'avaliacoes:quizActive') {
         setQuizActive(!!data.active);
+      }
+      if (data.type === 'avaliacoes:erminiaState') {
+        setErminiaOpen(!!data.open);
       }
       if (data.type === 'avaliacoes:requestProfiles' && isAdmin) {
         const { data: profs } = await supabase
@@ -638,7 +642,7 @@ const Index = () => {
             </TabsContent>
 
             {/* Floating ErminIA launcher (parent-side, always visible while on Avaliações tab) */}
-            {activeTab === 'avaliacoes' && !quizActive && (
+            {activeTab === 'avaliacoes' && !quizActive && !erminiaOpen && (
               <button
                 type="button"
                 onClick={() => {
