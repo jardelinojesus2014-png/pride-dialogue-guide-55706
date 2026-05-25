@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Moon, Sun, LogOut, Shield, Eye, EyeOff, Star, ClipboardList, BookOpen, Workflow, ChevronUp, GraduationCap, Palette, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Moon, Sun, LogOut, Shield, Eye, EyeOff, Star, ClipboardList, BookOpen, Workflow, ChevronUp, GraduationCap, Palette, ChevronLeft, ChevronRight, LayoutDashboard } from 'lucide-react';
+import { DashboardSection } from '@/components/DashboardSection';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
@@ -43,6 +44,7 @@ const Index = () => {
   const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
   const [userViewMode, setUserViewMode] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [showMotivationalPopup, setShowMotivationalPopup] = useState(false);
   const [showPurposePopup, setShowPurposePopup] = useState(false);
   const [showTrainingPopup, setShowTrainingPopup] = useState(false);
@@ -64,6 +66,7 @@ const Index = () => {
     icon: JSX.Element;
     showShortOnMobile?: boolean;
   }> = [
+    { key: 'tab_dashboard', type: 'tab', value: 'dashboard', defaultTitle: 'Dashboard', defaultShortTitle: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> },
     { key: 'tab_prospeccao', type: 'tab', value: 'prospeccao', defaultTitle: 'Roteiro de\nProspecção SDR', defaultShortTitle: 'Roteiro', icon: <ClipboardList className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> },
     { key: 'tab_cadencia', type: 'tab', value: 'cadencia', defaultTitle: 'Fluxo/ Cadência\n- Qualificação', defaultShortTitle: 'Cadência', icon: <Workflow className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> },
     { key: 'tab_materiais', type: 'tab', value: 'fluxo', defaultTitle: 'Materiais\nAdicionais', defaultShortTitle: 'Materiais', icon: <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> },
@@ -179,7 +182,7 @@ const Index = () => {
           </header>
 
           {/* Tabs Navigation */}
-          <Tabs defaultValue="prospeccao" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="w-full flex flex-wrap mb-6 h-auto p-2 bg-gradient-hero rounded-lg gap-2">
               {orderedTabs.map((tab, position) => {
                 const titleProps = {
@@ -242,8 +245,40 @@ const Index = () => {
               })}
             </TabsList>
 
+            <TabsContent value="dashboard" className="mt-0" data-section="dashboard-tab">
+              <EditableBanner sectionKey="banner_dashboard" isAdmin={isAdmin} userViewMode={userViewMode} />
+              <div className="mb-6 bg-gradient-hero rounded-xl shadow-lg p-6">
+                <EditableSectionHeader
+                  sectionKey="dashboard_header"
+                  title={sectionTitles['dashboard_header']?.title || 'Dashboard'}
+                  subtitle={sectionTitles['dashboard_header']?.subtitle || 'Sumário de toda a plataforma — clique em um card para acessar a aba.'}
+                  isAdmin={isAdmin}
+                  userViewMode={userViewMode}
+                  titleClassName="text-2xl font-black text-accent mb-2"
+                  subtitleClassName="text-accent/80"
+                />
+              </div>
+              <DashboardSection
+                isAdmin={isAdmin}
+                userViewMode={userViewMode}
+                cards={orderedTabs
+                  .filter((t) => t.key !== 'tab_dashboard')
+                  .map((t) => ({
+                    key: t.key,
+                    title: sectionTitles[t.key]?.title || t.defaultTitle,
+                    defaultDescription: `Acesse a aba ${(sectionTitles[t.key]?.title || t.defaultTitle).replace(/\n/g, ' ')}.`,
+                    icon: t.icon,
+                    onClick: () => {
+                      if (t.type === 'link' && t.onClick) t.onClick();
+                      else if (t.value) setActiveTab(t.value);
+                    },
+                  }))}
+              />
+            </TabsContent>
+
             <TabsContent value="prospeccao" className="mt-0" data-section="prospeccao-tab">
               <EditableBanner sectionKey="banner_prospeccao" isAdmin={isAdmin} userViewMode={userViewMode} />
+              
               
               {/* Golden Rule */}
               <div data-section="golden-rule">
