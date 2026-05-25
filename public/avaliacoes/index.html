@@ -2302,6 +2302,7 @@ async function sendChatMsg(){
         }
       }
     }
+    }
   }catch(e){
     S.chatMsgs.push({role:'assistant',content:'Erro de conexão: '+e.message+'. Verifique sua internet e tente novamente.'});
   }
