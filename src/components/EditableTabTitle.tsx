@@ -112,9 +112,13 @@ export const EditableTabTitle = ({
   }
 
   return (
-    <div className={cn("relative group flex items-center justify-center gap-1.5", className)}>
+    <div className={cn("relative group/tab flex items-center justify-center gap-1.5", className)}>
       {icon}
-      {showShortOnMobile ? (
+      {iconOnly ? (
+        <span className="max-w-0 overflow-hidden whitespace-nowrap opacity-0 group-hover/tab:max-w-[200px] group-hover/tab:opacity-100 group-hover/tab:ml-0.5 transition-all duration-300 ease-out text-center leading-tight">
+          {currentShortTitle || currentTitle.replace(/\n/g, ' ')}
+        </span>
+      ) : showShortOnMobile ? (
         <>
           <span className="hidden md:inline text-center leading-tight whitespace-pre-line">
             {currentTitle}
@@ -128,7 +132,7 @@ export const EditableTabTitle = ({
         <Button
           size="sm"
           variant="ghost"
-          className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity h-5 w-5 p-0 bg-accent/80 hover:bg-accent"
+          className="absolute -top-1 -right-1 opacity-0 group-hover/tab:opacity-100 transition-opacity h-5 w-5 p-0 bg-accent/80 hover:bg-accent"
           onClick={handleEditClick}
         >
           <Edit className="w-3 h-3 text-accent-foreground" />
@@ -137,3 +141,4 @@ export const EditableTabTitle = ({
     </div>
   );
 };
+
