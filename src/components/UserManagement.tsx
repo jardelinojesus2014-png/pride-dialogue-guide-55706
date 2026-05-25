@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Shield, ShieldOff, Calendar, Trash2, KeyRound, Loader2 } from 'lucide-react';
+import { Shield, ShieldOff, Calendar, Trash2, KeyRound, Loader2, LogOut } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -36,9 +36,10 @@ interface UserManagementProps {
 
 export const UserManagement = ({ users, onUserUpdated }: UserManagementProps) => {
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
-  const [actionType, setActionType] = useState<'promote' | 'demote' | 'delete' | null>(null);
+  const [actionType, setActionType] = useState<'promote' | 'demote' | 'delete' | 'logout' | null>(null);
   const [resetingPasswordFor, setResetingPasswordFor] = useState<string | null>(null);
   const [deletingUser, setDeletingUser] = useState(false);
+  const [forcingLogout, setForcingLogout] = useState(false);
 
   const handleRoleChange = async () => {
     if (!selectedUser) return;
@@ -131,6 +132,42 @@ export const UserManagement = ({ users, onUserUpdated }: UserManagementProps) =>
     }
   };
 
+  const handleForceLogout = async () => {
+    if (!selectedUser) return;
+
+    setForcingLogout(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/force-user-logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${sessionData.session?.access_token}`,
+        },
+        body: JSON.stringify({ action: 'force', userId: selectedUser.id }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Erro ao deslogar usuário');
+
+      toast({
+        title: 'Logout solicitado',
+        description: `${selectedUser.email} precisará entrar novamente para continuar.`,
+      });
+    } catch (error: any) {
+      console.error('Error forcing logout:', error);
+      toast({
+        title: 'Erro ao deslogar',
+        description: error.message || 'Não foi possível encerrar a sessão do usuário.',
+        variant: 'destructive',
+      });
+    } finally {
+      setForcingLogout(false);
+      setSelectedUser(null);
+      setActionType(null);
+    }
+  };
+
   const handleResetPassword = async (user: UserProfile) => {
     setResetingPasswordFor(user.id);
     try {
@@ -156,7 +193,7 @@ export const UserManagement = ({ users, onUserUpdated }: UserManagementProps) =>
     }
   };
 
-  const openDialog = (user: UserProfile, action: 'promote' | 'demote' | 'delete') => {
+  const openDialog = (user: UserProfile, action: 'promote' | 'demote' | 'delete' | 'logout') => {
     setSelectedUser(user);
     setActionType(action);
   };
