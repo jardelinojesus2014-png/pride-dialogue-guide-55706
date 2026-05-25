@@ -57,6 +57,7 @@ const Index = () => {
   const avaliacoesIframeRef = useRef<HTMLIFrameElement | null>(null);
   const [avaliacoesHeight, setAvaliacoesHeight] = useState<number>(700);
   const [quizActive, setQuizActive] = useState<boolean>(false);
+  const [erminiaOpen, setErminiaOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const onMsg = async (ev: MessageEvent) => {
