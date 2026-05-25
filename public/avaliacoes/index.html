@@ -317,6 +317,7 @@ const ERMINIA_SUPA_KEY = __QS.get('anonKey') || '';
 const ERMINIA_AI_URL = ERMINIA_SUPA_URL ? (ERMINIA_SUPA_URL + '/functions/v1/erminia-chat') : '';
 const PRESET_NAME = __QS.get('userName') || '';
 const PRESET_EMAIL = __QS.get('userEmail') || '';
+const PARENT_IS_ADMIN = __QS.get('isAdmin') === '1';
 
 
 // ══════════════════════════════════════════
