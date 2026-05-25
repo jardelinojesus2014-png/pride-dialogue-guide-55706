@@ -44,6 +44,7 @@ const Index = () => {
   const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
   const [userViewMode, setUserViewMode] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [showMotivationalPopup, setShowMotivationalPopup] = useState(false);
   const [showPurposePopup, setShowPurposePopup] = useState(false);
   const [showTrainingPopup, setShowTrainingPopup] = useState(false);
