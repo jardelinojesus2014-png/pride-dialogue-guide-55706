@@ -674,9 +674,47 @@ function saveQ(q,examId){
 }
 
 // Results (all exams, filtered by examId when needed)
-function getR(){try{return JSON.parse(localStorage.getItem(SK_R)||'[]');}catch(e){return[];}}
+function getRLocal(){try{return JSON.parse(localStorage.getItem(SK_R)||'[]');}catch(e){return[];}}
+function getR(){
+  var local=getRLocal();
+  var remote=window.__remoteExamResults||[];
+  if(!remote.length)return local;
+  var seen={};
+  local.forEach(function(r){if(r&&r.id)seen[r.id]=true;});
+  var merged=local.slice();
+  remote.forEach(function(r){if(!seen[r.id])merged.push(r);});
+  return merged;
+}
 function saveR(r){localStorage.setItem(SK_R,JSON.stringify(r));}
 function getRByExam(examId){return getR().filter(r=>(r.examId||DEFAULT_EXAM_ID)===examId);}
+function fetchRemoteExamResults(cb){
+  if(!ERMINIA_SUPA_URL||!ERMINIA_SUPA_KEY){cb&&cb();return;}
+  var token=window.__parentAccessToken||ERMINIA_SUPA_KEY;
+  fetch(ERMINIA_SUPA_URL+'/rest/v1/exam_attempts?select=*&order=date_iso.desc&limit=2000',{
+    headers:{'apikey':ERMINIA_SUPA_KEY,'Authorization':'Bearer '+token}
+  }).then(function(r){return r.ok?r.json():[];}).then(function(rows){
+    window.__remoteExamResults=(rows||[]).map(function(r){
+      return{
+        id:r.local_id||r.id,
+        _remoteId:r.id,
+        name:r.participant_name||'',email:r.email||'',
+        examId:r.exam_id,
+        version:r.version,attempt:r.attempt,
+        score:r.score,total:r.total,pct:r.pct,
+        time:r.time_seconds||0,
+        timeStr:pad(Math.floor((r.time_seconds||0)/60))+':'+pad((r.time_seconds||0)%60),
+        qTimes:r.q_times||[],
+        date:new Date(r.date_iso).toLocaleDateString('pt-BR'),
+        dateISO:r.date_iso,
+        answers:r.answers||[],
+        questions:r.questions||[],
+        autoSubmitted:!!r.auto_submitted,
+        _remote:true
+      };
+    });
+    cb&&cb();
+  }).catch(function(){cb&&cb();});
+}
 
 // Per-exam unlock tracking
 function getUlk(examId){
@@ -1338,9 +1376,9 @@ function submitQuizData(data,auto){
   const total=qs.length;
   const pct=total?Math.round(correct/total*100):0;
   const t=data.timer||0;
-  const results=getR();
-  results.push({
-    id:Date.now(),
+  const localId=Date.now();
+  const record={
+    id:localId,
     name:data.name,email:data.email,
     examId:data.examId||DEFAULT_EXAM_ID,
     version:data.version,attempt:data.attempt,
@@ -1352,9 +1390,41 @@ function submitQuizData(data,auto){
     answers:ans,
     questions:qs,
     autoSubmitted:auto||false
-  });
+  };
+  const results=getR();
+  results.push(record);
   saveR(results);
+  // Persist remotely so admins see attempts from any device
+  if(ERMINIA_SUPA_URL && ERMINIA_SUPA_KEY){
+    try{
+      fetch(ERMINIA_SUPA_URL+'/rest/v1/exam_attempts',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'apikey':ERMINIA_SUPA_KEY,
+          'Authorization':'Bearer '+ERMINIA_SUPA_KEY,
+          'Prefer':'return=minimal'
+        },
+        body:JSON.stringify({
+          local_id:localId,
+          exam_id:record.examId,
+          email:record.email||null,
+          participant_name:record.name||null,
+          score:correct,total:total,pct:pct,
+          time_seconds:t,
+          version:record.version||1,
+          attempt:record.attempt||1,
+          answers:ans,
+          questions:qs,
+          q_times:record.qTimes,
+          auto_submitted:!!auto,
+          date_iso:record.dateISO
+        })
+      }).catch(function(){});
+    }catch(e){}
+  }
 }
+
 
 function finishQuiz(auto,reason){
   if(S.timerInt){clearInterval(S.timerInt);S.timerInt=null;}
@@ -1966,6 +2036,7 @@ window.addEventListener('message',function(ev){
     window.__parentAccessToken=d.accessToken||null;
     if(S.view==='adm'){
       fetchRemoteStudySessions(function(){if(typeof renderAdmDashboard==='function')renderAdmDashboard();});
+      fetchRemoteExamResults(function(){if(typeof renderAdmDashboard==='function')renderAdmDashboard();});
     }
   }
 });

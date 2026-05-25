@@ -352,6 +352,66 @@ export type Database = {
         }
         Relationships: []
       }
+      exam_attempts: {
+        Row: {
+          answers: Json
+          attempt: number
+          auto_submitted: boolean
+          created_at: string
+          date_iso: string
+          email: string | null
+          exam_id: string
+          id: string
+          local_id: number | null
+          participant_name: string | null
+          pct: number
+          q_times: Json
+          questions: Json
+          score: number
+          time_seconds: number
+          total: number
+          version: number
+        }
+        Insert: {
+          answers?: Json
+          attempt?: number
+          auto_submitted?: boolean
+          created_at?: string
+          date_iso?: string
+          email?: string | null
+          exam_id: string
+          id?: string
+          local_id?: number | null
+          participant_name?: string | null
+          pct?: number
+          q_times?: Json
+          questions?: Json
+          score?: number
+          time_seconds?: number
+          total?: number
+          version?: number
+        }
+        Update: {
+          answers?: Json
+          attempt?: number
+          auto_submitted?: boolean
+          created_at?: string
+          date_iso?: string
+          email?: string | null
+          exam_id?: string
+          id?: string
+          local_id?: number | null
+          participant_name?: string | null
+          pct?: number
+          q_times?: Json
+          questions?: Json
+          score?: number
+          time_seconds?: number
+          total?: number
+          version?: number
+        }
+        Relationships: []
+      }
       fluxo_audio_files: {
         Row: {
           created_at: string
