@@ -553,9 +553,14 @@ const Index = () => {
 
             <TabsContent value="avaliacoes" className="mt-0">
               <EditableBanner sectionKey="banner_avaliacoes" isAdmin={isAdmin} userViewMode={userViewMode} />
-              
-              <div className="text-center text-muted-foreground py-8">
-                <p>Conteúdo da seção de avaliações será adicionado aqui.</p>
+
+              <div className="rounded-lg overflow-hidden border border-border bg-card shadow-sm">
+                <iframe
+                  src="/avaliacoes/index.html"
+                  title="Prova — Fluxo de Oportunidade · Pride"
+                  className="w-full"
+                  style={{ height: 'calc(100vh - 220px)', minHeight: '700px', border: 0 }}
+                />
               </div>
             </TabsContent>
           </Tabs>
