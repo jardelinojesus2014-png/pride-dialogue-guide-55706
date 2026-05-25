@@ -599,14 +599,14 @@ const Index = () => {
                   userName: (user?.user_metadata?.full_name as string) || (user?.email?.split('@')[0] ?? ''),
                 });
                 return (
-                  <div className="rounded-lg overflow-hidden border border-border bg-card shadow-sm">
-                    <iframe
-                      src={`/avaliacoes/index.html?${params.toString()}`}
-                      title="Plataforma de Avaliações · Pride"
-                      className="w-full"
-                      style={{ height: 'calc(100vh - 220px)', minHeight: '700px', border: 0 }}
-                    />
-                  </div>
+                  <iframe
+                    ref={avaliacoesIframeRef}
+                    src={`/avaliacoes/index.html?${params.toString()}`}
+                    title="Plataforma de Avaliações · Pride"
+                    scrolling="no"
+                    className="w-full block"
+                    style={{ height: `${avaliacoesHeight}px`, border: 0, background: 'transparent' }}
+                  />
                 );
               })()}
             </TabsContent>
