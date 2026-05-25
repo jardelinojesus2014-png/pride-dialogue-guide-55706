@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useOperadoras, useOperadoraContent, Operadora, OperadoraContent } from '@/hooks/useOperadoras';
 import { OperadoraContentDialog } from './OperadoraContentDialog';
-import { UnderConstructionBanner } from './UnderConstructionBanner';
+import { EditableBanner } from './EditableBanner';
 interface OperadorasSectionProps {
   isAdmin: boolean;
   userViewMode: boolean;
