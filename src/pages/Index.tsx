@@ -69,6 +69,9 @@ const Index = () => {
       if (data.type === 'avaliacoes:quizActive') {
         setQuizActive(!!data.active);
       }
+      if (data.type === 'avaliacoes:erminiaState') {
+        setErminiaOpen(!!data.open);
+      }
       if (data.type === 'avaliacoes:requestProfiles' && isAdmin) {
         const { data: profs } = await supabase
           .from('profiles')
