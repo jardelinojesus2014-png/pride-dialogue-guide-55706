@@ -47,7 +47,7 @@ interface UserProfile {
 
 const Admin = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { isAdmin, loading: adminLoading } = useIsAdmin();
   const [notes, setNotes] = useState<UserNote[]>([]);
   const [audioFiles, setAudioFiles] = useState<AdminAudioFile[]>([]);
