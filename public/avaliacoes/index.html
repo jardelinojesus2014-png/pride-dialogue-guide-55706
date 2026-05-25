@@ -1856,6 +1856,47 @@ function saveExamAccess(id){
   render();
 }
 
+function saveExamAccessFromChecks(id){
+  const boxes=document.querySelectorAll('.ex-acc-cb');
+  // merge with previous (so search-filtered out items keep their state)
+  const ex=getExam(id);
+  const prev=new Set((ex?.allowedEmails||[]).map(s=>String(s).toLowerCase()));
+  // visible boxes update prev
+  boxes.forEach(b=>{
+    const em=b.dataset.email;
+    if(b.checked) prev.add(em); else prev.delete(em);
+  });
+  const list=Array.from(prev).filter(Boolean);
+  const ovr=getExamOvr();
+  const cur=ovr[id]||{};
+  cur.allowedEmails=list;
+  ovr[id]=cur; saveExamOvr(ovr);
+  const defs=getExamDefs(); const idx=defs.findIndex(e=>e.id===id);
+  if(idx>=0){defs[idx].allowedEmails=list;saveExamDefs(defs);}
+  S.editingExamAccess=null; S.examAccessSearch='';
+  showAdmAlert(list.length?`Acesso restrito a ${list.length} usuário(s).`:'Acesso liberado para todos.');
+  render();
+}
+
+function examAccessSelectAll(id,select){
+  const profs=window.__avProfiles||[];
+  const ovr=getExamOvr(); const cur=ovr[id]||{};
+  cur.allowedEmails=select?profs.map(p=>(p.email||'').toLowerCase()).filter(Boolean):[];
+  ovr[id]=cur; saveExamOvr(ovr);
+  const defs=getExamDefs(); const idx=defs.findIndex(e=>e.id===id);
+  if(idx>=0){defs[idx].allowedEmails=cur.allowedEmails;saveExamDefs(defs);}
+  render();
+}
+
+// Receive profiles list from parent app
+window.addEventListener('message',function(ev){
+  const d=ev.data;
+  if(d&&d.type==='avaliacoes:profiles'&&Array.isArray(d.profiles)){
+    window.__avProfiles=d.profiles;
+    if(S.view==='adm'&&S.admView==='exams') render();
+  }
+});
+
 function deleteExam(id){
   if(!confirm('Remover esta prova e todas as suas questões? Os resultados serão mantidos.'))return;
   const defs=getExamDefs().filter(e=>e.id!==id);
