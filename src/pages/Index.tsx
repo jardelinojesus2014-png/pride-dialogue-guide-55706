@@ -246,8 +246,10 @@ const Index = () => {
                   isAdmin,
                   userViewMode,
                   icon: tab.icon,
+                  iconOnly: tab.key !== 'tab_dashboard',
                   ...(tab.showShortOnMobile === false ? { showShortOnMobile: false } : {}),
                 };
+
 
                 const reorderControls = canReorder ? (
                   <div className="flex items-center gap-0.5 ml-1" onClick={(e) => e.stopPropagation()}>
