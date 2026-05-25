@@ -641,6 +641,10 @@ function getExam(id){return getAllExams().find(e=>e.id===id)||null;}
 // Per-exam question bank
 function getQ(examId){
   const eid=examId||DEFAULT_EXAM_ID;
+  if(eid==='bonus_pods'){
+    const s=localStorage.getItem('pride_q_bonus_pods');
+    return s?JSON.parse(s):JSON.parse(JSON.stringify(BANK_BONUS));
+  }
   if(eid===DEFAULT_EXAM_ID){
     const s=localStorage.getItem('pride_q_'+eid);
     return s?JSON.parse(s):JSON.parse(JSON.stringify(BANK));
@@ -700,6 +704,10 @@ function getVersionQuestions(ver,examId){
   const bank=getQ(eid);
   if(!bank||!bank.length)return[];
   if(bank.length<=12)return bank;
+  if(eid==='bonus_pods'){
+    const idx=VERSIONS_BONUS[(ver-1)%VERSIONS_BONUS.length];
+    return idx.filter(i=>i<bank.length).map(i=>bank[i]);
+  }
   if(eid===DEFAULT_EXAM_ID){
     const idx=VERSIONS[(ver-1)%VERSIONS.length];
     return idx.filter(i=>i<bank.length).map(i=>bank[i]);
@@ -743,28 +751,6 @@ const root=document.getElementById('appRoot');
 // ══════════════════════════════════════════
 //  BOOTSTRAP
 // ══════════════════════════════════════════
-// Override getQ to support bonus exam
-const _getQOrig = getQ;
-function getQ(examId) {
-  if(examId === 'bonus_pods') {
-    const s = localStorage.getItem('pride_q_bonus_pods');
-    return s ? JSON.parse(s) : JSON.parse(JSON.stringify(BANK_BONUS));
-  }
-  return _getQOrig(examId);
-}
-
-// Override getVersionQuestions to use VERSIONS_BONUS
-const _getVQOrig = getVersionQuestions;
-function getVersionQuestions(ver, examId) {
-  if(examId === 'bonus_pods') {
-    const bank = getQ('bonus_pods');
-    if(!bank || !bank.length) return [];
-    const idx = VERSIONS_BONUS[(ver-1) % VERSIONS_BONUS.length];
-    return idx.filter(i => i < bank.length).map(i => bank[i]);
-  }
-  return _getVQOrig(ver, examId);
-}
-
 (function init(){
   // Check for any abandoned in-progress quiz across all exams
   const allExams=getAllExams();
