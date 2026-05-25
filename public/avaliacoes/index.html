@@ -2014,6 +2014,18 @@ function renderStudySessionsBlock(){
 
 function deleteStudySession(sessionId){
   localStorage.removeItem(sessionId);
+  if(window.__remoteStudySessions){
+    window.__remoteStudySessions=window.__remoteStudySessions.filter(function(s){return s.sessionId!==sessionId;});
+  }
+  if(ERMINIA_SUPA_URL && ERMINIA_SUPA_KEY){
+    var token=window.__parentAccessToken||ERMINIA_SUPA_KEY;
+    try{
+      fetch(ERMINIA_SUPA_URL+'/rest/v1/erminia_conversations?session_id=eq.'+encodeURIComponent(sessionId),{
+        method:'DELETE',
+        headers:{'apikey':ERMINIA_SUPA_KEY,'Authorization':'Bearer '+token}
+      }).catch(function(){});
+    }catch(e){}
+  }
   renderAdmDashboard();
 }
 
