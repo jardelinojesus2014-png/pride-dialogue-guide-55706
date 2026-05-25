@@ -1338,9 +1338,9 @@ function submitQuizData(data,auto){
   const total=qs.length;
   const pct=total?Math.round(correct/total*100):0;
   const t=data.timer||0;
-  const results=getR();
-  results.push({
-    id:Date.now(),
+  const localId=Date.now();
+  const record={
+    id:localId,
     name:data.name,email:data.email,
     examId:data.examId||DEFAULT_EXAM_ID,
     version:data.version,attempt:data.attempt,
@@ -1352,9 +1352,41 @@ function submitQuizData(data,auto){
     answers:ans,
     questions:qs,
     autoSubmitted:auto||false
-  });
+  };
+  const results=getR();
+  results.push(record);
   saveR(results);
+  // Persist remotely so admins see attempts from any device
+  if(ERMINIA_SUPA_URL && ERMINIA_SUPA_KEY){
+    try{
+      fetch(ERMINIA_SUPA_URL+'/rest/v1/exam_attempts',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'apikey':ERMINIA_SUPA_KEY,
+          'Authorization':'Bearer '+ERMINIA_SUPA_KEY,
+          'Prefer':'return=minimal'
+        },
+        body:JSON.stringify({
+          local_id:localId,
+          exam_id:record.examId,
+          email:record.email||null,
+          participant_name:record.name||null,
+          score:correct,total:total,pct:pct,
+          time_seconds:t,
+          version:record.version||1,
+          attempt:record.attempt||1,
+          answers:ans,
+          questions:qs,
+          q_times:record.qTimes,
+          auto_submitted:!!auto,
+          date_iso:record.dateISO
+        })
+      }).catch(function(){});
+    }catch(e){}
+  }
 }
+
 
 function finishQuiz(auto,reason){
   if(S.timerInt){clearInterval(S.timerInt);S.timerInt=null;}
