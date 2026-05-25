@@ -636,6 +636,34 @@ const Index = () => {
                 );
               })()}
             </TabsContent>
+
+            {/* Floating ErminIA launcher (parent-side, always visible while on Avaliações tab) */}
+            {activeTab === 'avaliacoes' && !quizActive && (
+              <button
+                type="button"
+                onClick={() => {
+                  const iframe = avaliacoesIframeRef.current;
+                  if (iframe) {
+                    iframe.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    setTimeout(() => {
+                      iframe.contentWindow?.postMessage({ type: 'avaliacoes:openErminia' }, '*');
+                    }, 350);
+                  }
+                }}
+                title="Estudar com ErminIA"
+                aria-label="Abrir ErminIA"
+                className="fixed bottom-6 right-6 z-50 flex items-center gap-3 pl-1.5 pr-4 py-1.5 rounded-full bg-[#0d1b3e] border border-[#f5c842]/40 shadow-2xl hover:shadow-[0_14px_36px_rgba(0,0,0,0.45)] hover:-translate-y-0.5 transition-all cursor-pointer"
+              >
+                <span className="w-11 h-11 rounded-full overflow-hidden border-2 border-[#f5c842] bg-[#0d1b3e] flex-shrink-0">
+                  <img src="/erminia-avatar.png" alt="ErminIA" className="w-full h-full object-cover" />
+                </span>
+                <span className="flex flex-col items-start leading-tight">
+                  <strong className="text-[#f5c842] text-[13px] font-bold tracking-wide">ErminIA</strong>
+                  <span className="text-[#a0b0cc] text-[10px] font-medium mt-0.5">Estudar agora</span>
+                </span>
+                <span className="text-[#f5c842] text-sm opacity-80 ml-1">›</span>
+              </button>
+            )}
           </Tabs>
 
           {/* Footer */}
