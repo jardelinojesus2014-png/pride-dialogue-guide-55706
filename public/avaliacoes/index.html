@@ -925,19 +925,26 @@ async function sendStudyMsg(){
   try{
     var sysPrompt=buildStudyPrompt();
     var msgs=S.studyMsgs.slice(-16).map(function(m){return{role:m.role,content:m.content};});
-    var response=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:sysPrompt,messages:msgs})
-    });
-    if(!response.ok){
-      var e=await response.json().catch(function(){return{};});
-      S.studyMsgs.push({role:'assistant',content:'Erro '+(e&&e.error?e.error.message:response.status)+'. Tente novamente.'});
+    if(!ERMINIA_AI_URL){
+      S.studyMsgs.push({role:'assistant',content:'Chat indisponível: a integração com IA não foi carregada. Recarregue a página.'});
     } else {
-      var data=await response.json();
-      var text=(data.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('')||'Não consegui processar. Tente novamente.';
-      S.studyMsgs.push({role:'assistant',content:text});
-      saveStudySession();
+      var response=await fetch(ERMINIA_AI_URL,{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          ...(ERMINIA_SUPA_KEY?{'Authorization':'Bearer '+ERMINIA_SUPA_KEY,'apikey':ERMINIA_SUPA_KEY}:{})
+        },
+        body:JSON.stringify({system:sysPrompt,messages:msgs})
+      });
+      if(!response.ok){
+        var e=await response.json().catch(function(){return{};});
+        S.studyMsgs.push({role:'assistant',content:'Erro: '+(e&&e.error?e.error:response.status)+'. Tente novamente.'});
+      } else {
+        var data=await response.json();
+        var text=data.text||'Não consegui processar. Tente novamente.';
+        S.studyMsgs.push({role:'assistant',content:text});
+        saveStudySession();
+      }
     }
   }catch(ex){
     S.studyMsgs.push({role:'assistant',content:'Erro de conexão: '+ex.message});
