@@ -184,7 +184,7 @@ const Index = () => {
               {orderedTabs.map((tab, position) => {
                 const titleProps = {
                   sectionKey: tab.key,
-                  defaultTitle: tab.defaultTitle.replace(/\n/g, '&#10;'),
+                  defaultTitle: tab.defaultTitle,
                   defaultShortTitle: tab.defaultShortTitle,
                   isAdmin,
                   userViewMode,
