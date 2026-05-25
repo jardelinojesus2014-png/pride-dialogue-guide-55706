@@ -597,6 +597,7 @@ const Index = () => {
                   anonKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '',
                   userEmail: user?.email || '',
                   userName: (user?.user_metadata?.full_name as string) || (user?.email?.split('@')[0] ?? ''),
+                  isAdmin: isAdmin ? '1' : '0',
                 });
                 return (
                   <iframe
