@@ -1724,17 +1724,29 @@ function resetToDefault(){
 // ══════════════════════════════════════════
 function renderAdmExams(){
   const allExams=getAllExams();
-  const defs=getExamDefs();
   let examRows='';
   allExams.forEach(ex=>{
     const results=getRByExam(ex.id);
-    const isEditing=S.editingExam===ex.id;
-    examRows+=`<div class="q-list-item" style="${ex.id===S.admExamId?'border-color:#f5c842':''}"}>
+    const allowed=(ex.allowedEmails||[]);
+    const accessLabel=allowed.length?`Restrita a ${allowed.length} e-mail(s)`:'Liberada para todos';
+    const isEditingAccess=S.editingExamAccess===ex.id;
+    let accessEditor='';
+    if(isEditingAccess){
+      accessEditor=`<div style="margin-top:10px;padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px">
+<label style="font-size:12px;font-weight:600;color:#0d1b3e;display:block;margin-bottom:6px">E-mails autorizados (um por linha). Deixe em branco para liberar a todos.</label>
+<textarea id="ex_emails_${ex.id}" rows="5" style="width:100%;font-family:monospace;font-size:12px;padding:8px;border:1px solid #cbd5e1;border-radius:6px" placeholder="usuario@pridecorretora.com.br">${allowed.join('\n')}</textarea>
+<div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end">
+<button class="btn btn-ghost btn-sm" onclick="S.editingExamAccess=null;render()">Cancelar</button>
+<button class="btn btn-gold btn-sm" onclick="saveExamAccess('${ex.id}')">Salvar acesso</button>
+</div></div>`;
+    }
+    examRows+=`<div class="q-list-item" style="${ex.id===S.admExamId?'border-color:#f5c842':''}">
 <div class="q-list-hd">
 <div style="flex:1">
-<div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+<div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;flex-wrap:wrap">
 <span class="tag">${ex.builtin?'Padrão':'Personalizada'}</span>
 ${ex.active!==false?'<span class="badge badge-ok">Ativa</span>':'<span class="badge badge-bad">Inativa</span>'}
+<span class="badge ${allowed.length?'badge-blue':'badge-ok'}" style="font-size:11px">${accessLabel}</span>
 ${ex.id===S.admExamId?'<span class="badge badge-blue">Selecionada</span>':''}
 </div>
 <div style="font-size:14px;font-weight:600;color:#0d1b3e">${ex.title}</div>
@@ -1742,10 +1754,12 @@ ${ex.id===S.admExamId?'<span class="badge badge-blue">Selecionada</span>':''}
 </div>
 <div class="q-list-actions">
 <button class="btn btn-dark btn-sm" onclick="S.admExamId='${ex.id}';S.admView='questions';render()">Ver questões</button>
-${!ex.builtin?`<button class="btn btn-sm btn-outline" onclick="toggleExamActive('${ex.id}')">${ex.active!==false?'Desativar':'Ativar'}</button>`:''}
+<button class="btn btn-sm btn-outline" onclick="toggleExamActive('${ex.id}')">${ex.active!==false?'Desativar':'Ativar'}</button>
+<button class="btn btn-sm btn-outline" onclick="S.editingExamAccess=S.editingExamAccess==='${ex.id}'?null:'${ex.id}';render()">${isEditingAccess?'Fechar acesso':'Quem pode fazer'}</button>
 ${!ex.builtin?`<button class="btn btn-danger btn-sm" onclick="deleteExam('${ex.id}')">Remover</button>`:''}
 </div>
 </div>
+${accessEditor}
 </div>`;
   });
   let newExamForm='';
@@ -1777,7 +1791,7 @@ function saveNewExam(){
   if(!title){showAdmAlert('Informe o título da prova.','err');return;}
   const id='exam_'+Date.now();
   const defs=getExamDefs();
-  defs.push({id,title,subtitle:sub,description:desc,active:true,builtin:false,bank:[],createdAt:new Date().toISOString().slice(0,10)});
+  defs.push({id,title,subtitle:sub,description:desc,active:true,builtin:false,bank:[],allowedEmails:[],createdAt:new Date().toISOString().slice(0,10)});
   saveExamDefs(defs);
   S.editingExam=null;
   S.admExamId=id;
@@ -1786,9 +1800,29 @@ function saveNewExam(){
 }
 
 function toggleExamActive(id){
-  const defs=getExamDefs();
-  const idx=defs.findIndex(e=>e.id===id);
-  if(idx>=0){defs[idx].active=!defs[idx].active;saveExamDefs(defs);}
+  const ex=getExam(id); if(!ex)return;
+  const ovr=getExamOvr();
+  const cur=ovr[id]||{};
+  cur.active=!(ex.active!==false);
+  ovr[id]=cur; saveExamOvr(ovr);
+  // keep custom def in sync for back-compat
+  const defs=getExamDefs(); const idx=defs.findIndex(e=>e.id===id);
+  if(idx>=0){defs[idx].active=cur.active;saveExamDefs(defs);}
+  render();
+}
+
+function saveExamAccess(id){
+  const ta=document.getElementById('ex_emails_'+id);
+  const raw=(ta?.value||'');
+  const list=raw.split(/[\n,;]/).map(s=>s.trim().toLowerCase()).filter(Boolean);
+  const ovr=getExamOvr();
+  const cur=ovr[id]||{};
+  cur.allowedEmails=list;
+  ovr[id]=cur; saveExamOvr(ovr);
+  const defs=getExamDefs(); const idx=defs.findIndex(e=>e.id===id);
+  if(idx>=0){defs[idx].allowedEmails=list;saveExamDefs(defs);}
+  S.editingExamAccess=null;
+  showAdmAlert(list.length?`Acesso restrito a ${list.length} e-mail(s).`:'Acesso liberado para todos.');
   render();
 }
 
@@ -1796,6 +1830,7 @@ function deleteExam(id){
   if(!confirm('Remover esta prova e todas as suas questões? Os resultados serão mantidos.'))return;
   const defs=getExamDefs().filter(e=>e.id!==id);
   saveExamDefs(defs);
+  const ovr=getExamOvr(); delete ovr[id]; saveExamOvr(ovr);
   if(S.admExamId===id)S.admExamId=DEFAULT_EXAM_ID;
   showAdmAlert('Prova removida.');render();
 }
