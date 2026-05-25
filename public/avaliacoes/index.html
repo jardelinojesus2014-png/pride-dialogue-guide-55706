@@ -1732,12 +1732,42 @@ function renderAdmExams(){
     const isEditingAccess=S.editingExamAccess===ex.id;
     let accessEditor='';
     if(isEditingAccess){
+      const profs=window.__avProfiles;
+      const allowedSet=new Set(allowed.map(s=>String(s).toLowerCase()));
+      let body='';
+      if(!profs){
+        try{window.parent.postMessage({type:'avaliacoes:requestProfiles'},'*');}catch(e){}
+        body=`<div style="padding:14px;text-align:center;color:#64748b;font-size:13px">Carregando usuários cadastrados...</div>`;
+      } else if(!profs.length){
+        body=`<div style="padding:14px;text-align:center;color:#64748b;font-size:13px">Nenhum usuário cadastrado encontrado.</div>`;
+      } else {
+        const search=(S.examAccessSearch||'').toLowerCase();
+        const filtered=profs.filter(p=>!search||(p.email||'').toLowerCase().includes(search));
+        const selCount=profs.filter(p=>allowedSet.has((p.email||'').toLowerCase())).length;
+        let rows='';
+        filtered.forEach(p=>{
+          const em=(p.email||'').toLowerCase();
+          const checked=allowedSet.has(em)?'checked':'';
+          rows+=`<label style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid #f1f5f9;cursor:pointer;font-size:13px;color:#0d1b3e">
+<input type="checkbox" class="ex-acc-cb" data-email="${em}" ${checked} style="width:15px;height:15px;cursor:pointer">
+<span style="flex:1">${p.email||'—'}</span>
+</label>`;
+        });
+        body=`<div style="margin-bottom:8px;display:flex;gap:8px;align-items:center">
+<input type="text" id="ex_acc_search" value="${(S.examAccessSearch||'').replace(/"/g,'&quot;')}" placeholder="Buscar e-mail..." style="flex:1;padding:7px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px" oninput="S.examAccessSearch=this.value;render();setTimeout(()=>{const i=document.getElementById('ex_acc_search');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length);}},0)">
+<button class="btn btn-ghost btn-sm" onclick="examAccessSelectAll('${ex.id}',true)">Marcar todos</button>
+<button class="btn btn-ghost btn-sm" onclick="examAccessSelectAll('${ex.id}',false)">Limpar</button>
+</div>
+<div style="font-size:11px;color:#64748b;margin-bottom:6px">${selCount} de ${profs.length} usuário(s) selecionado(s) · ${selCount===0?'liberado para todos':'apenas selecionados'}</div>
+<div style="max-height:260px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:6px;background:#fff">${rows||'<div style="padding:14px;text-align:center;color:#64748b;font-size:13px">Nenhum resultado.</div>'}</div>`;
+      }
       accessEditor=`<div style="margin-top:10px;padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px">
-<label style="font-size:12px;font-weight:600;color:#0d1b3e;display:block;margin-bottom:6px">E-mails autorizados (um por linha). Deixe em branco para liberar a todos.</label>
-<textarea id="ex_emails_${ex.id}" rows="5" style="width:100%;font-family:monospace;font-size:12px;padding:8px;border:1px solid #cbd5e1;border-radius:6px" placeholder="usuario@pridecorretora.com.br">${allowed.join('\n')}</textarea>
-<div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end">
-<button class="btn btn-ghost btn-sm" onclick="S.editingExamAccess=null;render()">Cancelar</button>
-<button class="btn btn-gold btn-sm" onclick="saveExamAccess('${ex.id}')">Salvar acesso</button>
+<label style="font-size:12px;font-weight:600;color:#0d1b3e;display:block;margin-bottom:6px">Quem pode realizar esta prova</label>
+<div style="font-size:11px;color:#64748b;margin-bottom:8px">Marque os usuários autorizados. Nenhum marcado = liberado para todos os usuários cadastrados.</div>
+${body}
+<div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end">
+<button class="btn btn-ghost btn-sm" onclick="S.editingExamAccess=null;S.examAccessSearch='';render()">Cancelar</button>
+<button class="btn btn-gold btn-sm" onclick="saveExamAccessFromChecks('${ex.id}')">Salvar acesso</button>
 </div></div>`;
     }
     examRows+=`<div class="q-list-item" style="${ex.id===S.admExamId?'border-color:#f5c842':''}">
