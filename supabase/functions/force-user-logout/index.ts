@@ -63,9 +63,11 @@ serve(async (req: Request) => {
 
       const forcedAt = freshUser.user.app_metadata?.force_logout_at;
       const forcedAtSeconds = forcedAt ? Math.floor(new Date(String(forcedAt)).getTime() / 1000) : 0;
-      const tokenIssuedAt = getTokenIat(token);
+      const lastSignInSeconds = freshUser.user.last_sign_in_at
+        ? Math.floor(new Date(freshUser.user.last_sign_in_at).getTime() / 1000)
+        : getTokenIat(token);
 
-      return json({ shouldLogout: !!forcedAtSeconds && !!tokenIssuedAt && tokenIssuedAt < forcedAtSeconds });
+      return json({ shouldLogout: !!forcedAtSeconds && !!lastSignInSeconds && lastSignInSeconds < forcedAtSeconds });
     }
 
     const { data: adminRole } = await supabaseAdmin
