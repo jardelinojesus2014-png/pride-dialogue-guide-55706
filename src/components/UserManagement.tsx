@@ -217,6 +217,13 @@ export const UserManagement = ({ users, onUserUpdated }: UserManagementProps) =>
         buttonClass: 'bg-destructive hover:bg-destructive/90',
       };
     }
+    if (actionType === 'logout') {
+      return {
+        title: 'Deslogar Usuário',
+        description: `Deseja encerrar a sessão de ${selectedUser?.email}? O usuário precisará fazer login novamente para continuar usando o sistema.`,
+        buttonClass: 'bg-destructive hover:bg-destructive/90',
+      };
+    }
     if (actionType === 'promote') {
       return {
         title: 'Promover a Admin',
@@ -303,6 +310,15 @@ export const UserManagement = ({ users, onUserUpdated }: UserManagementProps) =>
                         size="sm"
                         variant="outline"
                         className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => openDialog(user, 'logout')}
+                      >
+                        <LogOut className="w-4 h-4 mr-2" />
+                        Deslogar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
                         onClick={() => openDialog(user, 'delete')}
                       >
                         <Trash2 className="w-4 h-4 mr-2" />
@@ -324,16 +340,16 @@ export const UserManagement = ({ users, onUserUpdated }: UserManagementProps) =>
             <AlertDialogDescription>{dialogContent.description}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deletingUser}>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel disabled={deletingUser || forcingLogout}>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              onClick={actionType === 'delete' ? handleDeleteUser : handleRoleChange}
+              onClick={actionType === 'delete' ? handleDeleteUser : actionType === 'logout' ? handleForceLogout : handleRoleChange}
               className={dialogContent.buttonClass}
-              disabled={deletingUser}
+              disabled={deletingUser || forcingLogout}
             >
-              {deletingUser ? (
+              {deletingUser || forcingLogout ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Excluindo...
+                  {deletingUser ? 'Excluindo...' : 'Deslogando...'}
                 </>
               ) : (
                 'Confirmar'
