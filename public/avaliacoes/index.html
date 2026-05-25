@@ -8,6 +8,9 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:system-ui,sans-serif;background:transparent;color:#1a1a2e;overflow:hidden;}
 html{overflow:hidden;background:transparent;}
+/* Inside parent iframe: avoid 100vh wrappers creating infinite resize loops */
+.landing-wrap,.name-wrap,.result-wrap,.quiz-wrap,.instr-wrap{min-height:auto!important;}
+.landing-body{padding-bottom:32px!important;}
 
 /* ── NAV ── */
 .nav{background:#0d1b3e;padding:12px 24px;display:flex;justify-content:space-between;align-items:center;}
