@@ -620,6 +620,8 @@ const Index = () => {
                   userEmail: user?.email || '',
                   userName: (user?.user_metadata?.full_name as string) || (user?.email?.split('@')[0] ?? ''),
                   isAdmin: isAdmin ? '1' : '0',
+                  // Cache-buster: força o iframe a baixar a versão mais nova a cada 5 min
+                  v: String(Math.floor(Date.now() / (1000 * 60 * 5))),
                 });
                 return (
                   <iframe
