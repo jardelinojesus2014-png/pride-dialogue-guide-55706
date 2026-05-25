@@ -306,6 +306,14 @@ const ADM_PASSWORD = '03Japg@030320131988';
 const DOMAIN       = '@pridecorretora.com.br';
 const MAX_ATTEMPTS = 5;
 
+// Lovable AI edge function for Erminia chat (passed from parent via query string)
+const __QS = new URLSearchParams(window.location.search);
+const ERMINIA_SUPA_URL = __QS.get('supabaseUrl') || '';
+const ERMINIA_SUPA_KEY = __QS.get('anonKey') || '';
+const ERMINIA_AI_URL = ERMINIA_SUPA_URL ? (ERMINIA_SUPA_URL + '/functions/v1/erminia-chat') : '';
+const PRESET_NAME = __QS.get('userName') || '';
+const PRESET_EMAIL = __QS.get('userEmail') || '';
+
 
 // ══════════════════════════════════════════
 //  QUESTION BANK (15 questions, 0-indexed)
@@ -776,6 +784,13 @@ window.addEventListener('beforeunload',()=>{
 //  RENDER ROUTER
 // ══════════════════════════════════════════
 function render(){
+  // Auto-fill from query params (parent app passes the logged-in user)
+  if(PRESET_NAME && !S.name) S.name = PRESET_NAME;
+  if(PRESET_EMAIL && !S.email) S.email = PRESET_EMAIL.toLowerCase();
+  // If we already have user info and we are on identification screen, jump to exam selection
+  if(S.view==='quiz_name' && S.name && S.email && S.email.endsWith(DOMAIN)){
+    S.view='exam_select';
+  }
   const v=S.view;
   if(v==='instructions')return renderInstructions();
   if(v==='quiz_name')return renderName();
@@ -917,19 +932,26 @@ async function sendStudyMsg(){
   try{
     var sysPrompt=buildStudyPrompt();
     var msgs=S.studyMsgs.slice(-16).map(function(m){return{role:m.role,content:m.content};});
-    var response=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:sysPrompt,messages:msgs})
-    });
-    if(!response.ok){
-      var e=await response.json().catch(function(){return{};});
-      S.studyMsgs.push({role:'assistant',content:'Erro '+(e&&e.error?e.error.message:response.status)+'. Tente novamente.'});
+    if(!ERMINIA_AI_URL){
+      S.studyMsgs.push({role:'assistant',content:'Chat indisponível: a integração com IA não foi carregada. Recarregue a página.'});
     } else {
-      var data=await response.json();
-      var text=(data.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('')||'Não consegui processar. Tente novamente.';
-      S.studyMsgs.push({role:'assistant',content:text});
-      saveStudySession();
+      var response=await fetch(ERMINIA_AI_URL,{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          ...(ERMINIA_SUPA_KEY?{'Authorization':'Bearer '+ERMINIA_SUPA_KEY,'apikey':ERMINIA_SUPA_KEY}:{})
+        },
+        body:JSON.stringify({system:sysPrompt,messages:msgs})
+      });
+      if(!response.ok){
+        var e=await response.json().catch(function(){return{};});
+        S.studyMsgs.push({role:'assistant',content:'Erro: '+(e&&e.error?e.error:response.status)+'. Tente novamente.'});
+      } else {
+        var data=await response.json();
+        var text=data.text||'Não consegui processar. Tente novamente.';
+        S.studyMsgs.push({role:'assistant',content:text});
+        saveStudySession();
+      }
     }
   }catch(ex){
     S.studyMsgs.push({role:'assistant',content:'Erro de conexão: '+ex.message});
@@ -2246,29 +2268,30 @@ async function sendChatMsg(){
     const sysPromptTrimmed = sysPrompt.length > 12000 ? sysPrompt.substring(0, 12000) + '\n...[contexto adicional omitido por limite de tamanho]' : sysPrompt;
     // Only send last 20 messages to keep payload manageable
     const recentMsgs = S.chatMsgs.slice(-20).map(m=>({role:m.role,content:m.content}));
-    const response=await fetch('https://api.anthropic.com/v1/messages',{
+    if(!ERMINIA_AI_URL){
+      S.chatMsgs.push({role:'assistant',content:'Chat indisponível: a integração com IA não foi carregada. Recarregue a página.'});
+    } else {
+    const response=await fetch(ERMINIA_AI_URL,{
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'anthropic-version':'2023-06-01'
+        ...(ERMINIA_SUPA_KEY?{'Authorization':'Bearer '+ERMINIA_SUPA_KEY,'apikey':ERMINIA_SUPA_KEY}:{})
       },
       body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
         system:sysPromptTrimmed,
         messages:recentMsgs
       })
     });
     if(!response.ok){
       const errData=await response.json().catch(()=>({}));
-      const errMsg=errData?.error?.message||`Erro ${response.status}`;
+      const errMsg=errData?.error||`Erro ${response.status}`;
       S.chatMsgs.push({role:'assistant',content:`Não consegui processar sua mensagem (${errMsg}). Tente novamente.`});
     } else {
       const data=await response.json();
       if(data.error){
-        S.chatMsgs.push({role:'assistant',content:`Erro da API: ${data.error.message}. Tente novamente.`});
+        S.chatMsgs.push({role:'assistant',content:`Erro: ${data.error}. Tente novamente.`});
       } else {
-        const text=data.content?.filter(b=>b.type==='text').map(b=>b.text).join('')||'Não consegui processar sua mensagem. Tente novamente.';
+        const text=data.text||'Não consegui processar sua mensagem. Tente novamente.';
         S.chatMsgs.push({role:'assistant',content:text});
         // ── Save conversation after every exchange ──
         if(last){
@@ -2285,6 +2308,7 @@ async function sendChatMsg(){
           }));
         }
       }
+    }
     }
   }catch(e){
     S.chatMsgs.push({role:'assistant',content:'Erro de conexão: '+e.message+'. Verifique sua internet e tente novamente.'});
