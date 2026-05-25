@@ -418,6 +418,9 @@ export type Database = {
           allowed_emails: string[]
           created_at: string
           exam_id: string
+          scheduled_end: string | null
+          scheduled_start: string | null
+          study_enabled: boolean
           updated_at: string
           updated_by: string | null
         }
@@ -426,6 +429,9 @@ export type Database = {
           allowed_emails?: string[]
           created_at?: string
           exam_id: string
+          scheduled_end?: string | null
+          scheduled_start?: string | null
+          study_enabled?: boolean
           updated_at?: string
           updated_by?: string | null
         }
@@ -434,6 +440,9 @@ export type Database = {
           allowed_emails?: string[]
           created_at?: string
           exam_id?: string
+          scheduled_end?: string | null
+          scheduled_start?: string | null
+          study_enabled?: boolean
           updated_at?: string
           updated_by?: string | null
         }
