@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Moon, Sun, LogOut, Shield, Eye, EyeOff, Star, ClipboardList, BookOpen, Workflow, ChevronUp, GraduationCap, Palette, ChevronLeft, ChevronRight, LayoutDashboard } from 'lucide-react';
 import { DashboardSection } from '@/components/DashboardSection';
 import { supabase } from '@/integrations/supabase/client';
@@ -50,6 +50,37 @@ const Index = () => {
   const [showTrainingPopup, setShowTrainingPopup] = useState(false);
   const [fluxoExpandedItems, setFluxoExpandedItems] = useState<string[]>([]);
   const queryClient = useQueryClient();
+
+  // Avaliacoes iframe integration: auto-resize + quiz lock
+  const avaliacoesIframeRef = useRef<HTMLIFrameElement | null>(null);
+  const [avaliacoesHeight, setAvaliacoesHeight] = useState<number>(700);
+  const [quizActive, setQuizActive] = useState<boolean>(false);
+
+  useEffect(() => {
+    const onMsg = (ev: MessageEvent) => {
+      const data = ev.data as any;
+      if (!data || typeof data !== 'object') return;
+      if (data.type === 'avaliacoes:height' && typeof data.height === 'number') {
+        setAvaliacoesHeight(Math.max(600, Math.ceil(data.height)));
+      }
+      if (data.type === 'avaliacoes:quizActive') {
+        setQuizActive(!!data.active);
+      }
+    };
+    window.addEventListener('message', onMsg);
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  // Block navigation away while a quiz is in progress
+  useEffect(() => {
+    if (!quizActive) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [quizActive]);
 
   // Get section titles with fallbacks
   const getCadenciaTitle = () => sectionTitles['cadencia_header']?.title || 'Fluxo/ Cadência - Qualificação';
@@ -182,7 +213,13 @@ const Index = () => {
           </header>
 
           {/* Tabs Navigation */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs value={activeTab} onValueChange={(v) => {
+            if (quizActive && v !== 'avaliacoes') {
+              window.alert('Você está realizando uma prova. Finalize ou aguarde o envio automático antes de trocar de aba.');
+              return;
+            }
+            setActiveTab(v);
+          }} className="w-full">
             <TabsList className="w-full grid grid-cols-2 sm:grid-cols-4 mb-6 h-auto p-2 bg-gradient-hero rounded-lg gap-2">
               {orderedTabs.map((tab, position) => {
                 const titleProps = {
@@ -562,14 +599,14 @@ const Index = () => {
                   userName: (user?.user_metadata?.full_name as string) || (user?.email?.split('@')[0] ?? ''),
                 });
                 return (
-                  <div className="rounded-lg overflow-hidden border border-border bg-card shadow-sm">
-                    <iframe
-                      src={`/avaliacoes/index.html?${params.toString()}`}
-                      title="Plataforma de Avaliações · Pride"
-                      className="w-full"
-                      style={{ height: 'calc(100vh - 220px)', minHeight: '700px', border: 0 }}
-                    />
-                  </div>
+                  <iframe
+                    ref={avaliacoesIframeRef}
+                    src={`/avaliacoes/index.html?${params.toString()}`}
+                    title="Plataforma de Avaliações · Pride"
+                    scrolling="no"
+                    className="w-full block"
+                    style={{ height: `${avaliacoesHeight}px`, border: 0, background: 'transparent' }}
+                  />
                 );
               })()}
             </TabsContent>

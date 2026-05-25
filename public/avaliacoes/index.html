@@ -6,7 +6,11 @@
 <title>Prova — Fluxo de Oportunidade · Pride</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:system-ui,sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:100vh;}
+body{font-family:system-ui,sans-serif;background:transparent;color:#1a1a2e;overflow:hidden;}
+html{overflow:hidden;background:transparent;}
+/* Inside parent iframe: avoid 100vh wrappers creating infinite resize loops */
+.landing-wrap,.name-wrap,.result-wrap,.quiz-wrap,.instr-wrap{min-height:auto!important;}
+.landing-body{padding-bottom:32px!important;}
 
 /* ── NAV ── */
 .nav{background:#0d1b3e;padding:12px 24px;display:flex;justify-content:space-between;align-items:center;}
@@ -800,6 +804,36 @@ function render(){
   if(v==='adm_login')return renderAdmLogin();
   if(v==='adm')return renderAdm();
 }
+
+// ══════════════════════════════════════════
+//  PARENT WINDOW INTEGRATION (auto-resize + quiz lock)
+// ══════════════════════════════════════════
+(function(){
+  if(window.parent===window) return;
+  let lastH=0;
+  function postHeight(){
+    const h=Math.max(
+      document.documentElement.scrollHeight,
+      document.body?document.body.scrollHeight:0
+    );
+    if(Math.abs(h-lastH)>4){
+      lastH=h;
+      window.parent.postMessage({type:'avaliacoes:height',height:h},'*');
+    }
+  }
+  let lastQuiz=null;
+  function postQuizState(){
+    const active=(typeof S!=='undefined' && S.view==='quiz');
+    if(active!==lastQuiz){
+      lastQuiz=active;
+      window.parent.postMessage({type:'avaliacoes:quizActive',active:active},'*');
+    }
+  }
+  const ro=new ResizeObserver(()=>{postHeight();postQuizState();});
+  ro.observe(document.documentElement);
+  setInterval(()=>{postHeight();postQuizState();},800);
+  window.addEventListener('load',()=>{postHeight();postQuizState();});
+})();
 
 // ══════════════════════════════════════════
 //  INSTRUCTIONS
