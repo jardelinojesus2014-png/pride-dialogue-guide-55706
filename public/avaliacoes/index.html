@@ -1047,22 +1047,68 @@ function updateStudyChat(){
 
 function saveStudySession(){
   if(!S.studySessionId)return;
-  try{localStorage.setItem(S.studySessionId,JSON.stringify({
+  var payload={
     sessionId:S.studySessionId,type:'study',
     email:S.email||'anônimo',name:S.name||'',
     messages:S.studyMsgs,updatedAt:new Date().toISOString()
-  }));}catch(e){}
+  };
+  try{localStorage.setItem(S.studySessionId,JSON.stringify(payload));}catch(e){}
+  if(ERMINIA_SUPA_URL && ERMINIA_SUPA_KEY){
+    try{
+      fetch(ERMINIA_SUPA_URL+'/rest/v1/erminia_conversations?on_conflict=session_id',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'apikey':ERMINIA_SUPA_KEY,
+          'Authorization':'Bearer '+ERMINIA_SUPA_KEY,
+          'Prefer':'resolution=merge-duplicates,return=minimal'
+        },
+        body:JSON.stringify({
+          session_id:S.studySessionId,
+          email:S.email||null,
+          participant_name:S.name||null,
+          messages:S.studyMsgs,
+          updated_at:new Date().toISOString()
+        })
+      }).catch(function(){});
+    }catch(e){}
+  }
 }
 
 function getStudySessions(){
   var sessions=[];
+  var seen={};
+  if(window.__remoteStudySessions && Array.isArray(window.__remoteStudySessions)){
+    window.__remoteStudySessions.forEach(function(s){
+      sessions.push(s);seen[s.sessionId]=true;
+    });
+  }
   for(var i=0;i<localStorage.length;i++){
     var key=localStorage.key(i);
     if(key&&key.startsWith('study_')){
-      try{var s=JSON.parse(localStorage.getItem(key));if(s&&s.type==='study')sessions.push(s);}catch(e){}
+      try{var s=JSON.parse(localStorage.getItem(key));
+        if(s&&s.type==='study'&&!seen[s.sessionId])sessions.push(s);
+      }catch(e){}
     }
   }
   return sessions.sort(function(a,b){return new Date(b.updatedAt)-new Date(a.updatedAt);});
+}
+
+function fetchRemoteStudySessions(cb){
+  if(!ERMINIA_SUPA_URL||!ERMINIA_SUPA_KEY){cb&&cb();return;}
+  var token=window.__parentAccessToken||ERMINIA_SUPA_KEY;
+  fetch(ERMINIA_SUPA_URL+'/rest/v1/erminia_conversations?select=*&order=updated_at.desc&limit=500',{
+    headers:{'apikey':ERMINIA_SUPA_KEY,'Authorization':'Bearer '+token}
+  }).then(function(r){return r.ok?r.json():[];}).then(function(rows){
+    window.__remoteStudySessions=(rows||[]).map(function(r){
+      return{
+        sessionId:r.session_id,type:'study',
+        email:r.email||'anônimo',name:r.participant_name||'',
+        messages:r.messages||[],updatedAt:r.updated_at,_remote:true
+      };
+    });
+    cb&&cb();
+  }).catch(function(){cb&&cb();});
 }
 
 
