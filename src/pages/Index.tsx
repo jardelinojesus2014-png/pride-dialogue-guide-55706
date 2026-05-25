@@ -66,6 +66,7 @@ const Index = () => {
     icon: JSX.Element;
     showShortOnMobile?: boolean;
   }> = [
+    { key: 'tab_dashboard', type: 'tab', value: 'dashboard', defaultTitle: 'Dashboard', defaultShortTitle: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> },
     { key: 'tab_prospeccao', type: 'tab', value: 'prospeccao', defaultTitle: 'Roteiro de\nProspecção SDR', defaultShortTitle: 'Roteiro', icon: <ClipboardList className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> },
     { key: 'tab_cadencia', type: 'tab', value: 'cadencia', defaultTitle: 'Fluxo/ Cadência\n- Qualificação', defaultShortTitle: 'Cadência', icon: <Workflow className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> },
     { key: 'tab_materiais', type: 'tab', value: 'fluxo', defaultTitle: 'Materiais\nAdicionais', defaultShortTitle: 'Materiais', icon: <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> },
