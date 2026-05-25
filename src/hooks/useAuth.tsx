@@ -41,6 +41,53 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (!session?.access_token) return;
+
+    let cancelled = false;
+
+    const checkForcedLogout = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/force-user-logout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ action: 'check' }),
+        });
+
+        if (cancelled) return;
+
+        if (response.status === 401) {
+          await supabase.auth.signOut();
+          navigate('/auth');
+          return;
+        }
+
+        const result = await response.json().catch(() => null);
+        if (result?.shouldLogout) {
+          await supabase.auth.signOut();
+          toast({
+            title: 'Sessão encerrada',
+            description: 'Entre novamente para continuar.',
+          });
+          navigate('/auth');
+        }
+      } catch (error) {
+        console.error('Error checking forced logout:', error);
+      }
+    };
+
+    checkForcedLogout();
+    const interval = window.setInterval(checkForcedLogout, 30000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, [session?.access_token, navigate]);
+
   const signIn = async (email: string, password: string) => {
     try {
       const { error } = await supabase.auth.signInWithPassword({

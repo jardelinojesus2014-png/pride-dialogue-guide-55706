@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Users, FileText, Music, Filter, X, Workflow, Pencil, LogOut } from 'lucide-react';
+import { ArrowLeft, Users, FileText, Music, Filter, X, Workflow, Pencil } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserAudioFile } from '@/hooks/useUserAudioFiles';
@@ -47,7 +47,7 @@ interface UserProfile {
 
 const Admin = () => {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const { isAdmin, loading: adminLoading } = useIsAdmin();
   const [notes, setNotes] = useState<UserNote[]>([]);
   const [audioFiles, setAudioFiles] = useState<AdminAudioFile[]>([]);
@@ -207,10 +207,7 @@ const Admin = () => {
             Voltar
           </Button>
           <h1 className="text-3xl font-black text-foreground">Painel Administrativo</h1>
-          <Button variant="outline" onClick={signOut} className="text-destructive border-destructive/30 hover:bg-destructive/10">
-            <LogOut className="w-4 h-4 mr-2" />
-            Sair
-          </Button>
+          <div className="w-[88px]" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

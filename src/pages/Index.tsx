@@ -78,7 +78,7 @@ const Index = () => {
           '*'
         );
       }
-      if (data.type === 'avaliacoes:requestAuth' && isAdmin) {
+      if (data.type === 'avaliacoes:requestAuth') {
         const { data: { session } } = await supabase.auth.getSession();
         avaliacoesIframeRef.current?.contentWindow?.postMessage(
           { type: 'avaliacoes:auth', accessToken: session?.access_token || null },
