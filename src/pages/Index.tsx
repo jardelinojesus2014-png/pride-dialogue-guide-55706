@@ -245,8 +245,40 @@ const Index = () => {
               })}
             </TabsList>
 
+            <TabsContent value="dashboard" className="mt-0" data-section="dashboard-tab">
+              <EditableBanner sectionKey="banner_dashboard" isAdmin={isAdmin} userViewMode={userViewMode} />
+              <div className="mb-6 bg-gradient-hero rounded-xl shadow-lg p-6">
+                <EditableSectionHeader
+                  sectionKey="dashboard_header"
+                  title={sectionTitles['dashboard_header']?.title || 'Dashboard'}
+                  subtitle={sectionTitles['dashboard_header']?.subtitle || 'Sumário de toda a plataforma — clique em um card para acessar a aba.'}
+                  isAdmin={isAdmin}
+                  userViewMode={userViewMode}
+                  titleClassName="text-2xl font-black text-accent mb-2"
+                  subtitleClassName="text-accent/80"
+                />
+              </div>
+              <DashboardSection
+                isAdmin={isAdmin}
+                userViewMode={userViewMode}
+                cards={orderedTabs
+                  .filter((t) => t.key !== 'tab_dashboard')
+                  .map((t) => ({
+                    key: t.key,
+                    title: sectionTitles[t.key]?.title || t.defaultTitle,
+                    defaultDescription: `Acesse a aba ${(sectionTitles[t.key]?.title || t.defaultTitle).replace(/\n/g, ' ')}.`,
+                    icon: t.icon,
+                    onClick: () => {
+                      if (t.type === 'link' && t.onClick) t.onClick();
+                      else if (t.value) setActiveTab(t.value);
+                    },
+                  }))}
+              />
+            </TabsContent>
+
             <TabsContent value="prospeccao" className="mt-0" data-section="prospeccao-tab">
               <EditableBanner sectionKey="banner_prospeccao" isAdmin={isAdmin} userViewMode={userViewMode} />
+              
               
               {/* Golden Rule */}
               <div data-section="golden-rule">
