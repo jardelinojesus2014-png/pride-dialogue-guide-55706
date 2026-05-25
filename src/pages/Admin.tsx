@@ -207,6 +207,10 @@ const Admin = () => {
             Voltar
           </Button>
           <h1 className="text-3xl font-black text-foreground">Painel Administrativo</h1>
+          <Button variant="outline" onClick={signOut} className="text-destructive border-destructive/30 hover:bg-destructive/10">
+            <LogOut className="w-4 h-4 mr-2" />
+            Sair
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
