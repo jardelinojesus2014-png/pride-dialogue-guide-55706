@@ -14,6 +14,7 @@ interface EditableTabTitleProps {
   icon?: React.ReactNode;
   showShortOnMobile?: boolean;
   className?: string;
+  iconOnly?: boolean;
 }
 
 export const EditableTabTitle = ({
@@ -25,7 +26,9 @@ export const EditableTabTitle = ({
   icon,
   showShortOnMobile = true,
   className = '',
+  iconOnly = false,
 }: EditableTabTitleProps) => {
+
   const { data: sectionTitles = {} } = useSectionTitles();
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState('');
