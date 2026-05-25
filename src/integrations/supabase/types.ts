@@ -1136,6 +1136,7 @@ export type Database = {
         Row: {
           banner_subtitle: string | null
           created_at: string
+          display_order: number
           id: string
           section_key: string
           show_banner: boolean
@@ -1146,6 +1147,7 @@ export type Database = {
         Insert: {
           banner_subtitle?: string | null
           created_at?: string
+          display_order?: number
           id?: string
           section_key: string
           show_banner?: boolean
@@ -1156,6 +1158,7 @@ export type Database = {
         Update: {
           banner_subtitle?: string | null
           created_at?: string
+          display_order?: number
           id?: string
           section_key?: string
           show_banner?: boolean
