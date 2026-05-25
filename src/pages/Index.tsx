@@ -57,7 +57,7 @@ const Index = () => {
   const [quizActive, setQuizActive] = useState<boolean>(false);
 
   useEffect(() => {
-    const onMsg = (ev: MessageEvent) => {
+    const onMsg = async (ev: MessageEvent) => {
       const data = ev.data as any;
       if (!data || typeof data !== 'object') return;
       if (data.type === 'avaliacoes:height' && typeof data.height === 'number') {
@@ -66,10 +66,20 @@ const Index = () => {
       if (data.type === 'avaliacoes:quizActive') {
         setQuizActive(!!data.active);
       }
+      if (data.type === 'avaliacoes:requestProfiles' && isAdmin) {
+        const { data: profs } = await supabase
+          .from('profiles')
+          .select('id,email')
+          .order('email', { ascending: true });
+        avaliacoesIframeRef.current?.contentWindow?.postMessage(
+          { type: 'avaliacoes:profiles', profiles: profs || [] },
+          '*'
+        );
+      }
     };
     window.addEventListener('message', onMsg);
     return () => window.removeEventListener('message', onMsg);
-  }, []);
+  }, [isAdmin]);
 
   // Block navigation away while a quiz is in progress
   useEffect(() => {
