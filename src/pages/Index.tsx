@@ -237,7 +237,7 @@ const Index = () => {
             }
             setActiveTab(v);
           }} className="w-full">
-            <TabsList className="w-full grid grid-cols-2 sm:grid-cols-4 mb-6 h-auto p-2 bg-gradient-hero rounded-lg gap-2">
+            <TabsList className="w-full flex flex-nowrap items-center justify-start sm:justify-center mb-6 h-auto p-2 bg-gradient-hero rounded-lg gap-2 overflow-x-auto">
               {orderedTabs.map((tab, position) => {
                 const titleProps = {
                   sectionKey: tab.key,
