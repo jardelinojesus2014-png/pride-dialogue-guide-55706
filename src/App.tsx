@@ -21,6 +21,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <AuthProvider>
+          <InactivityReloader />
           <Routes>
             <Route path="/auth" element={<Auth />} />
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
