@@ -47,10 +47,64 @@ const Index = () => {
   const [showPurposePopup, setShowPurposePopup] = useState(false);
   const [showTrainingPopup, setShowTrainingPopup] = useState(false);
   const [fluxoExpandedItems, setFluxoExpandedItems] = useState<string[]>([]);
+  const queryClient = useQueryClient();
 
   // Get section titles with fallbacks
   const getCadenciaTitle = () => sectionTitles['cadencia_header']?.title || 'Fluxo/ Cadência - Qualificação';
   const getCadenciaSubtitle = () => sectionTitles['cadencia_header']?.subtitle || 'Acompanhe o fluxo de cadência dos seus atendimentos dia a dia';
+
+  // Tab definitions (default order). Admin can reorder; persisted via section_titles.display_order
+  const TAB_DEFS: Array<{
+    key: string;
+    type: 'tab' | 'link';
+    value?: string;
+    onClick?: () => void;
+    defaultTitle: string;
+    defaultShortTitle?: string;
+    icon: JSX.Element;
+    showShortOnMobile?: boolean;
+  }> = [
+    { key: 'tab_prospeccao', type: 'tab', value: 'prospeccao', defaultTitle: 'Roteiro de\nProspecção SDR', defaultShortTitle: 'Roteiro', icon: <ClipboardList className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> },
+    { key: 'tab_cadencia', type: 'tab', value: 'cadencia', defaultTitle: 'Fluxo/ Cadência\n- Qualificação', defaultShortTitle: 'Cadência', icon: <Workflow className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> },
+    { key: 'tab_materiais', type: 'tab', value: 'fluxo', defaultTitle: 'Materiais\nAdicionais', defaultShortTitle: 'Materiais', icon: <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> },
+    { key: 'tab_pride', type: 'tab', value: 'pride', defaultTitle: 'Conheça a\nPride Corretora', defaultShortTitle: 'Pride', icon: <img src={logoPrideGold} alt="Pride" className="w-6 h-6 sm:w-7 sm:h-7 object-contain flex-shrink-0" /> },
+    { key: 'tab_treinamentos', type: 'tab', value: 'treinamentos', defaultTitle: 'Treinamentos\nde Operadoras', defaultShortTitle: 'Treinamentos', icon: <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> },
+    { key: 'tab_artes_campanhas', type: 'link', onClick: () => navigate('/artes-campanhas'), defaultTitle: 'Artes e\nCampanhas', defaultShortTitle: 'Artes', icon: <Palette className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> },
+    { key: 'tab_avaliacoes', type: 'tab', value: 'avaliacoes', defaultTitle: 'Avaliações', icon: <Star className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />, showShortOnMobile: false },
+  ];
+
+  const orderedTabs = [...TAB_DEFS]
+    .map((t, idx) => ({ ...t, _order: sectionTitles[t.key]?.display_order ?? idx, _idx: idx }))
+    .sort((a, b) => a._order - b._order || a._idx - b._idx);
+
+  const reorderTab = async (currentKey: string, direction: -1 | 1) => {
+    const list = [...orderedTabs];
+    const i = list.findIndex(t => t.key === currentKey);
+    const j = i + direction;
+    if (i < 0 || j < 0 || j >= list.length) return;
+    [list[i], list[j]] = [list[j], list[i]];
+    try {
+      await Promise.all(
+        list.map(async (t, newIdx) => {
+          const existing = sectionTitles[t.key];
+          await supabase.from('section_titles').upsert({
+            section_key: t.key,
+            title: existing?.title ?? t.defaultTitle,
+            subtitle: existing?.subtitle ?? null,
+            show_banner: existing?.show_banner ?? false,
+            banner_subtitle: existing?.banner_subtitle ?? null,
+            display_order: newIdx,
+          }, { onConflict: 'section_key' });
+        })
+      );
+      queryClient.invalidateQueries({ queryKey: ['section-titles'] });
+    } catch (e) {
+      console.error('Error reordering tabs:', e);
+    }
+  };
+
+  const canReorder = isAdmin && !userViewMode;
+
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
