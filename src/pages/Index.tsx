@@ -182,7 +182,7 @@ const Index = () => {
           </header>
 
           {/* Tabs Navigation */}
-          <Tabs defaultValue="prospeccao" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="w-full flex flex-wrap mb-6 h-auto p-2 bg-gradient-hero rounded-lg gap-2">
               {orderedTabs.map((tab, position) => {
                 const titleProps = {
