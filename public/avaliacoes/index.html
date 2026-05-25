@@ -1957,6 +1957,12 @@ window.addEventListener('message',function(ev){
     window.__avProfiles=d.profiles;
     if(S.view==='adm'&&S.admView==='exams') render();
   }
+  if(d&&d.type==='avaliacoes:auth'){
+    window.__parentAccessToken=d.accessToken||null;
+    if(S.view==='adm'){
+      fetchRemoteStudySessions(function(){if(typeof renderAdmDashboard==='function')renderAdmDashboard();});
+    }
+  }
 });
 
 function deleteExam(id){
