@@ -636,8 +636,20 @@ BUILTIN_EXAMS.push({
 // Exam definitions (custom exams added by admin)
 function getExamDefs(){try{return JSON.parse(localStorage.getItem(SK_EXAMS)||'[]');}catch(e){return[];}}
 function saveExamDefs(d){localStorage.setItem(SK_EXAMS,JSON.stringify(d));}
-function getAllExams(){return[...BUILTIN_EXAMS,...getExamDefs()];}
+function getExamOvr(){try{return JSON.parse(localStorage.getItem(SK_EXAM_OVR)||'{}');}catch(e){return{};}}
+function saveExamOvr(o){localStorage.setItem(SK_EXAM_OVR,JSON.stringify(o));}
+function applyOvr(ex){
+  const o=getExamOvr()[ex.id];
+  if(!o)return ex;
+  return {...ex, active: o.active!==undefined?o.active:ex.active, allowedEmails: o.allowedEmails||ex.allowedEmails||[]};
+}
+function getAllExams(){return[...BUILTIN_EXAMS,...getExamDefs()].map(applyOvr);}
 function getExam(id){return getAllExams().find(e=>e.id===id)||null;}
+function isExamAllowedForEmail(ex,email){
+  const list=(ex.allowedEmails||[]).map(s=>String(s).toLowerCase().trim()).filter(Boolean);
+  if(!list.length)return true;
+  return list.includes(String(email||'').toLowerCase().trim());
+}
 
 // Per-exam question bank
 function getQ(examId){
