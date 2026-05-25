@@ -9,6 +9,7 @@ interface SectionTitle {
   subtitle: string | null;
   show_banner: boolean;
   banner_subtitle: string | null;
+  display_order: number;
   created_at: string;
   updated_at: string;
 }
