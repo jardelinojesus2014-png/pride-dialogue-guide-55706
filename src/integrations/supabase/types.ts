@@ -412,6 +412,33 @@ export type Database = {
         }
         Relationships: []
       }
+      exam_settings: {
+        Row: {
+          active: boolean
+          allowed_emails: string[]
+          created_at: string
+          exam_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          allowed_emails?: string[]
+          created_at?: string
+          exam_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          allowed_emails?: string[]
+          created_at?: string
+          exam_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       fluxo_audio_files: {
         Row: {
           created_at: string
