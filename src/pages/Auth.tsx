@@ -198,7 +198,7 @@ const Auth = () => {
           <div className="flex flex-col items-center mb-6">
             <img src={logoPride} alt="Pride Consultoria" className="w-20 h-20 object-contain mb-4" />
             <h1 className="text-3xl font-black text-foreground">PRIDE CONSULTORIA</h1>
-            <p className="text-muted-foreground text-sm mt-2">Roteiro de Prospecção SDR</p>
+            <p className="text-muted-foreground text-sm mt-2">Plataforma de Desenvolvimento</p>
           </div>
 
           <Tabs defaultValue="login" className="w-full">
