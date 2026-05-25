@@ -2261,29 +2261,30 @@ async function sendChatMsg(){
     const sysPromptTrimmed = sysPrompt.length > 12000 ? sysPrompt.substring(0, 12000) + '\n...[contexto adicional omitido por limite de tamanho]' : sysPrompt;
     // Only send last 20 messages to keep payload manageable
     const recentMsgs = S.chatMsgs.slice(-20).map(m=>({role:m.role,content:m.content}));
-    const response=await fetch('https://api.anthropic.com/v1/messages',{
+    if(!ERMINIA_AI_URL){
+      S.chatMsgs.push({role:'assistant',content:'Chat indisponível: a integração com IA não foi carregada. Recarregue a página.'});
+    } else {
+    const response=await fetch(ERMINIA_AI_URL,{
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'anthropic-version':'2023-06-01'
+        ...(ERMINIA_SUPA_KEY?{'Authorization':'Bearer '+ERMINIA_SUPA_KEY,'apikey':ERMINIA_SUPA_KEY}:{})
       },
       body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
         system:sysPromptTrimmed,
         messages:recentMsgs
       })
     });
     if(!response.ok){
       const errData=await response.json().catch(()=>({}));
-      const errMsg=errData?.error?.message||`Erro ${response.status}`;
+      const errMsg=errData?.error||`Erro ${response.status}`;
       S.chatMsgs.push({role:'assistant',content:`Não consegui processar sua mensagem (${errMsg}). Tente novamente.`});
     } else {
       const data=await response.json();
       if(data.error){
-        S.chatMsgs.push({role:'assistant',content:`Erro da API: ${data.error.message}. Tente novamente.`});
+        S.chatMsgs.push({role:'assistant',content:`Erro: ${data.error}. Tente novamente.`});
       } else {
-        const text=data.content?.filter(b=>b.type==='text').map(b=>b.text).join('')||'Não consegui processar sua mensagem. Tente novamente.';
+        const text=data.text||'Não consegui processar sua mensagem. Tente novamente.';
         S.chatMsgs.push({role:'assistant',content:text});
         // ── Save conversation after every exchange ──
         if(last){
