@@ -254,3 +254,230 @@ PRINCÍPIOS DO COFRE
 - Constância é Rei: os pilares garantem que os resultados de hoje se repitam amanhã.
 `
 };
+
+/* ──────────────────────────────────────────────────────────
+   MATERIAIS COMPLEMENTARES — disponíveis SEMPRE no modo estudo
+   da ErminIA (não são prova, servem de base de apoio).
+   ────────────────────────────────────────────────────────── */
+window.SUPPLEMENTAL_MATERIALS = {
+
+  'spin_selling': `
+════════════════════════════════════════════════════════════
+MATERIAL COMPLEMENTAR — SPIN SELLING
+A Arte de Fazer as Perguntas Certas (Treinamento Pride)
+(Material de apoio — NÃO cai em prova, mas embasa as duas avaliações)
+════════════════════════════════════════════════════════════
+
+ORIGEM E FILOSOFIA
+- Metodologia criada por Neil Rackham após 12 anos de estudo e mais de 35.000 visitas de vendas.
+- Conclusão central: vendedores de alto desempenho NÃO tentam convencer o cliente — eles fazem as perguntas certas para que o próprio cliente descubra que precisa da solução.
+- Em vendas consultivas como planos de saúde, o cliente não compra quando o vendedor explica o produto; compra quando percebe que tem um problema que precisa ser resolvido.
+- Na Pride o objetivo não é vender um plano — é garantir que o cliente tenha a melhor opção disponível. O SPIN é a ferramenta que torna isso possível.
+
+VENDA TRADICIONAL × VENDA CONSULTIVA COM SPIN
+- Tradicional: foco no produto, apresenta recursos e benefícios logo de início, tenta convencer, gera alta resistência e objeções, resultado é venda única.
+- Consultiva (SPIN): foco no cliente, descobre a dor antes de apresentar a solução, faz o cliente se convencer, menor resistência e decisão mais natural, resultado é relacionamento e fidelização.
+
+AS 4 ETAPAS — S P I N
+
+S — SITUAÇÃO (entender o terreno)
+- Coleta fatos e informações sobre o contexto atual do cliente. Ponto de partida da conversa.
+- Objetivo: criar um mapa da situação atual para identificar onde podem existir problemas.
+- ATENÇÃO: use com moderação. Perguntas demais sobre situação parecem invasivas ou demonstram falta de preparo. Pesquise o que puder antes da conversa.
+- Exemplos aplicados a planos de saúde:
+  • "Qual é o seu plano de saúde atual e há quanto tempo você o possui?"
+  • "Quantas pessoas da sua família estão incluídas no plano?"
+  • "Você costuma utilizar a rede credenciada com frequência?"
+  • "Você tem plano individual ou empresarial?"
+
+P — PROBLEMA (ajude o cliente a nomear o que já o incomoda)
+- Explora dificuldades, insatisfações e preocupações que o cliente já sente, mas muitas vezes não verbalizou.
+- Objetivo: fazer o cliente reconhecer e verbalizar a dor com as próprias palavras. Sem isso, qualquer solução parece desnecessária.
+- Exemplos:
+  • "Você tem ficado satisfeito com os reajustes anuais do seu plano?"
+  • "Já teve alguma dificuldade para agendar consultas ou exames na sua rede atual?"
+  • "O valor da mensalidade atual pesa no seu orçamento familiar?"
+  • "Você sente que está pagando por coberturas que nunca utiliza?"
+
+I — IMPLICAÇÃO (a dor precisa parecer maior do que o custo da solução)
+- Etapa mais poderosa e mais negligenciada do SPIN. Explora consequências e impactos dos problemas identificados.
+- Objetivo: transformar um problema percebido como "tolerável" em algo que o cliente sente urgência em resolver.
+- Exemplos:
+  • "Como esse reajuste anual constante afeta o seu planejamento financeiro para os próximos anos?"
+  • "Se precisar de uma internação de emergência e o hospital mais próximo não for credenciado, qual seria o impacto financeiro para a sua família?"
+  • "O fato de pagar caro e não usar o plano faz com que você deixe de investir em outras áreas importantes da sua vida?"
+  • "Você já calculou quanto pagou a mais nos últimos 3 anos por conta dos reajustes acumulados?"
+
+N — NECESSIDADE DE SOLUÇÃO (o cliente descreve o valor da sua oferta)
+- Faz o cliente focar nos benefícios e no valor de resolver o problema. Em vez de o vendedor descrever os benefícios, o próprio cliente os descreve — o que torna a percepção de valor muito mais forte.
+- Exemplos:
+  • "Se conseguíssemos reduzir sua mensalidade em 30% mantendo a mesma qualidade de atendimento, como isso ajudaria no seu orçamento?"
+  • "Como seria para você ter a tranquilidade de saber que sua família está coberta nos melhores hospitais da sua região?"
+  • "Qual seria o benefício de ter um plano onde você só paga a mais quando utilizar?"
+
+NA PRÁTICA — CASO 1: TRANSFORMANDO A DOR DO PREÇO EM DECISÃO
+Perfil: cliente paga R$ 4.000/mês, plano contratado há 5 anos, reajustes acumulados.
+- S: "Há quanto tempo você tem esse plano?" → "Uns 5 anos, desde que mudei de emprego."
+- P: "Os reajustes anuais têm te preocupado?" → "Sim, todo ano sobe e eu não consigo fazer nada."
+- I: "Quanto você acha que vai pagar daqui a 3 anos se continuar assim?" → "Nossa... deve passar de R$ 5.000 facilmente."
+- N: "Se eu te mostrasse um plano equivalente por R$ 2.800, o que você faria com os R$ 1.200 de diferença?" → "Uau, R$ 14.400 por ano! Daria pra fazer muita coisa."
+Resultado: o cliente chegou ao valor da solução por conta própria.
+
+NA PRÁTICA — CASO 2: CONVERTENDO QUEM "ACHA" QUE NÃO PRECISA DE PLANO
+Perfil: cliente paga plano completo, utiliza raramente, sente que "joga dinheiro fora".
+- S: "Com que frequência você costuma usar o plano?" → "Quase nunca, 2 ou 3 vezes por ano."
+- P: "Você sente que está pagando por coberturas que não utiliza?" → "Sim, é dinheiro jogado fora."
+- I: "Se precisar de uma internação sem plano, sabe quanto pode custar?" → "Não faço ideia... deve ser caro demais."
+- N: "E se você tivesse um plano com mensalidade menor e pagasse só quando usar? Faria sentido?" → "Claro! Pagaria menos e ainda teria cobertura."
+Resultado: o cliente percebe o valor da coparticipação sem que o vendedor precise "vender" o conceito.
+
+DICAS DE OURO
+1. Ouça mais do que fala — pergunte e ouça antes de falar sobre o produto.
+2. Não pule etapas — explore as Implicações primeiro para criar urgência real.
+3. Use o "silêncio consultivo" — depois de uma pergunta forte, espere. As melhores respostas vêm na pausa.
+4. Lembre-se do lema da Pride — priorize a melhor opção para o cliente; confiança gera relacionamento.
+
+ESSÊNCIA
+"Vender não é convencer alguém a comprar. É ajudar alguém a decidir o que é melhor para si."
+`,
+
+  'roteiro_prospeccao_sdr': `
+════════════════════════════════════════════════════════════
+MATERIAL COMPLEMENTAR — ROTEIRO DE PROSPECÇÃO SDR PRIDE
+Base das informações coletadas na prospecção (insumo dos cenários do cliente)
+(Material de apoio — NÃO cai em prova, complementa Fluxo de Oportunidades e Bônus PODs)
+════════════════════════════════════════════════════════════
+
+REGRA DE OURO DA PROSPECÇÃO
+- Os 30-40 segundos iniciais são DECISIVOS para toda a ligação.
+- Foco: CONEXÃO. Descaracterize "call center" — traga pessoalidade e leveza.
+- RESPIRE: é um diálogo, não um monólogo robotizado.
+- A ordem dos fatores altera o resultado. Vale para TODAS as etapas do roteiro.
+
+────────────────────────────────────────────────
+1) APRESENTAÇÃO — pessoa, empresa e motivo da ligação
+────────────────────────────────────────────────
+Saudação:
+- "[Nome]?" (aguardar)
+- "Bom dia/tarde/noite, tudo bem?" (aguardar)
+- "Tá podendo falar rapidinho?"
+
+Identificação:
+- "Sthefany aqui... nós conversamos um tempo atrás, não sei se vai se lembrar... sou da Pride Consultoria..."
+
+Apresentação da Pride:
+- "Empresa especializada na reavaliação de assistência médica... a gestão de plano de saúde."
+
+Motivo da ligação:
+- "Chegamos a falar um tempo atrás sobre o seu plano, na época você estava com o plano da [operadora] se não me engano... e fiquei de retomar mais pra frente pra entender como está seu cenário, se continua sendo a melhor opção..."
+
+────────────────────────────────────────────────
+2) CONEXÃO — fit + pergunta-link para qualificação
+────────────────────────────────────────────────
+Validar fit:
+- "Você já chegou a realizar algum comparativo do seu plano recentemente?"
+Transição:
+- "Ah, maravilha... liguei na hora certa então..."
+
+────────────────────────────────────────────────
+3) QUALIFICAÇÃO — SPIN (Situação + Problema)
+────────────────────────────────────────────────
+SITUAÇÃO — Plano atual + composição:
+- "Seu plano ainda é o [operadora], ele é pra quantas vidas?"
+- "E quem são, e as idades?"
+- "Você com x anos... e [fulano]...?"
+- "Qual a categoria dele?"
+- "Enfermaria ou apartamento?"
+- "Tem coparticipação?"
+- "Quanto tempo estão neste plano?"
+Coletar: Plano Atual (operadora), Quantidade de Vidas, Vínculo/Idade de todos os beneficiários, Categoria, Acomodação, Coparticipação, Tempo de Plano.
+
+SITUAÇÃO — Investimento:
+- "Quanto vocês tão investindo hoje no plano para as x vidas?"
+Coletar: Valor do plano atual (ou que deseja investir).
+
+SITUAÇÃO — CNPJ:
+- "Esse plano é pelo CNPJ?"
+- "MEI ou LTDA?"
+- "Esse CNPJ é São Paulo capital ou interior?"
+- "Todos os sócios vão entrar no plano?"
+Coletar: CNPJ ativo?, Tipo, Localidade, Sócios no plano, Números (se souber).
+
+SITUAÇÃO — Formação:
+- "Qual sua formação acadêmica?"
+Coletar: Formação Acadêmica.
+
+SITUAÇÃO — Características do contrato:
+- "Quando é o mês de reajuste/aniversário do plano?"
+- "E o boleto vence em qual dia do mês?"
+Coletar: Mês de reajuste, Dia de vencimento.
+
+SITUAÇÃO — Localização e Rede:
+- "Você mora em qual região, qual bairro?"
+- "Quais hospitais e laboratórios vocês costumam usar? Pra eu já passar pro especialista incluir essas opções no cenário."
+Coletar: Bairro/Zona, Hospitais e Laboratórios (rede SP).
+
+PROBLEMA — Utilização e Saúde:
+- "Alguém fazendo tratamento, tomando medicação de alto custo, com alguma doença?"
+- "Alguém grávida?"
+- "Alguém fazendo terapia?"
+Coletar: Tratamento/doença pré-existente, Gestante no grupo, Terapia.
+
+PROBLEMA — Dores com o plano atual:
+- "Vocês tiveram algum problema com esse plano atual?"
+Coletar: Dificuldade com o plano atual.
+
+Observações:
+- "Tem mais alguma coisa específica que é importante pra você? Alguma preferência ou necessidade que eu preciso considerar aqui?"
+
+────────────────────────────────────────────────
+4) AGENDAMENTO DA REUNIÃO (Google Meet)
+────────────────────────────────────────────────
+Conduzir:
+- "Perfeito, [Nome]! Já tenho aqui as informações pra passar pro especialista considerar e formular os cenários..."
+Validar decisor:
+- "Sobre o plano, é tudo com você mesmo ou depende da opinião/ajuda de alguém pra definir?"
+Coletar: Quem paga / Quem decide.
+Definir data e horário:
+- "Como está sua agenda entre hoje e amanhã pra uma reunião com o especialista? Qual horário funciona bem pra você?"
+Coletar: Retorno programado (data/hora).
+
+────────────────────────────────────────────────
+5) ASSENTAMENTO DA REUNIÃO — firmar compromisso
+────────────────────────────────────────────────
+Firmar:
+- "Então combinado, nossa reunião fica [dia] às [hora]. Só pra deixar claro, o fato de agendarmos não te obriga a mudar de plano — o nosso foco é entender se temos uma opção que faça mais sentido pra você ou se o seu plano continua sendo a melhor opção. O que eu preciso é do seu compromisso com a reunião [dia] às [hora]. Funciona 100%, né? Não corre o risco de esquecer?"
+Coletar: Reunião Agendada.
+
+Confirmar logística e dados:
+- "Vou te mandar o link da reunião por e-mail, pra você já dar o aceite e travar a agenda... mando pelo WhatsApp também. Só me dá um ok lá quando receber."
+- "Me confirma seu e-mail?"
+- "Esse número que estamos falando é WhatsApp também?"
+Coletar: Telefone, E-mail.
+
+────────────────────────────────────────────────
+6) ENCERRAMENTO
+────────────────────────────────────────────────
+- "Maravilha então... Já te mando o invite. Prazer falar com você, [Nome], e até [dia]! Abraço!"
+
+────────────────────────────────────────────────
+FAÇA × EVITE
+────────────────────────────────────────────────
+FAÇA:
+- Foque em Situação e Problema (S e P do SPIN).
+- Use as perguntas-link para transição natural.
+- Seja empático ao perguntar sobre saúde.
+- Firme o compromisso do cliente.
+
+EVITE:
+- Fazer interrogatório (precisa ser leve, é diálogo).
+- Perguntas repetitivas — escute o que o cliente está dizendo.
+- Esquecer que uma etapa se conecta à outra (a ordem importa).
+- Ir direto pra qualificação sem permissão.
+- Deixar o agendamento "solto" sem compromisso.
+- Esquecer de confirmar o decisor.
+
+Lembrete: esta é a PRIMEIRA ETAPA da VENDA. As informações coletadas aqui são o insumo que o corretor usa no D01 do Fluxo de Oportunidades para montar cenários estratégicos no Pride Central.
+`
+};
+
