@@ -213,7 +213,13 @@ const Index = () => {
           </header>
 
           {/* Tabs Navigation */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs value={activeTab} onValueChange={(v) => {
+            if (quizActive && v !== 'avaliacoes') {
+              window.alert('Você está realizando uma prova. Finalize ou aguarde o envio automático antes de trocar de aba.');
+              return;
+            }
+            setActiveTab(v);
+          }} className="w-full">
             <TabsList className="w-full grid grid-cols-2 sm:grid-cols-4 mb-6 h-auto p-2 bg-gradient-hero rounded-lg gap-2">
               {orderedTabs.map((tab, position) => {
                 const titleProps = {
