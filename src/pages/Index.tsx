@@ -642,7 +642,7 @@ const Index = () => {
             </TabsContent>
 
             {/* Floating ErminIA launcher (parent-side, always visible while on Avaliações tab) */}
-            {activeTab === 'avaliacoes' && !quizActive && (
+            {activeTab === 'avaliacoes' && !quizActive && !erminiaOpen && (
               <button
                 type="button"
                 onClick={() => {
