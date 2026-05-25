@@ -784,6 +784,13 @@ window.addEventListener('beforeunload',()=>{
 //  RENDER ROUTER
 // ══════════════════════════════════════════
 function render(){
+  // Auto-fill from query params (parent app passes the logged-in user)
+  if(PRESET_NAME && !S.name) S.name = PRESET_NAME;
+  if(PRESET_EMAIL && !S.email) S.email = PRESET_EMAIL.toLowerCase();
+  // If we already have user info and we are on identification screen, jump to exam selection
+  if(S.view==='quiz_name' && S.name && S.email && S.email.endsWith(DOMAIN)){
+    S.view='exam_select';
+  }
   const v=S.view;
   if(v==='instructions')return renderInstructions();
   if(v==='quiz_name')return renderName();
