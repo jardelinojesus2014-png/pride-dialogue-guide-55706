@@ -1500,6 +1500,11 @@ function admNav(){
 }
 
 function renderAdmDashboard(){
+  // Request access token from parent (admin) + fetch remote study sessions on first entry
+  if(!window.__remoteStudyRequested){
+    window.__remoteStudyRequested=true;
+    try{window.parent.postMessage({type:'avaliacoes:requestAuth'},'*');}catch(e){}
+  }
   const results=getRByExam(S.admExamId);
   const ulk=getUlk(S.admExamId);
   const avg=results.length?Math.round(results.reduce((s,r)=>s+r.pct,0)/results.length):0;
