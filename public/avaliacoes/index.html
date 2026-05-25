@@ -306,6 +306,14 @@ const ADM_PASSWORD = '03Japg@030320131988';
 const DOMAIN       = '@pridecorretora.com.br';
 const MAX_ATTEMPTS = 5;
 
+// Lovable AI edge function for Erminia chat (passed from parent via query string)
+const __QS = new URLSearchParams(window.location.search);
+const ERMINIA_SUPA_URL = __QS.get('supabaseUrl') || '';
+const ERMINIA_SUPA_KEY = __QS.get('anonKey') || '';
+const ERMINIA_AI_URL = ERMINIA_SUPA_URL ? (ERMINIA_SUPA_URL + '/functions/v1/erminia-chat') : '';
+const PRESET_NAME = __QS.get('userName') || '';
+const PRESET_EMAIL = __QS.get('userEmail') || '';
+
 
 // ══════════════════════════════════════════
 //  QUESTION BANK (15 questions, 0-indexed)
