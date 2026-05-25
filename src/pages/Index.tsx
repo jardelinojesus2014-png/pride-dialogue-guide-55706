@@ -51,6 +51,37 @@ const Index = () => {
   const [fluxoExpandedItems, setFluxoExpandedItems] = useState<string[]>([]);
   const queryClient = useQueryClient();
 
+  // Avaliacoes iframe integration: auto-resize + quiz lock
+  const avaliacoesIframeRef = useRef<HTMLIFrameElement | null>(null);
+  const [avaliacoesHeight, setAvaliacoesHeight] = useState<number>(700);
+  const [quizActive, setQuizActive] = useState<boolean>(false);
+
+  useEffect(() => {
+    const onMsg = (ev: MessageEvent) => {
+      const data = ev.data as any;
+      if (!data || typeof data !== 'object') return;
+      if (data.type === 'avaliacoes:height' && typeof data.height === 'number') {
+        setAvaliacoesHeight(Math.max(600, Math.ceil(data.height)));
+      }
+      if (data.type === 'avaliacoes:quizActive') {
+        setQuizActive(!!data.active);
+      }
+    };
+    window.addEventListener('message', onMsg);
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  // Block navigation away while a quiz is in progress
+  useEffect(() => {
+    if (!quizActive) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [quizActive]);
+
   // Get section titles with fallbacks
   const getCadenciaTitle = () => sectionTitles['cadencia_header']?.title || 'Fluxo/ Cadência - Qualificação';
   const getCadenciaSubtitle = () => sectionTitles['cadencia_header']?.subtitle || 'Acompanhe o fluxo de cadência dos seus atendimentos dia a dia';
