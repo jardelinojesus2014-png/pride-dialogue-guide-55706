@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Moon, Sun, LogOut, Shield, Eye, EyeOff, Star, ClipboardList, BookOpen, Workflow, ChevronUp, GraduationCap, Palette, ChevronLeft, ChevronRight, LayoutDashboard } from 'lucide-react';
 import { DashboardSection } from '@/components/DashboardSection';
 import { supabase } from '@/integrations/supabase/client';
