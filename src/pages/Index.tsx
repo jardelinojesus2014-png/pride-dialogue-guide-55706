@@ -181,97 +181,65 @@ const Index = () => {
           {/* Tabs Navigation */}
           <Tabs defaultValue="prospeccao" className="w-full">
             <TabsList className="w-full flex flex-wrap mb-6 h-auto p-2 bg-gradient-hero rounded-lg gap-2">
-              <TabsTrigger 
-                value="prospeccao" 
-                className="flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 data-[state=inactive]:hover:bg-accent/20 rounded-lg transition-all"
-              >
-                <EditableTabTitle
-                  sectionKey="tab_prospeccao"
-                  defaultTitle="Roteiro de&#10;Prospecção SDR"
-                  defaultShortTitle="Roteiro"
-                  isAdmin={isAdmin}
-                  userViewMode={userViewMode}
-                  icon={<ClipboardList className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />}
-                />
-              </TabsTrigger>
-              <TabsTrigger 
-                value="cadencia" 
-                className="flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 data-[state=inactive]:hover:bg-accent/20 rounded-lg transition-all"
-              >
-                <EditableTabTitle
-                  sectionKey="tab_cadencia"
-                  defaultTitle="Fluxo/ Cadência&#10;- Qualificação"
-                  defaultShortTitle="Cadência"
-                  isAdmin={isAdmin}
-                  userViewMode={userViewMode}
-                  icon={<Workflow className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />}
-                />
-              </TabsTrigger>
-              <TabsTrigger 
-                value="fluxo" 
-                className="flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 data-[state=inactive]:hover:bg-accent/20 rounded-lg transition-all"
-              >
-                <EditableTabTitle
-                  sectionKey="tab_materiais"
-                  defaultTitle="Materiais&#10;Adicionais"
-                  defaultShortTitle="Materiais"
-                  isAdmin={isAdmin}
-                  userViewMode={userViewMode}
-                  icon={<BookOpen className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />}
-                />
-              </TabsTrigger>
-              <TabsTrigger 
-                value="pride" 
-                className="flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 data-[state=inactive]:hover:bg-accent/20 rounded-lg transition-all"
-              >
-                <EditableTabTitle
-                  sectionKey="tab_pride"
-                  defaultTitle="Conheça a&#10;Pride Corretora"
-                  defaultShortTitle="Pride"
-                  isAdmin={isAdmin}
-                  userViewMode={userViewMode}
-                  icon={<img src={logoPrideGold} alt="Pride" className="w-6 h-6 sm:w-7 sm:h-7 object-contain flex-shrink-0" />}
-                />
-              </TabsTrigger>
-              <TabsTrigger 
-                value="treinamentos" 
-                className="flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 data-[state=inactive]:hover:bg-accent/20 rounded-lg transition-all"
-              >
-                <EditableTabTitle
-                  sectionKey="tab_treinamentos"
-                  defaultTitle="Treinamentos&#10;de Operadoras"
-                  defaultShortTitle="Treinamentos"
-                  isAdmin={isAdmin}
-                  userViewMode={userViewMode}
-                  icon={<GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />}
-                />
-              </TabsTrigger>
-              <button
-                onClick={() => navigate('/artes-campanhas')}
-                className="flex-none min-w-[110px] text-sm sm:text-base font-black py-2.5 px-3 text-accent/70 hover:bg-accent hover:text-primary rounded-lg transition-all flex items-center justify-center gap-2"
-              >
-                <EditableTabTitle
-                  sectionKey="tab_artes_campanhas"
-                  defaultTitle="Artes e&#10;Campanhas"
-                  defaultShortTitle="Artes"
-                  isAdmin={isAdmin}
-                  userViewMode={userViewMode}
-                  icon={<Palette className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />}
-                />
-              </button>
-              <TabsTrigger 
-                value="avaliacoes" 
-                className="flex-none min-w-[110px] text-sm sm:text-base font-black py-2.5 px-3 text-accent/70 hover:bg-accent hover:text-primary data-[state=active]:bg-accent data-[state=active]:text-primary rounded-lg transition-all"
-              >
-                <EditableTabTitle
-                  sectionKey="tab_avaliacoes"
-                  defaultTitle="Avaliações"
-                  isAdmin={isAdmin}
-                  userViewMode={userViewMode}
-                  icon={<Star className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />}
-                  showShortOnMobile={false}
-                />
-              </TabsTrigger>
+              {orderedTabs.map((tab, position) => {
+                const titleProps = {
+                  sectionKey: tab.key,
+                  defaultTitle: tab.defaultTitle.replace(/\n/g, '&#10;'),
+                  defaultShortTitle: tab.defaultShortTitle,
+                  isAdmin,
+                  userViewMode,
+                  icon: tab.icon,
+                  ...(tab.showShortOnMobile === false ? { showShortOnMobile: false } : {}),
+                };
+
+                const reorderControls = canReorder ? (
+                  <div className="flex items-center gap-0.5 ml-1" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); reorderTab(tab.key, -1); }}
+                      disabled={position === 0}
+                      className="p-0.5 rounded hover:bg-accent/30 disabled:opacity-30 disabled:cursor-not-allowed"
+                      title="Mover para a esquerda"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); reorderTab(tab.key, 1); }}
+                      disabled={position === orderedTabs.length - 1}
+                      className="p-0.5 rounded hover:bg-accent/30 disabled:opacity-30 disabled:cursor-not-allowed"
+                      title="Mover para a direita"
+                    >
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : null;
+
+                if (tab.type === 'link') {
+                  return (
+                    <div
+                      key={tab.key}
+                      className="flex-none min-w-[110px] text-sm sm:text-base font-black py-2.5 px-3 text-accent/70 hover:bg-accent hover:text-primary rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      onClick={tab.onClick}
+                    >
+                      <EditableTabTitle {...titleProps} />
+                      {reorderControls}
+                    </div>
+                  );
+                }
+
+                const isAvaliacoes = tab.value === 'avaliacoes';
+                const triggerClass = isAvaliacoes
+                  ? "flex-none min-w-[110px] text-sm sm:text-base font-black py-2.5 px-3 text-accent/70 hover:bg-accent hover:text-primary data-[state=active]:bg-accent data-[state=active]:text-primary rounded-lg transition-all"
+                  : "flex-1 min-w-[120px] text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 data-[state=inactive]:hover:bg-accent/20 rounded-lg transition-all";
+
+                return (
+                  <TabsTrigger key={tab.key} value={tab.value!} className={triggerClass}>
+                    <EditableTabTitle {...titleProps} />
+                    {reorderControls}
+                  </TabsTrigger>
+                );
+              })}
             </TabsList>
 
             <TabsContent value="prospeccao" className="mt-0" data-section="prospeccao-tab">
