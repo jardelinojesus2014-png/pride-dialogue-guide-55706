@@ -16,7 +16,7 @@ const getTokenIat = (token: string) => {
   try {
     const [, payload] = token.split(".");
     if (!payload) return 0;
-    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(payload.length / 4) * 4, "=");
     const decoded = JSON.parse(atob(normalized));
     return typeof decoded.iat === "number" ? decoded.iat : 0;
   } catch {
