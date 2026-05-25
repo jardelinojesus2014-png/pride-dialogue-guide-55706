@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Users, FileText, Music, Filter, X, Workflow, Pencil } from 'lucide-react';
+import { ArrowLeft, Users, FileText, Music, Filter, X, Workflow, Pencil, LogOut } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserAudioFile } from '@/hooks/useUserAudioFiles';
