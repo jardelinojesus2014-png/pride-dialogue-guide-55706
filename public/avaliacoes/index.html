@@ -2036,6 +2036,7 @@ window.addEventListener('message',function(ev){
     window.__parentAccessToken=d.accessToken||null;
     if(S.view==='adm'){
       fetchRemoteStudySessions(function(){if(typeof renderAdmDashboard==='function')renderAdmDashboard();});
+      fetchRemoteExamResults(function(){if(typeof renderAdmDashboard==='function')renderAdmDashboard();});
     }
   }
 });
