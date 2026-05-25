@@ -322,6 +322,36 @@ export type Database = {
         }
         Relationships: []
       }
+      erminia_conversations: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          messages: Json
+          participant_name: string | null
+          session_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          messages?: Json
+          participant_name?: string | null
+          session_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          messages?: Json
+          participant_name?: string | null
+          session_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       fluxo_audio_files: {
         Row: {
           created_at: string
