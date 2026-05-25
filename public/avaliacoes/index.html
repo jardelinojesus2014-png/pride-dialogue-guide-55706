@@ -802,6 +802,36 @@ function render(){
 }
 
 // ══════════════════════════════════════════
+//  PARENT WINDOW INTEGRATION (auto-resize + quiz lock)
+// ══════════════════════════════════════════
+(function(){
+  if(window.parent===window) return;
+  let lastH=0;
+  function postHeight(){
+    const h=Math.max(
+      document.documentElement.scrollHeight,
+      document.body?document.body.scrollHeight:0
+    );
+    if(Math.abs(h-lastH)>4){
+      lastH=h;
+      window.parent.postMessage({type:'avaliacoes:height',height:h},'*');
+    }
+  }
+  let lastQuiz=null;
+  function postQuizState(){
+    const active=(typeof S!=='undefined' && S.view==='quiz');
+    if(active!==lastQuiz){
+      lastQuiz=active;
+      window.parent.postMessage({type:'avaliacoes:quizActive',active:active},'*');
+    }
+  }
+  const ro=new ResizeObserver(()=>{postHeight();postQuizState();});
+  ro.observe(document.documentElement);
+  setInterval(()=>{postHeight();postQuizState();},800);
+  window.addEventListener('load',()=>{postHeight();postQuizState();});
+})();
+
+// ══════════════════════════════════════════
 //  INSTRUCTIONS
 // ══════════════════════════════════════════
 function renderInstructions(){
