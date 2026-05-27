@@ -47,10 +47,11 @@ serve(async (req: Request) => {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    const { data: authData, error: authError } = await supabaseAdmin.auth.getUser(token);
-    if (authError || !authData.user) {
-      return json({ error: authError?.message || "Invalid token" }, 401);
+    const { data: claimsData, error: claimsError } = await supabaseAdmin.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims?.sub) {
+      return json({ error: claimsError?.message || "Invalid token" }, 401);
     }
+    const callerUserId = claimsData.claims.sub as string;
 
     const body = await req.json().catch(() => ({}));
     const action = body.action === "force" ? "force" : "check";
