@@ -48,11 +48,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const checkForcedLogout = async () => {
       try {
+        let currentSession = session;
+        const expiresAtMs = (currentSession?.expires_at || 0) * 1000;
+        if (currentSession && expiresAtMs && expiresAtMs - Date.now() < 60000) {
+          const refreshed = await supabase.auth.refreshSession();
+          currentSession = refreshed.data.session;
+        }
+
+        if (!currentSession?.access_token) return;
+
         const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/force-user-logout`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
+            Authorization: `Bearer ${currentSession.access_token}`,
           },
           body: JSON.stringify({ action: 'check' }),
         });
