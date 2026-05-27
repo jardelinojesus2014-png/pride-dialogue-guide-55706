@@ -676,10 +676,7 @@ const Index = () => {
                 onClick={() => {
                   const iframe = avaliacoesIframeRef.current;
                   if (iframe) {
-                    iframe.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    setTimeout(() => {
-                      iframe.contentWindow?.postMessage({ type: 'avaliacoes:openErminia' }, '*');
-                    }, 350);
+                    iframe.contentWindow?.postMessage({ type: 'avaliacoes:openErminia' }, '*');
                   }
                 }}
                 title="Estudar com ErminIA"
