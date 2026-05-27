@@ -94,6 +94,34 @@ const Index = () => {
     return () => window.removeEventListener('message', onMsg);
   }, [isAdmin]);
 
+  // While ErminIA chat is open, stream parent viewport info to the iframe so
+  // its fixed-position panel can stay glued to the visible window (otherwise
+  // 100vh inside the auto-resized iframe becomes the full page height).
+  useEffect(() => {
+    if (!erminiaOpen) return;
+    const post = () => {
+      const iframe = avaliacoesIframeRef.current;
+      if (!iframe) return;
+      const rect = iframe.getBoundingClientRect();
+      const top = Math.max(0, -rect.top); // offset from iframe top to viewport top
+      const height = Math.min(window.innerHeight, rect.height - top);
+      iframe.contentWindow?.postMessage(
+        { type: 'avaliacoes:viewport', top, height },
+        '*'
+      );
+    };
+    post();
+    window.addEventListener('scroll', post, { passive: true });
+    window.addEventListener('resize', post);
+    const interval = setInterval(post, 500);
+    return () => {
+      window.removeEventListener('scroll', post);
+      window.removeEventListener('resize', post);
+      clearInterval(interval);
+    };
+  }, [erminiaOpen]);
+
+
   // Block navigation away while a quiz is in progress
   useEffect(() => {
     if (!quizActive) return;
