@@ -98,6 +98,27 @@ export type Database = {
         }
         Relationships: []
       }
+      avaliacoes_admin_state: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       cadencia_days: {
         Row: {
           created_at: string
