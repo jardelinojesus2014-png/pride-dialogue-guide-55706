@@ -655,7 +655,7 @@ const Index = () => {
                 });
                 return (
                   <iframe
-                    key={`avaliacoes-${isAdmin ? 'adm' : 'user'}`}
+                    key={`avaliacoes-${isAdmin ? 'adm' : 'user'}-${user?.id ?? 'anon'}`}
                     ref={avaliacoesIframeRef}
                     src={`/avaliacoes/index.html?${params.toString()}`}
                     title="Plataforma de Avaliações · Pride"
