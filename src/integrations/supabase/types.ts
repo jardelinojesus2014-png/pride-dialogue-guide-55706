@@ -451,6 +451,60 @@ export type Database = {
         }
         Relationships: []
       }
+      exam_definitions: {
+        Row: {
+          active: boolean
+          allowed_emails: string[]
+          bank: Json
+          created_at: string
+          created_by: string | null
+          description: string | null
+          exam_id: string
+          id: string
+          is_builtin: boolean
+          scheduled_end: string | null
+          scheduled_start: string | null
+          study_enabled: boolean
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          allowed_emails?: string[]
+          bank?: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          exam_id: string
+          id?: string
+          is_builtin?: boolean
+          scheduled_end?: string | null
+          scheduled_start?: string | null
+          study_enabled?: boolean
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          allowed_emails?: string[]
+          bank?: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          exam_id?: string
+          id?: string
+          is_builtin?: boolean
+          scheduled_end?: string | null
+          scheduled_start?: string | null
+          study_enabled?: boolean
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       exam_settings: {
         Row: {
           active: boolean
