@@ -642,7 +642,7 @@ const Index = () => {
               <TrainingCategoriesSection isAdmin={isAdmin} userViewMode={userViewMode} />
             </TabsContent>
 
-            <TabsContent value="avaliacoes" className="mt-0">
+            <TabsContent value="avaliacoes" forceMount className="mt-0 data-[state=inactive]:hidden">
               <EditableBanner sectionKey="banner_avaliacoes" isAdmin={isAdmin} userViewMode={userViewMode} />
 
               {(() => {
@@ -652,8 +652,6 @@ const Index = () => {
                   userEmail: user?.email || '',
                   userName: (user?.user_metadata?.full_name as string) || (user?.email?.split('@')[0] ?? ''),
                   isAdmin: isAdmin ? '1' : '0',
-                  // Cache-buster: força o iframe a baixar a versão mais nova a cada 5 min
-                  v: String(Math.floor(Date.now() / (1000 * 60 * 5))),
                 });
                 return (
                   <iframe
@@ -669,14 +667,23 @@ const Index = () => {
               })()}
             </TabsContent>
 
-            {/* Floating ErminIA launcher (parent-side, always visible while on Avaliações tab) */}
-            {activeTab === 'avaliacoes' && !quizActive && !erminiaOpen && (
+            {/* Floating ErminIA launcher — visible on every tab so the user can
+                study from anywhere without losing the conversation. */}
+            {!quizActive && !erminiaOpen && (
               <button
                 type="button"
                 onClick={() => {
-                  const iframe = avaliacoesIframeRef.current;
-                  if (iframe) {
-                    iframe.contentWindow?.postMessage({ type: 'avaliacoes:openErminia' }, '*');
+                  const openIt = () => {
+                    avaliacoesIframeRef.current?.contentWindow?.postMessage(
+                      { type: 'avaliacoes:openErminia' },
+                      '*'
+                    );
+                  };
+                  if (activeTab !== 'avaliacoes') {
+                    setActiveTab('avaliacoes');
+                    setTimeout(openIt, 250);
+                  } else {
+                    openIt();
                   }
                 }}
                 title="Estudar com ErminIA"
