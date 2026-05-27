@@ -83,9 +83,20 @@ const Index = () => {
         );
       }
       if (data.type === 'avaliacoes:requestAuth') {
-        const { data: { session } } = await supabase.auth.getSession();
+        let { data: { session } } = await supabase.auth.getSession();
+        const expiresAtMs = (session?.expires_at || 0) * 1000;
+        if (session && expiresAtMs && expiresAtMs - Date.now() < 60000) {
+          const refreshed = await supabase.auth.refreshSession();
+          session = refreshed.data.session || session;
+        }
         avaliacoesIframeRef.current?.contentWindow?.postMessage(
-          { type: 'avaliacoes:auth', accessToken: session?.access_token || null },
+          {
+            type: 'avaliacoes:auth',
+            accessToken: session?.access_token || null,
+            userId: session?.user?.id || null,
+            userEmail: session?.user?.email || null,
+            userName: (session?.user?.user_metadata?.full_name as string) || (session?.user?.email?.split('@')[0] ?? ''),
+          },
           '*'
         );
       }
