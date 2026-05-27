@@ -352,6 +352,45 @@ export type Database = {
         }
         Relationships: []
       }
+      erminia_sources: {
+        Row: {
+          content_text: string
+          created_at: string
+          created_by: string | null
+          display_order: number
+          file_path: string | null
+          file_url: string | null
+          id: string
+          source_type: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content_text?: string
+          created_at?: string
+          created_by?: string | null
+          display_order?: number
+          file_path?: string | null
+          file_url?: string | null
+          id?: string
+          source_type?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content_text?: string
+          created_at?: string
+          created_by?: string | null
+          display_order?: number
+          file_path?: string | null
+          file_url?: string | null
+          id?: string
+          source_type?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       exam_attempts: {
         Row: {
           answers: Json
