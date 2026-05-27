@@ -252,6 +252,155 @@ Base de Ferro (R$ 1.500 protegidos com os 5 pilares) + Equipe On Fire (R$ 30.000
 PRINCÍPIOS DO COFRE
 - O Controle é Seu: entregas verificáveis e auditáveis. Não depende de sorte, depende de processo.
 - Constância é Rei: os pilares garantem que os resultados de hoje se repitam amanhã.
+`,
+
+  'roteiro_prospeccao': `
+════════════════════════════════════════════════════════════
+MATERIAL OFICIAL — ROTEIRO DE PROSPECÇÃO PRIDE
+"O Roteiro de Ouro" — A anatomia da ligação perfeita na Pride Consultoria
+════════════════════════════════════════════════════════════
+
+REGRA DE OURO DA PROSPECÇÃO
+- Os 30 a 40 segundos iniciais são DECISIVOS para o sucesso de toda a ligação.
+- A ordem dos fatores ALTERA o resultado — vale para TODAS as etapas.
+- Descaracterize o "call center": traga pessoalidade e leveza, evite o tom robótico.
+- Foco na CONEXÃO: o objetivo imediato não é vender, é conectar.
+- RESPIRE — é um diálogo humano, não um monólogo.
+- O objetivo da ligação NÃO é fechar contrato. É vender a REUNIÃO. Esta é a 1ª etapa da venda.
+
+────────────────────────────────────────────────
+O MAPA DA LIGAÇÃO — 6 ETAPAS CRÍTICAS (engrenagem)
+────────────────────────────────────────────────
+1. APRESENTAÇÃO  — Saudação + Identificação + Empresa + Motivo
+2. CONEXÃO       — Validação de Fit (pergunta-link) + Transição
+3. QUALIFICAÇÃO  — Diagnóstico SPIN (Situação + Problema)
+4. AGENDAMENTO   — Condução + Validação do decisor + Definição de data/hora
+5. ASSENTAMENTO  — Duplo Bloqueio (Acordo Mental + Confirmação Logística)
+6. ENCERRAMENTO  — Despedida profissional + Ação imediata (invite + WhatsApp)
+A engrenagem só gira se TODAS as etapas se encaixarem na ordem certa.
+
+────────────────────────────────────────────────
+ETAPA 1 — APRESENTAÇÃO & MOTIVO DA LIGAÇÃO
+────────────────────────────────────────────────
+SAUDAÇÃO (uma por vez, AGUARDANDO resposta entre elas):
+- "[Nome]?"  → aguardar
+- "Bom dia/tarde/noite, tudo bem?"  → aguardar
+- "Tá podendo falar rapidinho?"  → aguardar
+
+IDENTIFICAÇÃO:
+- "[Seu nome] aqui... nós conversamos um tempo atrás, não sei se vai se lembrar... sou da Pride Consultoria..."
+
+A EMPRESA:
+- "Empresa especializada na reavaliação de assistência médica... a gestão de plano de saúde."
+
+O MOTIVO:
+- "Chegamos a falar um tempo atrás sobre o seu plano, na época você estava com o plano da [operadora] se não me engano... e fiquei de retomar mais pra frente pra entender como está seu cenário, se continua sendo a melhor opção..."
+
+────────────────────────────────────────────────
+ETAPA 2 — CONEXÃO (Ponte / Pergunta-Link)
+────────────────────────────────────────────────
+Valida o fit ANTES de qualificar (pede permissão implícita para investigar):
+- "Você já chegou a realizar algum comparativo do seu plano recentemente?"
+Transição:
+- "Ah, maravilha... liguei na hora certa então..."
+NUNCA pule essa etapa — sem conexão, a qualificação vira interrogatório.
+
+────────────────────────────────────────────────
+ETAPA 3 — QUALIFICAÇÃO (SPIN: Situação + Problema)
+────────────────────────────────────────────────
+Aqui o foco é S e P do SPIN. Implicação e Necessidade são trabalhadas pelo
+especialista na reunião — na prospecção, a missão é diagnosticar.
+
+3A) RAIO-X DA SITUAÇÃO — PLANO & INVESTIMENTO
+- "Seu plano ainda é o [operadora], ele é pra quantas vidas?"
+- "E quem são, e as idades?"
+- "Qual a categoria dele?"
+- "Enfermaria ou apartamento?"
+- "Tem coparticipação?"
+- "Quanto tempo estão neste plano?"
+- "Quanto vocês tão investindo hoje no plano para as x vidas?"
+Coletar: Operadora, Vínculo/Idade, Quantidade de Vidas, Categoria, Acomodação,
+Coparticipação, Tempo de Plano, Valor de Investimento Atual.
+
+3B) RAIO-X DA SITUAÇÃO — CORPORATIVO & LOGÍSTICA
+- "Esse plano é pelo CNPJ?"  "MEI ou LTDA?"  "Capital ou interior?"
+- "Todos os sócios vão entrar no plano?"
+- "Qual sua formação acadêmica?"
+- "Quando é o mês de reajuste do plano?"  "O boleto vence em qual dia?"
+- "Você mora em qual região/bairro?"
+- "Quais hospitais e laboratórios vocês costumam usar?"
+Coletar: CNPJ ativo, Tipo, Localidade, Sócios no plano, Número do CNPJ,
+Formação, Mês de reajuste, Dia do vencimento, Bairro/Zona, Rede (Hospitais/Labs).
+
+3C) IDENTIFICANDO O PROBLEMA (A DOR CENTRAL)
+SAÚDE E UTILIZAÇÃO  — REGRA DE OURO: empatia visceral ao falar de saúde.
+- "Tem alguém fazendo algum tratamento, tomando medicação de alto custo, com alguma doença?"
+- "Alguém grávida?"
+- "Alguém fazendo terapia?"
+DORES COM O PLANO ATUAL:
+- "Vocês tiveram algum problema com esse plano atual?"
+- "Tem mais alguma coisa específica que é importante pra você? Alguma preferência ou necessidade?"
+Coletar: Tratamentos/doenças, Gestante, Terapia, Dificuldades com o plano atual, Observações.
+
+────────────────────────────────────────────────
+ETAPA 4 — O PIVÔ PARA O AGENDAMENTO (Google Meet)
+────────────────────────────────────────────────
+1) A CONDUÇÃO:
+- "Perfeito, [Nome]! Já tenho aqui as informações pra passar pro especialista considerar e formular os cenários... já conseguimos te direcionar."
+2) A VALIDAÇÃO (decisor):
+- "Sobre o plano, é tudo com você mesmo ou depende da opinião/ajuda de alguém pra definir?"
+3) A AÇÃO:
+- "Como está sua agenda entre hoje e amanhã pra uma reunião com o especialista? Qual horário funciona bem pra você?"
+Coletar: Quem paga / Quem decide, Retorno Programado (Data/Hora).
+
+────────────────────────────────────────────────
+ETAPA 5 — O ASSENTAMENTO (Duplo Bloqueio)
+────────────────────────────────────────────────
+BLOQUEIO 1 — O Acordo Mental (tirar a pressão e firmar compromisso):
+- "Então combinado, fica pra [dia] às [hora]. O fato de agendarmos a reunião
+  não te obriga a mudar de plano — nosso foco é entender se temos uma opção
+  que faça mais sentido OU se o seu plano continua sendo a melhor opção.
+  Agora, o que eu preciso é do seu compromisso com a reunião. Funciona 100%
+  pra você, né? Não corre o risco de esquecer?"
+BLOQUEIO 2 — Confirmação Logística:
+- "Vou te mandar o link por e-mail pra você já dar o aceite... mando pelo WhatsApp também."
+- "Qual seu e-mail?"  "Esse número é WhatsApp também?"
+Coletar: Reunião Agendada confirmada, Telefone (WhatsApp), E-mail validado.
+
+────────────────────────────────────────────────
+ETAPA 6 — ENCERRAMENTO PROFISSIONAL
+────────────────────────────────────────────────
+- "Maravilha então... Já te mando o invite. Prazer falar com você, [Nome], e até [dia]! Abraço!"
+
+AÇÃO IMEDIATA (no momento em que desligar):
+- Enviar o invite pelo e-mail.
+- Confirmar o envio via mensagem no WhatsApp.
+
+────────────────────────────────────────────────
+MATRIZ DE POSTURA — CONSULTOR PRIDE × ROBÔ DE TELEMARKETING
+────────────────────────────────────────────────
+FAÇA (✅ Consultor Pride):
+- Foque profundamente em SITUAÇÃO e PROBLEMA (S e P do SPIN).
+- Use perguntas-link para criar transições naturais.
+- Demonstre empatia visceral ao falar de saúde.
+- Firme o compromisso REAL do cliente no final (duplo bloqueio).
+- Respeite a ordem dos fatores — uma etapa se conecta à outra.
+
+EVITE (❌ Robô de Telemarketing):
+- Interrogatório frio em vez de diálogo leve.
+- Perguntas repetitivas, ignorando o que o cliente disse.
+- Pular para a qualificação SEM pedir permissão (sem etapa 2).
+- Deixar o agendamento solto, sem compromisso firme.
+- Esquecer de confirmar quem é o real DECISOR da compra.
+
+────────────────────────────────────────────────
+LEMBRETES DE OURO
+────────────────────────────────────────────────
+- Esta é a PRIMEIRA ETAPA da VENDA. O objetivo é vender a REUNIÃO, não o plano.
+- Sem CONEXÃO, não há QUALIFICAÇÃO. Sem QUALIFICAÇÃO, não há cenário no D01 do Fluxo.
+- As informações coletadas aqui são o INSUMO que o corretor usa no D01 do Fluxo
+  de Oportunidades para montar cenários estratégicos no Pride Central.
+- Empatia em saúde não é técnica — é postura.
 `
 };
 
