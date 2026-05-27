@@ -98,6 +98,27 @@ export type Database = {
         }
         Relationships: []
       }
+      avaliacoes_admin_state: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       cadencia_days: {
         Row: {
           created_at: string
@@ -448,6 +469,60 @@ export type Database = {
           time_seconds?: number
           total?: number
           version?: number
+        }
+        Relationships: []
+      }
+      exam_definitions: {
+        Row: {
+          active: boolean
+          allowed_emails: string[]
+          bank: Json
+          created_at: string
+          created_by: string | null
+          description: string | null
+          exam_id: string
+          id: string
+          is_builtin: boolean
+          scheduled_end: string | null
+          scheduled_start: string | null
+          study_enabled: boolean
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          allowed_emails?: string[]
+          bank?: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          exam_id: string
+          id?: string
+          is_builtin?: boolean
+          scheduled_end?: string | null
+          scheduled_start?: string | null
+          study_enabled?: boolean
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          allowed_emails?: string[]
+          bank?: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          exam_id?: string
+          id?: string
+          is_builtin?: boolean
+          scheduled_end?: string | null
+          scheduled_start?: string | null
+          study_enabled?: boolean
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
