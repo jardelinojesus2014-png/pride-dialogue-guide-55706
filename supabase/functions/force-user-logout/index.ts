@@ -57,7 +57,7 @@ serve(async (req: Request) => {
     const action = body.action === "force" ? "force" : "check";
 
     if (action === "check") {
-      const { data: freshUser, error: freshUserError } = await supabaseAdmin.auth.admin.getUserById(authData.user.id);
+      const { data: freshUser, error: freshUserError } = await supabaseAdmin.auth.admin.getUserById(callerUserId);
       if (freshUserError || !freshUser.user) {
         return json({ error: freshUserError?.message || "User not found" }, 401);
       }
@@ -74,7 +74,7 @@ serve(async (req: Request) => {
     const { data: adminRole } = await supabaseAdmin
       .from("user_roles")
       .select("role")
-      .eq("user_id", authData.user.id)
+      .eq("user_id", callerUserId)
       .eq("role", "admin")
       .maybeSingle();
 
@@ -87,7 +87,7 @@ serve(async (req: Request) => {
       return json({ error: "User ID is required" }, 400);
     }
 
-    if (userId === authData.user.id) {
+    if (userId === callerUserId) {
       return json({ error: "Cannot force logout your own account" }, 400);
     }
 
