@@ -118,6 +118,27 @@ const Index = () => {
           '*'
         );
       }
+      if (data.type === 'avaliacoes:requestErminiaConversations') {
+        if (ev.source !== avaliacoesIframeRef.current?.contentWindow) return;
+        if (!isAdmin) {
+          avaliacoesIframeRef.current?.contentWindow?.postMessage(
+            { type: 'avaliacoes:erminiaConversations', rows: [], error: 'admin_required' },
+            '*'
+          );
+          return;
+        }
+
+        const { data: rows, error } = await supabase
+          .from('erminia_conversations')
+          .select('*')
+          .order('updated_at', { ascending: false })
+          .limit(1000);
+
+        avaliacoesIframeRef.current?.contentWindow?.postMessage(
+          { type: 'avaliacoes:erminiaConversations', rows: rows || [], error: error?.message || null },
+          '*'
+        );
+      }
       if (data.type === 'avaliacoes:requestAuth') {
         let { data: { session } } = await supabase.auth.getSession();
         const expiresAtMs = (session?.expires_at || 0) * 1000;
