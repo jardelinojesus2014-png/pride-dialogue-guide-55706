@@ -72,6 +72,42 @@ const Index = () => {
       if (data.type === 'avaliacoes:erminiaState') {
         setErminiaOpen(!!data.open);
       }
+      if (data.type === 'avaliacoes:saveErminiaConversation') {
+        if (ev.source !== avaliacoesIframeRef.current?.contentWindow) return;
+        const conversation = data.conversation || {};
+        if (!conversation.sessionId || !Array.isArray(conversation.messages)) return;
+
+        let { data: { session } } = await supabase.auth.getSession();
+        const expiresAtMs = (session?.expires_at || 0) * 1000;
+        if (session && expiresAtMs && expiresAtMs - Date.now() < 60000) {
+          const refreshed = await supabase.auth.refreshSession();
+          session = refreshed.data.session || session;
+        }
+
+        if (!session?.user) return;
+
+        const email = (session.user.email || conversation.email || '').toLowerCase();
+        const participantName =
+          conversation.name ||
+          (session.user.user_metadata?.full_name as string) ||
+          email.split('@')[0] ||
+          null;
+
+        const { error } = await supabase
+          .from('erminia_conversations')
+          .upsert({
+            session_id: String(conversation.sessionId),
+            user_id: session.user.id,
+            email,
+            participant_name: participantName,
+            messages: conversation.messages,
+            updated_at: conversation.updatedAt || new Date().toISOString(),
+          } as any, { onConflict: 'session_id' });
+
+        if (error) {
+          console.error('Erro ao registrar conversa da ErminIA:', error);
+        }
+      }
       if (data.type === 'avaliacoes:requestProfiles' && isAdmin) {
         const { data: profs } = await supabase
           .from('profiles')
@@ -103,7 +139,7 @@ const Index = () => {
     };
     window.addEventListener('message', onMsg);
     return () => window.removeEventListener('message', onMsg);
-  }, [isAdmin]);
+  }, [isAdmin, user]);
 
   // While ErminIA chat is open, stream parent viewport info to the iframe so
   // its fixed-position panel can stay glued to the visible window (otherwise
