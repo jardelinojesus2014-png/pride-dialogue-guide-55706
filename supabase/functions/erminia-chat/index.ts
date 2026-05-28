@@ -6,27 +6,92 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
+const jsonResponse = (body: Record<string, unknown>, status = 200) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+
+const getBearerToken = (req: Request) => {
+  const auth = req.headers.get("authorization") || "";
+  return auth.toLowerCase().startsWith("bearer ") ? auth.slice(7).trim() : "";
+};
+
+const readUserFromToken = async (supabaseUrl: string, anonKey: string, token: string) => {
+  if (!token || token.split(".").length !== 3) return null;
+  const resp = await fetch(`${supabaseUrl}/auth/v1/user`, {
+    headers: { Authorization: `Bearer ${token}`, apikey: anonKey },
+  });
+  if (!resp.ok) return null;
+  return await resp.json().catch(() => null);
+};
+
+const saveConversation = async ({
+  supabaseUrl,
+  serviceKey,
+  user,
+  conversation,
+  messages,
+}: {
+  supabaseUrl: string;
+  serviceKey: string;
+  user: any;
+  conversation: any;
+  messages: Array<{ role: string; content: string }>;
+}) => {
+  if (!user?.id || !conversation?.sessionId || !Array.isArray(messages)) return;
+
+  const email = String(user.email || conversation.email || "").toLowerCase() || null;
+  const participantName =
+    conversation.name ||
+    user.user_metadata?.full_name ||
+    (email ? email.split("@")[0] : null);
+
+  const resp = await fetch(`${supabaseUrl}/rest/v1/erminia_conversations?on_conflict=session_id`, {
+    method: "POST",
+    headers: {
+      apikey: serviceKey,
+      Authorization: `Bearer ${serviceKey}`,
+      "Content-Type": "application/json",
+      Prefer: "resolution=merge-duplicates,return=minimal",
+    },
+    body: JSON.stringify({
+      session_id: String(conversation.sessionId),
+      user_id: user.id,
+      email,
+      participant_name: participantName,
+      messages,
+      updated_at: new Date().toISOString(),
+    }),
+  });
+
+  if (!resp.ok) {
+    console.error("erminia conversation save failed", resp.status, await resp.text());
+  }
+};
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { system, messages } = await req.json();
+    const { system, messages, conversation } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY") || "";
     if (!LOVABLE_API_KEY) {
-      return new Response(
-        JSON.stringify({ error: "LOVABLE_API_KEY not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+      return jsonResponse({ error: "LOVABLE_API_KEY not configured" }, 500);
     }
 
     if (!Array.isArray(messages)) {
-      return new Response(
-        JSON.stringify({ error: "messages must be an array" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+      return jsonResponse({ error: "messages must be an array" }, 400);
     }
+
+    const authUser = SUPABASE_URL && SUPABASE_ANON_KEY
+      ? await readUserFromToken(SUPABASE_URL, SUPABASE_ANON_KEY, getBearerToken(req))
+      : null;
 
     const payloadMessages = [
       ...(system ? [{ role: "system", content: String(system) }] : []),
@@ -53,35 +118,38 @@ Deno.serve(async (req) => {
 
     if (!resp.ok) {
       if (resp.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Limite de requisições atingido, tente novamente em alguns instantes." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-        );
+        return jsonResponse({ error: "Limite de requisições atingido, tente novamente em alguns instantes." }, 429);
       }
       if (resp.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Créditos de IA esgotados. Adicione créditos no workspace Lovable." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-        );
+        return jsonResponse({ error: "Créditos de IA esgotados. Adicione créditos no workspace Lovable." }, 402);
       }
       const t = await resp.text();
       console.error("AI gateway error", resp.status, t);
-      return new Response(
-        JSON.stringify({ error: "Erro no gateway de IA" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+      return jsonResponse({ error: "Erro no gateway de IA" }, 500);
     }
 
     const data = await resp.json();
     const text = data?.choices?.[0]?.message?.content ?? "";
-    return new Response(JSON.stringify({ text }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+
+    if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY && authUser?.id && conversation?.sessionId) {
+      await saveConversation({
+        supabaseUrl: SUPABASE_URL,
+        serviceKey: SUPABASE_SERVICE_ROLE_KEY,
+        user: authUser,
+        conversation,
+        messages: [
+          ...(Array.isArray(conversation.messages) ? conversation.messages : messages).map((m: any) => ({
+            role: m.role === "user" ? "user" : "assistant",
+            content: String(m.content ?? ""),
+          })),
+          { role: "assistant", content: String(text) },
+        ],
+      });
+    }
+
+    return jsonResponse({ text, saved: Boolean(authUser?.id && conversation?.sessionId) });
   } catch (e) {
     console.error("erminia-chat error", e);
-    return new Response(
-      JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    return jsonResponse({ error: e instanceof Error ? e.message : "Unknown error" }, 500);
   }
 });
