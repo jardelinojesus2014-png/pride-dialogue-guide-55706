@@ -1,5 +1,9 @@
 import { UserPurposeReflections } from './UserPurposeReflections';
 
-export const PurposeReflectionsSection = () => {
-  return <UserPurposeReflections />;
+interface PurposeReflectionsSectionProps {
+  filterUserId?: string;
+}
+
+export const PurposeReflectionsSection = ({ filterUserId }: PurposeReflectionsSectionProps) => {
+  return <UserPurposeReflections filterUserId={filterUserId} />;
 };

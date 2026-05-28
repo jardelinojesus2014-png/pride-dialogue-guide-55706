@@ -4,8 +4,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-export const UserPurposeReflections = () => {
-  const { reflections, isLoading } = useAllPurposeReflections();
+interface UserPurposeReflectionsProps {
+  filterUserId?: string;
+}
+
+export const UserPurposeReflections = ({ filterUserId }: UserPurposeReflectionsProps) => {
+  const { reflections, isLoading } = useAllPurposeReflections(filterUserId);
 
   if (isLoading) {
     return (
