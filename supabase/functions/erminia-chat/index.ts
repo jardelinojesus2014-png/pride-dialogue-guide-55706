@@ -17,10 +17,10 @@ const getBearerToken = (req: Request) => {
   return auth.toLowerCase().startsWith("bearer ") ? auth.slice(7).trim() : "";
 };
 
-const readUserFromToken = async (supabaseUrl: string, token: string) => {
+const readUserFromToken = async (supabaseUrl: string, anonKey: string, token: string) => {
   if (!token || token.split(".").length !== 3) return null;
   const resp = await fetch(`${supabaseUrl}/auth/v1/user`, {
-    headers: { Authorization: `Bearer ${token}`, apikey: token },
+    headers: { Authorization: `Bearer ${token}`, apikey: anonKey },
   });
   if (!resp.ok) return null;
   return await resp.json().catch(() => null);
@@ -80,6 +80,7 @@ Deno.serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY") || "";
     if (!LOVABLE_API_KEY) {
       return jsonResponse({ error: "LOVABLE_API_KEY not configured" }, 500);
     }
@@ -88,8 +89,8 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: "messages must be an array" }, 400);
     }
 
-    const authUser = SUPABASE_URL
-      ? await readUserFromToken(SUPABASE_URL, getBearerToken(req))
+    const authUser = SUPABASE_URL && SUPABASE_ANON_KEY
+      ? await readUserFromToken(SUPABASE_URL, SUPABASE_ANON_KEY, getBearerToken(req))
       : null;
 
     const payloadMessages = [
@@ -137,7 +138,7 @@ Deno.serve(async (req) => {
         user: authUser,
         conversation,
         messages: [
-          ...messages.map((m: any) => ({
+          ...(Array.isArray(conversation.messages) ? conversation.messages : messages).map((m: any) => ({
             role: m.role === "user" ? "user" : "assistant",
             content: String(m.content ?? ""),
           })),
