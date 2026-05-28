@@ -329,7 +329,7 @@ const Admin = () => {
               </TabsContent>
 
               <TabsContent value="reflections" className="space-y-4">
-                <PurposeReflectionsSection />
+                <PurposeReflectionsSection filterUserId={filterUser} />
               </TabsContent>
 
               <TabsContent value="cadencia" className="space-y-4">

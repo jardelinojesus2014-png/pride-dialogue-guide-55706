@@ -93,17 +93,23 @@ export const usePurposeReflections = () => {
 };
 
 // Hook for admin to view all reflections
-export const useAllPurposeReflections = () => {
+export const useAllPurposeReflections = (filterUserId?: string) => {
   const { data: reflections, isLoading } = useQuery({
-    queryKey: ['all-purpose-reflections'],
+    queryKey: ['all-purpose-reflections', filterUserId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('user_purpose_reflections')
         .select(`
           *,
           profiles (email)
         `)
         .order('created_at', { ascending: false});
+
+      if (filterUserId && filterUserId !== 'all') {
+        query = query.eq('user_id', filterUserId);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       return data;
