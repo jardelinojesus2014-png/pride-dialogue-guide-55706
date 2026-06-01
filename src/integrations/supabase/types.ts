@@ -529,6 +529,45 @@ export type Database = {
         }
         Relationships: []
       }
+      exam_schedule_windows: {
+        Row: {
+          allowed_emails: string[]
+          created_at: string
+          created_by: string | null
+          display_order: number
+          exam_id: string
+          id: string
+          label: string | null
+          scheduled_end: string | null
+          scheduled_start: string | null
+          updated_at: string
+        }
+        Insert: {
+          allowed_emails?: string[]
+          created_at?: string
+          created_by?: string | null
+          display_order?: number
+          exam_id: string
+          id?: string
+          label?: string | null
+          scheduled_end?: string | null
+          scheduled_start?: string | null
+          updated_at?: string
+        }
+        Update: {
+          allowed_emails?: string[]
+          created_at?: string
+          created_by?: string | null
+          display_order?: number
+          exam_id?: string
+          id?: string
+          label?: string | null
+          scheduled_end?: string | null
+          scheduled_start?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       exam_settings: {
         Row: {
           active: boolean
