@@ -3676,11 +3676,12 @@ window.addEventListener('message',function(ev){
     fetchAdminState(function(){syncLocalChatHistories();});
     fetchRemoteExamDefinitions(function(){syncLocalAdminExamDefinitions();try{render();}catch(_){}});
     fetchRemoteExamSettings();
+    fetchRemoteExamScheduleWindows();
     fetchErminiaSources();
     // Polling: revalidar configs a cada 30s para refletir pausas do admin em tempo quase real
     if(!window.__examSettingsPoll){
       window.__examSettingsPoll=setInterval(function(){
-        if(document.visibilityState==='visible'){ fetchRemoteExamSettings(); fetchErminiaSources(); }
+        if(document.visibilityState==='visible'){ fetchRemoteExamSettings(); fetchRemoteExamScheduleWindows(); fetchErminiaSources(); }
       },30000);
     }
     if(S.view==='adm'){
