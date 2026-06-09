@@ -3568,7 +3568,9 @@ function toggleExamStudy(id){
 }
 
 function addScheduleWindow(examId){
-  upsertRemoteExamScheduleWindow({examId:examId,label:'',scheduledStart:null,scheduledEnd:null,allowedEmails:[],displayOrder:Date.now()},function(ok){
+  var wins=getExamWindows({id:examId})||[];
+  var nextOrder=wins.reduce(function(m,w){return Math.max(m,(w.displayOrder|0));},0)+1;
+  upsertRemoteExamScheduleWindow({examId:examId,label:'',scheduledStart:null,scheduledEnd:null,allowedEmails:[],displayOrder:nextOrder},function(ok){
     if(ok){showAdmAlert('Nova janela criada.');render();}
   });
 }
