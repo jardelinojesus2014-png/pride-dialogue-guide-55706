@@ -1349,7 +1349,7 @@ function saveQ(q,examId){
   const defs=getExamDefs();const idx=defs.findIndex(e=>e.id===eid);
   if(idx>=0){defs[idx].bank=q;saveExamDefs(defs);}
   if(hasRemoteBackend()&&PARENT_IS_ADMIN){
-    var ex=getExam(eid)||{id:eid,title:eid,active:true,builtin:(eid===DEFAULT_EXAM_ID||eid==='bonus_pods'||eid==='roteiro_prospeccao')};
+    var ex=getExam(eid)||{id:eid,title:eid,active:true,builtin:(eid===DEFAULT_EXAM_ID||eid==='bonus_pods'||eid==='roteiro_prospeccao'||eid==='amil_pme')};
     upsertRemoteExamDefinition(Object.assign({},ex,{bank:q}),function(ok){if(ok)showAdmAlert('Questões salvas no banco geral.');});
   }
   return true;
