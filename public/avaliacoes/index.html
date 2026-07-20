@@ -1330,6 +1330,10 @@ function getQ(examId){
     const s=localStorage.getItem('pride_q_roteiro_prospeccao');
     return s?JSON.parse(s):JSON.parse(JSON.stringify(BANK_ROTEIRO));
   }
+  if(eid==='amil_pme'){
+    const s=localStorage.getItem('pride_q_amil_pme');
+    return s?JSON.parse(s):JSON.parse(JSON.stringify(BANK_AMIL));
+  }
 
   if(eid===DEFAULT_EXAM_ID){
     const s=localStorage.getItem('pride_q_'+eid);
