@@ -4071,6 +4071,58 @@ Quando você explicar um dia específico do fluxo (Dia 1, Dia 2, Dia 4, Dia 6, D
 Use apenas quando estiver realmente explicando aquele dia/conceito — não force.`
     : 'OBS.: Esta prova não possui slides associados — NÃO use tags [SLIDE:xxx] em hipótese alguma.';
 
+  // ── Bloco de discursivas por prova (parte oficial da avaliação, conduzida aqui no pós-prova) ──
+  const discursivasByExam = {
+    'amil_pme': `PARTE DISSERTATIVA — OBRIGATÓRIA (faz parte da avaliação Amil PME)
+
+A prova Amil PME possui 2 questões discursivas que DEVEM ser aplicadas por você,
+ErmínIA, como parte integrante da avaliação — antes mesmo de encerrar o debrief.
+
+FLUXO DE APLICAÇÃO:
+1. Depois do 1º tópico de correção das erradas (ou já na 1ª mensagem, se o
+   candidato acertou tudo), sinalize com naturalidade: "Antes de fechar, faltam
+   as 2 discursivas da prova. Vamos uma de cada vez, tá bom?".
+2. Aplique UMA POR VEZ. Só avance para a segunda depois que o candidato
+   responder a primeira.
+3. Avalie a resposta com base no MATERIAL OFICIAL desta prova (não invente).
+4. Se estiver incompleta ou errada, oriente o ponto correto e peça para
+   reformular. Só considere "respondida" quando o candidato demonstrar o
+   conceito central.
+
+DISCURSIVA 1:
+"Explique a regra de obrigatoriedade para a contratação de planos por
+empresas MEI."
+Resposta esperada: Empresas MEI só são aceitas se o sócio/proprietário aderir
+ao plano OBRIGATORIAMENTE. Em um contrato de 2 vidas, uma delas precisa ser
+o dono do MEI. (Reforçar também o tempo mínimo de 180 dias de CNPJ do MEI.)
+
+DISCURSIVA 2:
+"Por que empresas de 'Segurança Armada' e 'Motoboys/Delivery' possuem
+restrição de comercialização?"
+Resposta esperada: Devido à natureza da atividade econômica (CNAE) ser
+considerada de ALTO RISCO OCUPACIONAL, o que gera restrição técnica na
+aceitação pela subscrição da operadora.
+
+REGRA DE CONVERSÃO EM NOTA:
+- Se ambas as discursivas foram bem respondidas: reforce que o desempenho
+  ficou consolidado.
+- Se uma ou as duas falharem no conceito central mesmo após reformulação:
+  registre no encerramento que a parte dissertativa não foi cumprida e que
+  o corretor precisa revisar o Manual do Corretor Amil PME antes de nova
+  tentativa.`
+  };
+  const discursivasBlock = discursivasByExam[examId] || '';
+
+  // ── Reforço sobre discutir os erros com a ErmínIA ──
+  const errosReforcoBlock = `REFORÇO OBRIGATÓRIO SOBRE OS ERROS (todas as provas):
+Em algum momento do debrief (idealmente logo após o 1º erro trabalhado e
+novamente no encerramento), REFORCE ao candidato — com palavras suas, sem
+robotizar — que CONVERSAR SOBRE CADA ERRO COM VOCÊ É PARTE FUNDAMENTAL DA
+AVALIAÇÃO e do desenvolvimento dele sobre o tema. Não é opcional: é assim
+que ele evolui de verdade no conteúdo. Se o candidato tentar encerrar sem
+ter discutido um erro, retome com carinho e firmeza: "espera, esse ponto
+aqui a gente precisa fechar juntos — é onde você mais evolui".`;
+
   // Pre-computed
   const _topicos = wrongList
     ? wrongList.split('\n').slice(0,3).map(l=>'   - '+l.trim()).join('\n')
