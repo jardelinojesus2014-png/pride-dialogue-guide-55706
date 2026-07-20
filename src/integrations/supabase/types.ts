@@ -1037,8 +1037,50 @@ export type Database = {
           },
         ]
       }
+      operadora_topics: {
+        Row: {
+          body: string | null
+          created_at: string
+          created_by: string | null
+          display_order: number
+          id: string
+          operadora_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          display_order?: number
+          id?: string
+          operadora_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          display_order?: number
+          id?: string
+          operadora_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operadora_topics_operadora_id_fkey"
+            columns: ["operadora_id"]
+            isOneToOne: false
+            referencedRelation: "operadoras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       operadoras: {
         Row: {
+          ans: string | null
           created_at: string
           created_by: string | null
           display_order: number | null
@@ -1046,9 +1088,12 @@ export type Database = {
           logo_path: string | null
           logo_url: string
           name: string
+          subtitle: string | null
+          tags: string[] | null
           updated_at: string
         }
         Insert: {
+          ans?: string | null
           created_at?: string
           created_by?: string | null
           display_order?: number | null
@@ -1056,9 +1101,12 @@ export type Database = {
           logo_path?: string | null
           logo_url: string
           name: string
+          subtitle?: string | null
+          tags?: string[] | null
           updated_at?: string
         }
         Update: {
+          ans?: string | null
           created_at?: string
           created_by?: string | null
           display_order?: number | null
@@ -1066,6 +1114,8 @@ export type Database = {
           logo_path?: string | null
           logo_url?: string
           name?: string
+          subtitle?: string | null
+          tags?: string[] | null
           updated_at?: string
         }
         Relationships: []
