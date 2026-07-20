@@ -1534,6 +1534,10 @@ function getVersionQuestions(ver,examId){
     const idx=VERSIONS_ROTEIRO[(ver-1)%VERSIONS_ROTEIRO.length];
     return idx.filter(i=>i<bank.length).map(i=>bank[i]);
   }
+  if(eid==='amil_pme'){
+    const idx=VERSIONS_AMIL[(ver-1)%VERSIONS_AMIL.length];
+    return idx.filter(i=>i<bank.length).map(i=>bank[i]);
+  }
   if(eid===DEFAULT_EXAM_ID){
     const idx=VERSIONS[(ver-1)%VERSIONS.length];
     return idx.filter(i=>i<bank.length).map(i=>bank[i]);
