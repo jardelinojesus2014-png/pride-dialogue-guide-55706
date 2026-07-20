@@ -838,6 +838,52 @@ BUILTIN_EXAMS.push({
 });
 
 // ══════════════════════════════════════════
+//  PROVA 4 — REGRAS DE CONTRATAÇÃO AMIL PME
+//  Fonte: Manual do Corretor Amil PME
+//  20 múltipla escolha + 2 discursivas (conduzidas pela ErmínIA no pós-prova)
+// ══════════════════════════════════════════
+const BANK_AMIL = [
+  {id:1,tag:"MEI — Tempo de CNPJ",text:"Durante a triagem inicial, um SDR identifica que a empresa do lead é um MEI (Microempreendedor Individual). Para que este lead seja considerado qualificado em relação ao tempo de atividade, o CNPJ deve ter, no mínimo:",opts:["60 dias de abertura","90 dias de abertura","120 dias de abertura","180 dias de abertura"],correct:3,feedback:"MEI só é aceito com pelo menos 180 dias de abertura de CNPJ. As demais naturezas jurídicas (LTDA, EIRELI, S/A etc.) têm exigência de 60 dias."},
+  {id:2,tag:"LTDA — Tempo de CNPJ",text:"Uma empresa de natureza jurídica LTDA (Sociedade Limitada) possui 65 dias de abertura no CNPJ. Segundo as regras de tempo mínimo de abertura, esta empresa:",opts:["Está elegível para contratação, pois o prazo mínimo para LTDA é de 60 dias","Está inelegível, pois o prazo mínimo para qualquer natureza jurídica é de 180 dias","Deve aguardar completar 120 dias para ser aceita","Pode contratar apenas planos da linha Bronze"],correct:0,feedback:"Para LTDA (e demais naturezas exceto MEI) o mínimo é 60 dias. Com 65 dias, a empresa já está elegível."},
+  {id:3,tag:"Compulsoriedade — Sócios",text:"Uma empresa possui 10 sócios listados no Contrato Social e deseja contratar o plano com Preço Compulsório. Para que a regra de compulsoriedade seja atendida, quantos sócios devem, obrigatoriamente, aderir ao plano?",opts:["10 sócios","9 sócios","8 sócios","5 sócios"],correct:1,feedback:"Regra prática: (N − 1) sócios precisam aderir para manter o Preço Compulsório. Com 10 sócios listados, no mínimo 9 devem entrar no plano."},
+  {id:4,tag:"Compulsoriedade — Grupo insuficiente",text:"Sobre a Compulsoriedade, o que ocorre se o grupo de entrantes for inferior ao percentual mínimo exigido para o preço compulsório?",opts:["A proposta é recusada automaticamente pela subscrição","O contrato é implantado com carência dobrada para todos os beneficiários","O grupo deverá ser enquadrado na tabela de Preço Opcional (ou Flex)","A empresa perde o direito ao plano Amil Dental gratuito de 12 meses"],correct:2,feedback:"Não é recusa — é reenquadramento comercial: o grupo cai da tabela de Preço Compulsório para a de Preço Opcional (Flex)."},
+  {id:5,tag:"Carência — Janela",text:"Um lead informa que cancelou seu plano de saúde anterior há 55 dias. Ele deseja saber se terá redução de carência ao contratar a Amil. Considerando a regra, qual a resposta correta?",opts:["Não terá redução, pois o intervalo máximo permitido é de 30 dias","Terá redução, pois o intervalo está dentro do limite máximo de 60 dias sem plano anterior","Terá redução apenas se o plano anterior for de uma operadora não-congênere","O gap de 55 dias é considerado muito alto e exige cumprimento de CPT total de 24 meses"],correct:1,feedback:"A janela de aproveitamento é de até 60 dias entre o fim do plano anterior e a nova vigência. 55 dias está dentro do limite."},
+  {id:6,tag:"Carência — Congênere",text:"Para elegibilidade à redução de carência, além do tempo de permanência no plano anterior, o SDR deve verificar se a operadora anterior é classificada como:",opts:["Operadora de autogestão pura","Operadora que possua contrato de reciprocidade com a rede própria Amil","Congênere, conforme a lista e critérios técnicos da seção 5.5 do manual","Operadora que não utilize o sistema de coparticipação"],correct:2,feedback:"A redução depende de a operadora anterior estar na lista de CONGÊNERES (seção 5.5 do Manual): Bradesco, SulAmérica, Porto Seguro, Unimed, GNDI/Hapvida, Omint etc."},
+  {id:7,tag:"Naturezas com restrição",text:"Certas Naturezas Jurídicas possuem restrição de aceitação ou exigem análise criteriosa da subscrição. Assinale a alternativa que apresenta uma dessas naturezas:",opts:["Sociedade Limitada (LTDA)","Empresa Individual de Responsabilidade Limitada (EIRELI)","Partidos Políticos ou Entidades Religiosas","Microempreendedor Individual (MEI) com 2 anos de abertura"],correct:2,feedback:"Partidos Políticos e Entidades Religiosas estão entre as naturezas com restrição/recusa técnica, ao lado de Sociedade em Conta de Participação, Cartórios e Produtor Rural com CNPJ."},
+  {id:8,tag:"CNAE — Risco",text:"Sobre as restrições de Atividade Econômica (CNAE), é correto afirmar que:",opts:["Todas as atividades econômicas são aceitas sem qualquer análise técnica","CNAEs ligados a atividades de risco ou sazonalidade podem sofrer restrição de aceitação","A Amil aceita exclusivamente empresas do setor de serviços e tecnologia","O CNAE define apenas a cor da carteirinha do beneficiário"],correct:1,feedback:"CNAEs de alto risco ocupacional ou de forte sazonalidade sofrem restrição na subscrição — checar ANTES de avançar no fluxo comercial."},
+  {id:9,tag:"Porte I × Porte II",text:"Diferencie os critérios de Porte I e Porte II na contratação Amil PME, considerando vidas e documentação:",opts:["Porte I atende de 2 a 9 vidas; Porte II de 10 a 99 vidas","Porte I atende de 2 a 29 vidas (exige Relação de FGTS); Porte II de 30 a 99 vidas (permite Ficha de Registro)","Porte I é exclusivo para MEI; Porte II é exclusivo para LTDA e S/A","Porte I exige compulsoriedade de 100%; Porte II permite 50% de adesão"],correct:1,feedback:"Porte I = 2 a 29 vidas (documentação mais completa, inclusive Relação FGTS). Porte II = 30 a 99 vidas (documentação enxuta, Ficha de Registro e Declaração de Informações de Saúde)."},
+  {id:10,tag:"Idade — Dependentes/Agregados",text:"Qual é o limite de idade máximo para a aceitação de dependentes diretos (como cônjuges e filhos) e agregados no momento da implantação de um novo contrato?",opts:["Até 35 anos, 11 meses e 29 dias","Até 58 anos, 11 meses e 29 dias","Até 64 anos, 11 meses e 29 dias","Até 69 anos, 11 meses e 29 dias"],correct:3,feedback:"O limite de aceitação no ato da implantação é 69 anos, 11 meses e 29 dias — a partir de 70 entra sob PRC 606, sem redução."},
+  {id:11,tag:"Recém-admitidos",text:"Para fins de compulsoriedade, a Amil aceita funcionários que acabaram de ser contratados pela empresa. Qual é o tempo máximo de admissão para que eles sejam considerados 'recém-admitidos'?",opts:["Até 15 dias de registro","Até 30 dias de registro","Menos de 45 dias de admissão","Exatamente 60 dias de registro"],correct:2,feedback:"Funcionários com menos de 45 dias de admissão são 'recém-admitidos' e podem entrar sem impactar a compulsoriedade."},
+  {id:12,tag:"Filhos inválidos",text:"Qual é a regra de idade para a inclusão de 'Filhos Inválidos' como dependentes no contrato PME?",opts:["Até 24 anos, 11 meses e 29 dias","Até 58 anos, 11 meses e 29 dias","Até 69 anos, 11 meses e 29 dias","São aceitos sem limite de idade"],correct:3,feedback:"Filhos inválidos são aceitos sem limite de idade, mediante comprovação médica/documental."},
+  {id:13,tag:"Período mínimo",text:"Caso uma empresa decida cancelar o contrato antes de completar o primeiro período de vigência, ela estará sujeita ao pagamento de multa rescisória. Qual é esse período inicial obrigatório?",opts:["6 meses","12 meses","24 meses","180 dias"],correct:1,feedback:"O período mínimo de vigência é de 12 meses — cancelamento antes disso gera multa."},
+  {id:14,tag:"Idade — Agregados indiretos",text:"Qual é o limite de idade estabelecido para a aceitação de dependentes indiretos (agregados), como irmãos, sobrinhos e netos, no ato da contratação?",opts:["Até 24 anos, 11 meses e 29 dias","Até 58 anos, 11 meses e 29 dias","Até 69 anos, 11 meses e 29 dias","Não existe limite de idade para agregados de sócios"],correct:2,feedback:"Agregados indiretos seguem o mesmo teto: 69 anos, 11 meses e 29 dias no ato da implantação."},
+  {id:15,tag:"Vigência",text:"Após o pagamento do primeiro boleto (mensalidade de implantação), em quanto tempo o contrato passa a ter vigência ativa para utilização?",opts:["Imediatamente após o pagamento","24 horas após a confirmação da quitação","No 1º dia útil do mês subsequente","15 dias após o processamento bancário"],correct:1,feedback:"A vigência começa em 24h após a confirmação da quitação do 1º boleto — não é imediato e não é dia útil subsequente."},
+  {id:16,tag:"Multa rescisória",text:"Caso uma empresa cancele o contrato antes de completar os primeiros 12 meses de vigência, qual é a multa rescisória aplicável?",opts:["Valor fixo de duas mensalidades","50% do valor das mensalidades restantes para completar o período de 12 meses","Perda total do direito a reembolso de atendimentos pendentes","Não há multa rescisória após a confirmação do pagamento do primeiro boleto"],correct:1,feedback:"Multa = 50% do valor das mensalidades restantes até fechar os 12 meses, sem prejuízo de coparticipações e demais encargos."},
+  {id:17,tag:"Coligadas — Empresa mãe",text:"Qual a restrição imposta à natureza jurídica da empresa principal (chamada de empresa 'mãe') em uma contratação envolvendo empresas Coligadas?",opts:["Ela deve possuir obrigatoriamente mais de 30 vidas","Ela não pode ser um Empresário Individual (MEI, ME ou EPP código 213-5)","Ela deve ter o mesmo CNAE de todas as coligadas","Ela não pode possuir débitos em planos de Pessoa Física"],correct:1,feedback:"A empresa mãe em contratos com coligadas NÃO pode ser Empresário Individual (MEI/ME/EPP código 213-5)."},
+  {id:18,tag:"70+ anos",text:"Para fins de qualificação, beneficiários com 70 anos de idade ou mais podem ser aceitos no contrato PME?",opts:["Não possuem aceitação em nenhuma hipótese","São aceitos apenas se forem sócios da empresa","São aceitos, porém devem cumprir carência integral (PRC 606), sem direito a redução","São aceitos com redução de carência apenas se vierem de operadoras de autogestão"],correct:2,feedback:"70+ entra, mas obrigatoriamente sob PRC 606 — carência integral, sem qualquer redução."},
+  {id:19,tag:"PRC 617",text:"Para a qualificação de redução de carência via PRC 617 (redução máxima), qual o tempo mínimo de permanência exigido no plano anterior congênere?",opts:["Acima de 3 meses","Acima de 6 meses","Acima de 12 meses","Acima de 24 meses"],correct:1,feedback:"PRC 617 (redução máxima) exige permanência superior a 6 meses em operadora CONGÊNERE, respeitando a janela de 60 dias entre planos."},
+  {id:20,tag:"Naturezas recusadas",text:"Quais das naturezas jurídicas abaixo são expressamente RECUSADAS por restrição técnica da operadora?",opts:["Empresa Simples de Inovação e Sociedade em Conta de Participação","Empresa Individual de Responsabilidade Limitada (EIRELI) e LTDA","Sociedade Simples (S/S) e Sociedade Anônima (S/A)","Produtor Rural com CNPJ e Cartórios"],correct:0,feedback:"Empresa Simples de Inovação e Sociedade em Conta de Participação estão expressamente recusadas pela subscrição. Cartórios e Produtor Rural exigem análise criteriosa (não é recusa automática)."}
+];
+
+const VERSIONS_AMIL = [
+  [0,1,2,3,4,5,6,7,8,9,10,11],
+  [8,9,10,11,12,13,14,15,16,17,18,19],
+  [0,2,4,6,8,10,12,14,16,18,19,1],
+  [1,3,5,7,9,11,13,15,17,19,0,2],
+  [4,5,6,9,10,11,12,15,16,17,18,19]
+];
+
+BUILTIN_EXAMS.push({
+  id: 'amil_pme',
+  title: 'Regras de Contratação Amil PME',
+  subtitle: 'Manual do Corretor Amil PME (2 a 99 vidas)',
+  description: 'Avalia o domínio do SDR/Corretor sobre as regras de contratação Amil PME — natureza jurídica, tempo de CNPJ, compulsoriedade, carências e PRCs, CNAEs restritos, dependentes, vigência e multa. Inclui parte discursiva conduzida com a ErmínIA no pós-prova.',
+  active: true,
+  builtin: true,
+  createdAt: '2026-07-20'
+});
+
+// ══════════════════════════════════════════
 //  STORAGE HELPERS
 // ══════════════════════════════════════════
 // Exam definitions (custom exams added by admin)
@@ -1284,6 +1330,10 @@ function getQ(examId){
     const s=localStorage.getItem('pride_q_roteiro_prospeccao');
     return s?JSON.parse(s):JSON.parse(JSON.stringify(BANK_ROTEIRO));
   }
+  if(eid==='amil_pme'){
+    const s=localStorage.getItem('pride_q_amil_pme');
+    return s?JSON.parse(s):JSON.parse(JSON.stringify(BANK_AMIL));
+  }
 
   if(eid===DEFAULT_EXAM_ID){
     const s=localStorage.getItem('pride_q_'+eid);
@@ -1295,11 +1345,11 @@ function getQ(examId){
 function saveQ(q,examId){
   const eid=examId||DEFAULT_EXAM_ID;
   if(hasRemoteBackend()&&PARENT_IS_ADMIN&&!window.__parentAccessToken){ensureParentAuth();showAdmAlert('Aguarde a conexão de administrador para salvar no banco geral. Nada foi salvo só localmente.','err');return false;}
-  if(eid===DEFAULT_EXAM_ID||eid==='bonus_pods'||eid==='roteiro_prospeccao'){localStorage.setItem('pride_q_'+eid,JSON.stringify(q));}
+  if(eid===DEFAULT_EXAM_ID||eid==='bonus_pods'||eid==='roteiro_prospeccao'||eid==='amil_pme'){localStorage.setItem('pride_q_'+eid,JSON.stringify(q));}
   const defs=getExamDefs();const idx=defs.findIndex(e=>e.id===eid);
   if(idx>=0){defs[idx].bank=q;saveExamDefs(defs);}
   if(hasRemoteBackend()&&PARENT_IS_ADMIN){
-    var ex=getExam(eid)||{id:eid,title:eid,active:true,builtin:(eid===DEFAULT_EXAM_ID||eid==='bonus_pods'||eid==='roteiro_prospeccao')};
+    var ex=getExam(eid)||{id:eid,title:eid,active:true,builtin:(eid===DEFAULT_EXAM_ID||eid==='bonus_pods'||eid==='roteiro_prospeccao'||eid==='amil_pme')};
     upsertRemoteExamDefinition(Object.assign({},ex,{bank:q}),function(ok){if(ok)showAdmAlert('Questões salvas no banco geral.');});
   }
   return true;
@@ -1435,6 +1485,7 @@ function examVersionCount(examId){
   if(exam.builtin){
     if(eid==='bonus_pods')return VERSIONS_BONUS.length;
     if(eid==='roteiro_prospeccao')return VERSIONS_ROTEIRO.length;
+    if(eid==='amil_pme')return VERSIONS_AMIL.length;
     return VERSIONS.length;
   }
   return 5;
@@ -1481,6 +1532,10 @@ function getVersionQuestions(ver,examId){
   }
   if(eid==='roteiro_prospeccao'){
     const idx=VERSIONS_ROTEIRO[(ver-1)%VERSIONS_ROTEIRO.length];
+    return idx.filter(i=>i<bank.length).map(i=>bank[i]);
+  }
+  if(eid==='amil_pme'){
+    const idx=VERSIONS_AMIL[(ver-1)%VERSIONS_AMIL.length];
     return idx.filter(i=>i<bank.length).map(i=>bank[i]);
   }
   if(eid===DEFAULT_EXAM_ID){
@@ -3966,7 +4021,8 @@ function buildSystemPrompt(result){
   const suppKeysByExam = {
     'fluxo_oportunidade': ['spin_selling','roteiro_prospeccao_sdr'],
     'bonus_pods':         ['spin_selling'],
-    'roteiro_prospeccao': ['spin_selling']
+    'roteiro_prospeccao': ['spin_selling'],
+    'amil_pme':           []
   };
   const suppKeys = suppKeysByExam[examId] || ['spin_selling'];
   suppKeys.forEach(function(k){
@@ -3976,14 +4032,15 @@ function buildSystemPrompt(result){
   // Fontes anexadas pelo admin — filtradas para esta prova.
   // Regra: se o título mencionar um exam_id específico, só injeta se bater com a prova atual.
   // Caso contrário (universal — SPIN, notas gerais), entra sempre.
-  const KNOWN_EXAM_IDS = ['fluxo_oportunidade','bonus_pods','roteiro_prospeccao'];
+  const KNOWN_EXAM_IDS = ['fluxo_oportunidade','bonus_pods','roteiro_prospeccao','amil_pme'];
   function sourceBelongsToCurrentExam(src, currentExamId){
     var title=(src.title||'').toLowerCase();
     // Aliases de prova → palavras-chave que indicam pertencimento exclusivo
     var aliases = {
       'fluxo_oportunidade': ['fluxo_oportunidade','fluxo de oportunidade','fluxo de atendimento','cadência','cadencia','playbook'],
       'bonus_pods':         ['bonus_pods','pods','pilares','bônus'],
-      'roteiro_prospeccao': ['roteiro_prospeccao','roteiro de prospec','prospecção','prospeccao','roteiro de ouro','sdr']
+      'roteiro_prospeccao': ['roteiro_prospeccao','roteiro de prospec','prospecção','prospeccao','roteiro de ouro','sdr'],
+      'amil_pme':           ['amil_pme','amil pme','amil','manual do corretor','carência','carencia','prc 6','compulsoriedade','mei','cnae','porte i','porte ii']
     };
     var owner=null;
     Object.keys(aliases).forEach(function(eid){
@@ -4013,6 +4070,58 @@ Quando você explicar um dia específico do fluxo (Dia 1, Dia 2, Dia 4, Dia 6, D
 - Para os 3 Mandamentos: [SLIDE:mandamentos] | Panorama: [SLIDE:panorama] | Matriz: [SLIDE:diagnostico]
 Use apenas quando estiver realmente explicando aquele dia/conceito — não force.`
     : 'OBS.: Esta prova não possui slides associados — NÃO use tags [SLIDE:xxx] em hipótese alguma.';
+
+  // ── Bloco de discursivas por prova (parte oficial da avaliação, conduzida aqui no pós-prova) ──
+  const discursivasByExam = {
+    'amil_pme': `PARTE DISSERTATIVA — OBRIGATÓRIA (faz parte da avaliação Amil PME)
+
+A prova Amil PME possui 2 questões discursivas que DEVEM ser aplicadas por você,
+ErmínIA, como parte integrante da avaliação — antes mesmo de encerrar o debrief.
+
+FLUXO DE APLICAÇÃO:
+1. Depois do 1º tópico de correção das erradas (ou já na 1ª mensagem, se o
+   candidato acertou tudo), sinalize com naturalidade: "Antes de fechar, faltam
+   as 2 discursivas da prova. Vamos uma de cada vez, tá bom?".
+2. Aplique UMA POR VEZ. Só avance para a segunda depois que o candidato
+   responder a primeira.
+3. Avalie a resposta com base no MATERIAL OFICIAL desta prova (não invente).
+4. Se estiver incompleta ou errada, oriente o ponto correto e peça para
+   reformular. Só considere "respondida" quando o candidato demonstrar o
+   conceito central.
+
+DISCURSIVA 1:
+"Explique a regra de obrigatoriedade para a contratação de planos por
+empresas MEI."
+Resposta esperada: Empresas MEI só são aceitas se o sócio/proprietário aderir
+ao plano OBRIGATORIAMENTE. Em um contrato de 2 vidas, uma delas precisa ser
+o dono do MEI. (Reforçar também o tempo mínimo de 180 dias de CNPJ do MEI.)
+
+DISCURSIVA 2:
+"Por que empresas de 'Segurança Armada' e 'Motoboys/Delivery' possuem
+restrição de comercialização?"
+Resposta esperada: Devido à natureza da atividade econômica (CNAE) ser
+considerada de ALTO RISCO OCUPACIONAL, o que gera restrição técnica na
+aceitação pela subscrição da operadora.
+
+REGRA DE CONVERSÃO EM NOTA:
+- Se ambas as discursivas foram bem respondidas: reforce que o desempenho
+  ficou consolidado.
+- Se uma ou as duas falharem no conceito central mesmo após reformulação:
+  registre no encerramento que a parte dissertativa não foi cumprida e que
+  o corretor precisa revisar o Manual do Corretor Amil PME antes de nova
+  tentativa.`
+  };
+  const discursivasBlock = discursivasByExam[examId] || '';
+
+  // ── Reforço sobre discutir os erros com a ErmínIA ──
+  const errosReforcoBlock = `REFORÇO OBRIGATÓRIO SOBRE OS ERROS (todas as provas):
+Em algum momento do debrief (idealmente logo após o 1º erro trabalhado e
+novamente no encerramento), REFORCE ao candidato — com palavras suas, sem
+robotizar — que CONVERSAR SOBRE CADA ERRO COM VOCÊ É PARTE FUNDAMENTAL DA
+AVALIAÇÃO e do desenvolvimento dele sobre o tema. Não é opcional: é assim
+que ele evolui de verdade no conteúdo. Se o candidato tentar encerrar sem
+ter discutido um erro, retome com carinho e firmeza: "espera, esse ponto
+aqui a gente precisa fechar juntos — é onde você mais evolui".`;
 
   // Pre-computed
   const _topicos = wrongList
@@ -4092,6 +4201,10 @@ REGRAS ABSOLUTAS — NUNCA QUEBRE:
 6. Responda em português brasileiro, em tom de conversa.
 
 ${slidesBlock}
+
+${errosReforcoBlock}
+
+${discursivasBlock}
 
 ══════════════════════════════════════
 PROTOCOLO DE COMPORTAMENTO
