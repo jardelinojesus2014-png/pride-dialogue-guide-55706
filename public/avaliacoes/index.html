@@ -4021,7 +4021,8 @@ function buildSystemPrompt(result){
   const suppKeysByExam = {
     'fluxo_oportunidade': ['spin_selling','roteiro_prospeccao_sdr'],
     'bonus_pods':         ['spin_selling'],
-    'roteiro_prospeccao': ['spin_selling']
+    'roteiro_prospeccao': ['spin_selling'],
+    'amil_pme':           []
   };
   const suppKeys = suppKeysByExam[examId] || ['spin_selling'];
   suppKeys.forEach(function(k){
@@ -4031,14 +4032,15 @@ function buildSystemPrompt(result){
   // Fontes anexadas pelo admin — filtradas para esta prova.
   // Regra: se o título mencionar um exam_id específico, só injeta se bater com a prova atual.
   // Caso contrário (universal — SPIN, notas gerais), entra sempre.
-  const KNOWN_EXAM_IDS = ['fluxo_oportunidade','bonus_pods','roteiro_prospeccao'];
+  const KNOWN_EXAM_IDS = ['fluxo_oportunidade','bonus_pods','roteiro_prospeccao','amil_pme'];
   function sourceBelongsToCurrentExam(src, currentExamId){
     var title=(src.title||'').toLowerCase();
     // Aliases de prova → palavras-chave que indicam pertencimento exclusivo
     var aliases = {
       'fluxo_oportunidade': ['fluxo_oportunidade','fluxo de oportunidade','fluxo de atendimento','cadência','cadencia','playbook'],
       'bonus_pods':         ['bonus_pods','pods','pilares','bônus'],
-      'roteiro_prospeccao': ['roteiro_prospeccao','roteiro de prospec','prospecção','prospeccao','roteiro de ouro','sdr']
+      'roteiro_prospeccao': ['roteiro_prospeccao','roteiro de prospec','prospecção','prospeccao','roteiro de ouro','sdr'],
+      'amil_pme':           ['amil_pme','amil pme','amil','manual do corretor','carência','carencia','prc 6','compulsoriedade','mei','cnae','porte i','porte ii']
     };
     var owner=null;
     Object.keys(aliases).forEach(function(eid){
