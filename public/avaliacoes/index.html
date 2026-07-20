@@ -1345,7 +1345,7 @@ function getQ(examId){
 function saveQ(q,examId){
   const eid=examId||DEFAULT_EXAM_ID;
   if(hasRemoteBackend()&&PARENT_IS_ADMIN&&!window.__parentAccessToken){ensureParentAuth();showAdmAlert('Aguarde a conexão de administrador para salvar no banco geral. Nada foi salvo só localmente.','err');return false;}
-  if(eid===DEFAULT_EXAM_ID||eid==='bonus_pods'||eid==='roteiro_prospeccao'){localStorage.setItem('pride_q_'+eid,JSON.stringify(q));}
+  if(eid===DEFAULT_EXAM_ID||eid==='bonus_pods'||eid==='roteiro_prospeccao'||eid==='amil_pme'){localStorage.setItem('pride_q_'+eid,JSON.stringify(q));}
   const defs=getExamDefs();const idx=defs.findIndex(e=>e.id===eid);
   if(idx>=0){defs[idx].bank=q;saveExamDefs(defs);}
   if(hasRemoteBackend()&&PARENT_IS_ADMIN){
