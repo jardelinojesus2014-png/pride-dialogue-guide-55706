@@ -310,6 +310,47 @@ export type Database = {
         }
         Relationships: []
       }
+      category_topics: {
+        Row: {
+          body: string | null
+          category_id: string
+          created_at: string
+          created_by: string | null
+          display_order: number
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          category_id: string
+          created_at?: string
+          created_by?: string | null
+          display_order?: number
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          category_id?: string
+          created_at?: string
+          created_by?: string | null
+          display_order?: number
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "category_topics_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "training_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content_folders: {
         Row: {
           created_at: string
@@ -1591,6 +1632,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      training_events: {
+        Row: {
+          created_at: string
+          id: string
+          ref_id: string | null
+          ref_name: string | null
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ref_id?: string | null
+          ref_name?: string | null
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ref_id?: string | null
+          ref_name?: string | null
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: []
       }
       user_audio_files: {
         Row: {
