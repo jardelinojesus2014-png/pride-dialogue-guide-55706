@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Plus, Trash2, Edit2, ChevronUp, FolderOpen, Building2, BookOpen, Video, FileText, Headphones, Image, X, Save, GraduationCap, Construction } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Trash2, Edit2, FolderOpen, Building2, BookOpen, Video, FileText, Headphones, Image, X, Save, GraduationCap, Construction, Star, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,7 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useTrainingCategories, useTrainingCategoryContent, TrainingCategory } from '@/hooks/useTrainingCategories';
-import { OperadorasSection } from './OperadorasSection';
+import { useTrainingSearch, TrainingSearchItem } from '@/hooks/useTrainingSearch';
+import { useTrainingActivity, ActivityItem } from '@/hooks/useTrainingActivity';
+import { useAuth } from '@/hooks/useAuth';
+import { TrainingSearchBar } from './TrainingSearchBar';
+import { TrainingQuickAccess } from './TrainingQuickAccess';
+import { TrainingAdminPanel } from './TrainingAdminPanel';
+import { logTrainingEvent } from '@/lib/trainingEvents';
 
 interface TrainingCategoriesSectionProps {
   isAdmin: boolean;
@@ -25,14 +32,18 @@ const ICON_OPTIONS = [
   { value: 'graduation-cap', label: 'Graduação', icon: GraduationCap },
 ];
 
-const getIconComponent = (iconName: string) => {
+export const getIconComponent = (iconName: string) => {
   const iconOption = ICON_OPTIONS.find(opt => opt.value === iconName);
   return iconOption?.icon || FolderOpen;
 };
 
 export const TrainingCategoriesSection = ({ isAdmin, userViewMode }: TrainingCategoriesSectionProps) => {
   const { categories, loading, addCategory, updateCategory, deleteCategory } = useTrainingCategories();
-  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+  const { items: searchItems } = useTrainingSearch();
+  const { user } = useAuth();
+  const { favorites, recents, isFavorite, toggleFavorite, removeFavorite, addRecent, clearRecents } = useTrainingActivity(user?.id);
+  const navigate = useNavigate();
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<TrainingCategory | null>(null);
   const [newTitle, setNewTitle] = useState('');
@@ -83,6 +94,64 @@ export const TrainingCategoriesSection = ({ isAdmin, userViewMode }: TrainingCat
     setNewBannerSubtitle(category.banner_subtitle || '');
   };
 
+  // Navega para a página da categoria (Central de conhecimento)
+  const goToCategory = (categoryId: string) => navigate(`/central/${categoryId}`);
+
+  // Navega direto para a página (documentação) da operadora
+  const goToOperadora = (operadoraId: string) => navigate(`/operadora/${operadoraId}`);
+
+  // Conversores para o formato de favoritos/recentes
+  const categoryActivity = (category: TrainingCategory): ActivityItem => ({
+    id: `category:${category.id}`,
+    kind: 'category',
+    title: category.title,
+    refId: category.id,
+  });
+
+  const searchItemToActivity = (it: TrainingSearchItem): ActivityItem => {
+    if (it.kind === 'operadora') {
+      return { id: `operadora:${it.parentId}`, kind: 'operadora', title: it.title, refId: it.parentId };
+    }
+    if (it.kind === 'category') {
+      return { id: `category:${it.parentId}`, kind: 'category', title: it.title, refId: it.parentId };
+    }
+    return {
+      id: `content:${it.key}`,
+      kind: 'content',
+      title: it.title,
+      subtitle: it.parentName,
+      contentType: it.contentType,
+      fileUrl: it.fileUrl,
+    };
+  };
+
+  // Abre um item (favorito, recente ou resultado de busca) e registra em "recentes"
+  const openActivity = (item: ActivityItem) => {
+    if (item.kind === 'content' && item.fileUrl) {
+      window.open(item.fileUrl, '_blank', 'noopener,noreferrer');
+    } else if (item.kind === 'operadora' && item.refId) {
+      goToOperadora(item.refId);
+    } else if (item.kind === 'category' && item.refId) {
+      goToCategory(item.refId);
+    }
+    addRecent(item);
+  };
+
+  const handleSearchSelect = (it: TrainingSearchItem) => {
+    if (it.kind === 'topic' && it.parentId) {
+      const anchor = it.topicId ? `#topic-${it.topicId}` : '';
+      if (it.parentType === 'category') {
+        navigate(`/central/${it.parentId}${anchor}`);
+        addRecent({ id: `category:${it.parentId}`, kind: 'category', title: it.parentName || it.title, refId: it.parentId });
+      } else {
+        navigate(`/operadora/${it.parentId}${anchor}`);
+        addRecent({ id: `operadora:${it.parentId}`, kind: 'operadora', title: it.parentName || it.title, refId: it.parentId });
+      }
+      return;
+    }
+    openActivity(searchItemToActivity(it));
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -93,16 +162,27 @@ export const TrainingCategoriesSection = ({ isAdmin, userViewMode }: TrainingCat
 
   return (
     <div className="space-y-6">
-      {/* Admin Controls */}
+      {/* Controles de admin: painel de analytics + nova categoria */}
       {showAdminControls && (
-        <div className="flex justify-end">
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                <Plus className="w-4 h-4 mr-2" />
-                Nova Categoria
-              </Button>
-            </DialogTrigger>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => setShowAdminPanel((v) => !v)}
+              className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-sm font-medium transition-colors ${
+                showAdminPanel ? 'bg-accent text-accent-foreground' : 'bg-accent/10 text-primary hover:bg-accent/20'
+              }`}
+            >
+              <BarChart3 className="w-4 h-4" />
+              {showAdminPanel ? 'Ocultar painel' : 'Painel do admin'}
+            </button>
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-muted-foreground hover:text-foreground">
+                  <Plus className="w-3.5 h-3.5" />
+                  Nova Categoria
+                </Button>
+              </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Adicionar Nova Categoria de Treinamento</DialogTitle>
@@ -174,8 +254,29 @@ export const TrainingCategoriesSection = ({ isAdmin, userViewMode }: TrainingCat
               </div>
             </DialogContent>
           </Dialog>
+          </div>
+          {showAdminPanel && <TrainingAdminPanel />}
         </div>
       )}
+
+      {/* Barra de pesquisa — grande e centralizada */}
+      <div className="w-full max-w-2xl mx-auto">
+        <TrainingSearchBar
+          items={searchItems}
+          onSelect={handleSearchSelect}
+          onSearch={(q) => logTrainingEvent(user?.id, 'search', null, q)}
+          className="w-full"
+        />
+      </div>
+
+      {/* Favoritos + Acessados recentemente */}
+      <TrainingQuickAccess
+        favorites={favorites}
+        recents={recents}
+        onOpen={openActivity}
+        onRemoveFavorite={removeFavorite}
+        onClearRecents={clearRecents}
+      />
 
       {/* Edit Dialog */}
       <Dialog open={!!editingCategory} onOpenChange={(open) => !open && setEditingCategory(null)}>
@@ -252,33 +353,51 @@ export const TrainingCategoriesSection = ({ isAdmin, userViewMode }: TrainingCat
         </DialogContent>
       </Dialog>
 
-      {/* Categories Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Áreas de conhecimento */}
+      <h2 className="text-base font-bold text-foreground pt-2 flex items-center gap-2">
+        <span className="inline-block w-1 h-5 rounded-full bg-accent" />
+        Áreas de conhecimento
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {categories.map((category) => {
           const IconComponent = getIconComponent(category.icon);
-          const isExpanded = expandedCategory === category.id;
 
           return (
             <div key={category.id} className="relative group">
               <button
-                onClick={() => setExpandedCategory(isExpanded ? null : category.id)}
-                className={`w-full p-6 rounded-lg border-2 transition-all duration-200 hover:shadow-lg hover:scale-105 bg-card ${
-                  isExpanded
-                    ? 'border-accent ring-2 ring-accent/50 shadow-lg'
-                    : 'border-border hover:border-accent/50'
-                }`}
+                onClick={() => {
+                  addRecent(categoryActivity(category));
+                  goToCategory(category.id);
+                }}
+                className="w-full h-full px-6 py-7 rounded-2xl border border-border bg-card text-center transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 hover:border-accent/50"
               >
                 <div className="flex flex-col items-center gap-3">
-                  <div className="p-3 rounded-full bg-accent/10">
-                    <IconComponent className="w-8 h-8 text-accent" />
+                  <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center transition-transform duration-200 group-hover:scale-110">
+                    <IconComponent className="w-6 h-6 text-accent" />
                   </div>
-                  <h3 className="font-bold text-center text-foreground">{category.title}</h3>
+                  <h3 className="font-bold text-lg text-primary">{category.title}</h3>
                   {category.description && (
-                    <p className="text-sm text-muted-foreground text-center line-clamp-2">
+                    <p className="text-sm text-muted-foreground line-clamp-2 max-w-md">
                       {category.description}
                     </p>
                   )}
                 </div>
+              </button>
+
+              {/* Favoritar (todos os usuários) */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleFavorite(categoryActivity(category));
+                }}
+                className={`absolute top-2 left-2 p-1.5 rounded-full transition-all z-10 ${
+                  isFavorite(`category:${category.id}`)
+                    ? 'text-accent'
+                    : 'text-muted-foreground/40 opacity-0 group-hover:opacity-100 hover:text-accent'
+                }`}
+                title={isFavorite(`category:${category.id}`) ? 'Remover dos favoritos' : 'Favoritar'}
+              >
+                <Star className={`w-4 h-4 ${isFavorite(`category:${category.id}`) ? 'fill-accent' : ''}`} />
               </button>
 
               {/* Admin actions */}
@@ -312,52 +431,6 @@ export const TrainingCategoriesSection = ({ isAdmin, userViewMode }: TrainingCat
           );
         })}
       </div>
-
-      {/* Expanded Category Content */}
-      {expandedCategory && (() => {
-        const expandedCat = categories.find(c => c.id === expandedCategory);
-        return (
-          <div className="mt-6 space-y-4">
-            {/* Under Construction Banner */}
-            {expandedCat?.show_banner && (
-              <div className="bg-card rounded-lg shadow-xl p-8 text-center border-2 border-border">
-                <div className="inline-block bg-gradient-to-r from-orange-500 to-red-600 rounded-full p-4 mb-4 shadow-2xl">
-                  <Construction className="w-10 h-10 text-white" />
-                </div>
-                <h2 className="text-2xl font-black text-primary mb-2">🚧 Em Construção</h2>
-                {expandedCat.banner_subtitle && (
-                  <p className="text-lg text-muted-foreground">
-                    {expandedCat.banner_subtitle}
-                  </p>
-                )}
-              </div>
-            )}
-            
-            {expandedCat?.is_operadoras_section ? (
-              <OperadorasSection isAdmin={isAdmin} userViewMode={userViewMode} />
-            ) : (
-              <CategoryContentSection
-                categoryId={expandedCategory}
-                categoryName={expandedCat?.title || ''}
-                showAdminControls={showAdminControls}
-                onClose={() => setExpandedCategory(null)}
-              />
-            )}
-          </div>
-        );
-      })()}
-
-      {/* Minimize Button */}
-      {expandedCategory && (
-        <button
-          onClick={() => setExpandedCategory(null)}
-          className="fixed bottom-6 right-6 bg-gradient-hero hover:opacity-90 text-accent font-bold px-4 py-3 rounded-full shadow-2xl flex items-center gap-2 transition-all duration-300 hover:scale-110 z-50 border-2 border-accent"
-          title="Minimizar todas as seções"
-        >
-          <ChevronUp className="w-5 h-5" />
-          <span className="hidden sm:inline">Minimizar Tudo</span>
-        </button>
-      )}
     </div>
   );
 };
@@ -370,7 +443,7 @@ interface CategoryContentSectionProps {
   onClose: () => void;
 }
 
-const CategoryContentSection = ({ categoryId, categoryName, showAdminControls, onClose }: CategoryContentSectionProps) => {
+export const CategoryContentSection = ({ categoryId, categoryName, showAdminControls, onClose }: CategoryContentSectionProps) => {
   const { content, loading, addContent, deleteContent } = useTrainingCategoryContent(categoryId);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [contentType, setContentType] = useState<'video' | 'pdf' | 'photo' | 'audio'>('video');

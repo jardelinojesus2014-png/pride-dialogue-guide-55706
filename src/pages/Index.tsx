@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Moon, Sun, LogOut, Shield, Eye, EyeOff, Star, ClipboardList, BookOpen, Workflow, ChevronUp, GraduationCap, Palette, ChevronLeft, ChevronRight, LayoutDashboard } from 'lucide-react';
+import { Star, ClipboardList, BookOpen, Workflow, ChevronUp, GraduationCap, Palette, ChevronLeft, ChevronRight, LayoutDashboard, Pencil, Check } from 'lucide-react';
 import { DashboardSection } from '@/components/DashboardSection';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useSectionTitles } from '@/hooks/useSectionTitles';
 import { useNavigate } from 'react-router-dom';
-import { HowToUseVideoDialog } from '@/components/HowToUseVideoDialog';
+import { AppHeader } from '@/components/AppHeader';
 import { GoldenRule } from '@/components/GoldenRule';
 import { ScriptSections } from '@/components/ScriptSections';
 import { CadenciaSections } from '@/components/CadenciaSections';
@@ -34,23 +34,27 @@ import { PurposePopup } from '@/components/PurposePopup';
 import { TrainingPopup } from '@/components/TrainingPopup';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import logoPride from '@/assets/Logo_Pride.png';
 import logoPrideGold from '@/assets/Logo_Pride-2.png';
 import logoPrideCircle from '@/assets/logo-pride-circle.png';
 
 
 const Index = () => {
-  const { signOut, user } = useAuth();
+  const { user } = useAuth();
   const { isAdmin } = useIsAdmin();
   const { data: sectionTitles = {} } = useSectionTitles();
   const navigate = useNavigate();
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() =>
+    document.documentElement.classList.contains('dark'),
+  );
   const [userViewMode, setUserViewMode] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [activeTab, setActiveTab] = useState<string>(
+    () => new URLSearchParams(window.location.search).get('tab') || 'dashboard'
+  );
   const [showMotivationalPopup, setShowMotivationalPopup] = useState(false);
   const [showPurposePopup, setShowPurposePopup] = useState(false);
   const [showTrainingPopup, setShowTrainingPopup] = useState(false);
   const [fluxoExpandedItems, setFluxoExpandedItems] = useState<string[]>([]);
+  const [tabEditMode, setTabEditMode] = useState(false);
   const queryClient = useQueryClient();
 
   // Avaliacoes iframe integration: auto-resize + quiz lock
@@ -259,11 +263,6 @@ const Index = () => {
   const canReorder = isAdmin && !userViewMode;
 
 
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    document.documentElement.classList.toggle('dark');
-  };
-
   const toggleUserViewMode = () => {
     setUserViewMode(!userViewMode);
   };
@@ -272,66 +271,7 @@ const Index = () => {
     <div className="min-h-screen transition-colors duration-300">
       <div className="min-h-screen bg-gradient-subtle p-4 sm:p-6">
         <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <header className="bg-gradient-hero rounded-lg shadow-xl p-6 sm:p-8 mb-6">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div className="flex items-center gap-4">
-                <img src={logoPride} alt="Pride Consultoria" className="w-16 h-16 sm:w-20 sm:h-20 object-contain" />
-                <div>
-                  <h1 className="text-2xl sm:text-4xl font-black text-accent">
-                    PRIDE CONSULTORIA
-                  </h1>
-                  <p className="text-accent/80 font-semibold text-sm sm:text-base mt-1">
-                    Plataforma de Desenvolvimento
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <HowToUseVideoDialog isAdmin={isAdmin} />
-                
-                {isAdmin && (
-                  <button
-                    onClick={() => navigate('/admin')}
-                    className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
-                    title="Painel Admin"
-                  >
-                    <Shield className="w-5 h-5" />
-                    <span className="hidden sm:inline">Admin</span>
-                  </button>
-                )}
-
-                {isAdmin && (
-                  <button
-                    onClick={toggleUserViewMode}
-                    className={`${
-                      userViewMode 
-                        ? 'bg-green-500 hover:bg-green-600 text-white' 
-                        : 'bg-primary/10 hover:bg-primary/20 text-accent'
-                    } font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg`}
-                    title={userViewMode ? 'Modo Admin' : 'Visualizar como Usuário'}
-                  >
-                    {userViewMode ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                )}
-                <button
-                  onClick={toggleDarkMode}
-                  className="bg-primary/10 hover:bg-primary/20 text-accent font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
-                >
-                  {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                </button>
-                <button
-                  onClick={() => signOut()}
-                  className="bg-destructive hover:bg-destructive/90 text-destructive-foreground font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
-                  title="Sair"
-                >
-                  <LogOut className="w-5 h-5" />
-                  <span className="hidden sm:inline">Sair</span>
-                </button>
-              </div>
-            </div>
-          </header>
-
-          {/* Tabs Navigation */}
+          {/* Cabeçalho + navegação de abas — congelados juntos no topo */}
           <Tabs value={activeTab} onValueChange={(v) => {
             if (quizActive && v !== 'avaliacoes') {
               window.alert('Você está realizando uma prova. Finalize ou aguarde o envio automático antes de trocar de aba.');
@@ -339,7 +279,15 @@ const Index = () => {
             }
             setActiveTab(v);
           }} className="w-full">
-            <TabsList className="w-full flex flex-nowrap items-center justify-start sm:justify-center mb-6 h-auto p-2 bg-gradient-hero rounded-lg gap-2 overflow-x-auto">
+            <div data-sticky-header className="sticky top-0 z-50 -mx-4 sm:-mx-6 -mt-4 sm:-mt-6 px-4 sm:px-6 pt-4 sm:pt-6 pb-2 bg-gradient-subtle">
+              <div className="mb-3">
+                <AppHeader
+                  userViewMode={userViewMode}
+                  onToggleUserViewMode={toggleUserViewMode}
+                  onDarkModeChange={setDarkMode}
+                />
+              </div>
+              <TabsList className="w-full flex flex-nowrap items-center justify-start sm:justify-center mb-0 h-auto p-2 bg-gradient-hero rounded-lg gap-2 overflow-x-auto shadow-xl">
               {orderedTabs.map((tab, position) => {
                 const titleProps = {
                   sectionKey: tab.key,
@@ -348,12 +296,11 @@ const Index = () => {
                   isAdmin,
                   userViewMode,
                   icon: tab.icon,
-                  iconOnly: tab.key !== 'tab_dashboard',
-                  ...(tab.showShortOnMobile === false ? { showShortOnMobile: false } : {}),
+                  showEdit: canReorder && tabEditMode,
                 };
 
 
-                const reorderControls = canReorder ? (
+                const reorderControls = canReorder && tabEditMode ? (
                   <div className="flex items-center gap-0.5 ml-1" onClick={(e) => e.stopPropagation()}>
                     <button
                       type="button"
@@ -380,7 +327,7 @@ const Index = () => {
                   return (
                     <div
                       key={tab.key}
-                      className="flex-shrink-0 text-sm sm:text-base font-black py-2.5 px-3 text-accent/70 hover:bg-accent hover:text-primary rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      className="flex-shrink-0 min-w-[72px] py-1.5 px-2 text-accent/70 hover:bg-accent/20 rounded-lg transition-all flex items-center justify-center cursor-pointer"
                       onClick={tab.onClick}
                     >
                       <EditableTabTitle {...titleProps} />
@@ -389,7 +336,7 @@ const Index = () => {
                   );
                 }
 
-                const triggerClass = "flex-shrink-0 text-sm sm:text-base font-black py-2.5 px-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 data-[state=inactive]:hover:bg-accent/20 rounded-lg transition-all";
+                const triggerClass = "flex-shrink-0 min-w-[72px] py-1.5 px-2 rounded-lg data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=inactive]:text-accent/70 data-[state=inactive]:hover:bg-accent/20 transition-all";
 
 
                 return (
@@ -399,19 +346,36 @@ const Index = () => {
                   </TabsTrigger>
                 );
               })}
+
+              {canReorder && (
+                <button
+                  type="button"
+                  onClick={() => setTabEditMode((v) => !v)}
+                  className={`flex-shrink-0 ml-1 flex items-center gap-1.5 py-2.5 px-3 rounded-lg text-sm font-bold transition-all ${
+                    tabEditMode
+                      ? 'bg-accent text-accent-foreground'
+                      : 'text-accent/70 hover:bg-accent/20'
+                  }`}
+                  title={tabEditMode ? 'Concluir edição das abas' : 'Editar e reordenar abas'}
+                >
+                  {tabEditMode ? <Check className="w-4 h-4" /> : <Pencil className="w-4 h-4" />}
+                  <span className="hidden sm:inline">{tabEditMode ? 'Concluir' : 'Editar abas'}</span>
+                </button>
+              )}
             </TabsList>
+            </div>
 
             <TabsContent value="dashboard" className="mt-0" data-section="dashboard-tab">
               <EditableBanner sectionKey="banner_dashboard" isAdmin={isAdmin} userViewMode={userViewMode} />
-              <div className="mb-6 bg-gradient-hero rounded-xl shadow-lg p-6">
+              <div className="mb-6 pl-3 border-l-4 border-accent">
                 <EditableSectionHeader
                   sectionKey="dashboard_header"
                   title={sectionTitles['dashboard_header']?.title || 'Dashboard'}
                   subtitle={sectionTitles['dashboard_header']?.subtitle || 'Sumário de toda a plataforma — clique em um card para acessar a aba.'}
                   isAdmin={isAdmin}
                   userViewMode={userViewMode}
-                  titleClassName="text-2xl font-black text-accent mb-2"
-                  subtitleClassName="text-accent/80"
+                  titleClassName="text-2xl font-black text-primary"
+                  subtitleClassName="text-muted-foreground mt-1"
                 />
               </div>
               <DashboardSection
@@ -464,7 +428,7 @@ const Index = () => {
 
               {/* Admin Audio Section */}
               <Accordion type="multiple" className="mb-4" defaultValue={[]}>
-                <AccordionItem value="admin-audio" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="admin-audio">
+                <AccordionItem value="admin-audio" className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden hover:border-accent/40 transition-colors" data-section="admin-audio">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <EditableAccordionTitle
                       sectionKey="accordion_audios_treinamento"
@@ -481,7 +445,7 @@ const Index = () => {
 
               {/* Video Section */}
               <Accordion type="multiple" className="mb-4" defaultValue={[]}>
-                <AccordionItem value="videos" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="videos">
+                <AccordionItem value="videos" className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden hover:border-accent/40 transition-colors" data-section="videos">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <EditableAccordionTitle
                       sectionKey="accordion_videos_treinamento"
@@ -500,10 +464,16 @@ const Index = () => {
               <div className="mb-6 flex justify-center">
                 <button
                   onClick={() => setShowMotivationalPopup(true)}
-                  className="bg-gradient-to-r from-orange-500 via-red-600 to-purple-700 hover:from-orange-600 hover:via-red-700 hover:to-purple-800 text-white font-black px-8 py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-sm sm:text-base relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-200%] before:animate-[shimmer_3s_ease-in-out_infinite]"
+                  className="group inline-flex items-center gap-3 rounded-2xl border border-orange-200 dark:border-orange-900/60 bg-orange-50/70 dark:bg-orange-950/20 px-5 py-3 hover:bg-orange-100/80 hover:border-orange-300 dark:hover:border-orange-800 transition-all"
                   title="Mensagem motivacional"
                 >
-                  🔥 Em caso de insegurança ou medo - CLIQUE AQUI
+                  <span className="flex items-center justify-center w-9 h-9 rounded-full bg-orange-100 dark:bg-orange-900/40 text-lg group-hover:scale-110 transition-transform">
+                    🔥
+                  </span>
+                  <span className="text-sm sm:text-base font-semibold text-orange-700 dark:text-orange-300 text-left">
+                    Em caso de insegurança ou medo,{' '}
+                    <span className="underline underline-offset-2">clique aqui</span>
+                  </span>
                 </button>
               </div>
             </TabsContent>
@@ -532,7 +502,7 @@ const Index = () => {
               <EditableBanner sectionKey="banner_pride" isAdmin={isAdmin} userViewMode={userViewMode} />
               
               <Accordion type="multiple" className="w-full space-y-4">
-                <AccordionItem value="website" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="website">
+                <AccordionItem value="website" className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden hover:border-accent/40 transition-colors" data-section="website">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <EditableAccordionTitle
                       sectionKey="accordion_site_pride"
@@ -546,7 +516,7 @@ const Index = () => {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="reviews" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="reviews">
+                <AccordionItem value="reviews" className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden hover:border-accent/40 transition-colors" data-section="reviews">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <EditableAccordionTitle
                       sectionKey="accordion_avaliacoes_google"
@@ -560,7 +530,7 @@ const Index = () => {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="institutional" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="institutional">
+                <AccordionItem value="institutional" className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden hover:border-accent/40 transition-colors" data-section="institutional">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <EditableAccordionTitle
                       sectionKey="accordion_video_institucional"
@@ -574,7 +544,7 @@ const Index = () => {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="mission" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="mission-vision">
+                <AccordionItem value="mission" className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden hover:border-accent/40 transition-colors" data-section="mission-vision">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <EditableAccordionTitle
                       sectionKey="accordion_missao_visao"
@@ -593,10 +563,16 @@ const Index = () => {
               <div className="mt-6 mb-6 flex justify-center">
                 <button
                   onClick={() => setShowTrainingPopup(true)}
-                  className="bg-gradient-to-r from-green-500 via-purple-600 to-orange-600 hover:from-green-600 hover:via-purple-700 hover:to-orange-700 text-white font-black px-8 py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-sm sm:text-base relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-200%] before:animate-[shimmer_3s_ease-in-out_infinite]"
+                  className="group inline-flex items-center gap-3 rounded-2xl border border-orange-200 dark:border-orange-900/60 bg-orange-50/70 dark:bg-orange-950/20 px-5 py-3 hover:bg-orange-100/80 hover:border-orange-300 dark:hover:border-orange-800 transition-all"
                   title="Mensagem de treino"
                 >
-                  🎯 Não sabe o que fazer? - CLIQUE AQUI
+                  <span className="flex items-center justify-center w-9 h-9 rounded-full bg-orange-100 dark:bg-orange-900/40 text-lg group-hover:scale-110 transition-transform">
+                    🎯
+                  </span>
+                  <span className="text-sm sm:text-base font-semibold text-orange-700 dark:text-orange-300 text-left">
+                    Não sabe o que fazer?{' '}
+                    <span className="underline underline-offset-2">clique aqui</span>
+                  </span>
                 </button>
               </div>
             </TabsContent>
@@ -610,7 +586,7 @@ const Index = () => {
                 value={fluxoExpandedItems}
                 onValueChange={setFluxoExpandedItems}
               >
-                <AccordionItem value="qualification" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="qualification">
+                <AccordionItem value="qualification" className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden hover:border-accent/40 transition-colors" data-section="qualification">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <EditableAccordionTitle
                       sectionKey="accordion_info_qualificacao"
@@ -624,7 +600,7 @@ const Index = () => {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="pdf" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="pdfs">
+                <AccordionItem value="pdf" className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden hover:border-accent/40 transition-colors" data-section="pdfs">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <EditableAccordionTitle
                       sectionKey="accordion_materiais_pdf"
@@ -638,7 +614,7 @@ const Index = () => {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="audio" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="fluxo-audio">
+                <AccordionItem value="audio" className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden hover:border-accent/40 transition-colors" data-section="fluxo-audio">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <EditableAccordionTitle
                       sectionKey="accordion_audios_fluxo"
@@ -652,7 +628,7 @@ const Index = () => {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="video" className="bg-card rounded-xl shadow-lg border-2 border-primary/30 overflow-hidden hover:border-primary/50 transition-colors" data-section="fluxo-video">
+                <AccordionItem value="video" className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden hover:border-accent/40 transition-colors" data-section="fluxo-video">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <EditableAccordionTitle
                       sectionKey="accordion_videos_fluxo"
@@ -666,7 +642,7 @@ const Index = () => {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="purpose-answers" className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 rounded-xl shadow-lg border-2 border-orange-200/50 dark:border-orange-700/30 overflow-hidden hover:border-orange-300/70 dark:hover:border-orange-600/50 transition-colors" data-section="purpose-reflections">
+                <AccordionItem value="purpose-answers" className="bg-orange-50/50 dark:bg-orange-950/20 rounded-2xl border border-orange-200 dark:border-orange-900/60 shadow-sm overflow-hidden hover:border-orange-300 dark:hover:border-orange-800 transition-colors" data-section="purpose-reflections">
                   <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-primary/5 transition-colors">
                     <EditableAccordionTitle
                       sectionKey="accordion_reflexoes_proposito"
@@ -697,10 +673,16 @@ const Index = () => {
               <div className="mt-6 mb-6 flex justify-center">
                 <button
                   onClick={() => setShowPurposePopup(true)}
-                  className="bg-gradient-to-r from-orange-500 via-red-600 to-purple-700 hover:from-orange-600 hover:via-red-700 hover:to-purple-800 text-white font-black px-8 py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-sm sm:text-base relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-200%] before:animate-[shimmer_3s_ease-in-out_infinite]"
+                  className="group inline-flex items-center gap-3 rounded-2xl border border-orange-200 dark:border-orange-900/60 bg-orange-50/70 dark:bg-orange-950/20 px-5 py-3 hover:bg-orange-100/80 hover:border-orange-300 dark:hover:border-orange-800 transition-all"
                   title="Encontre seu propósito"
                 >
-                  🔥 Se está desmotivado - CLIQUE AQUI
+                  <span className="flex items-center justify-center w-9 h-9 rounded-full bg-orange-100 dark:bg-orange-900/40 text-lg group-hover:scale-110 transition-transform">
+                    🔥
+                  </span>
+                  <span className="text-sm sm:text-base font-semibold text-orange-700 dark:text-orange-300 text-left">
+                    Se está desmotivado,{' '}
+                    <span className="underline underline-offset-2">clique aqui</span>
+                  </span>
                 </button>
               </div>
             </TabsContent>

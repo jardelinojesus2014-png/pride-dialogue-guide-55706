@@ -67,12 +67,12 @@ const EditableDescription = ({
 
   return (
     <div className="relative">
-      <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">{description}</p>
+      <p className="text-sm text-muted-foreground leading-relaxed mt-1.5 line-clamp-2">{description}</p>
       {effectiveIsAdmin && (
         <Button
           size="sm"
           variant="ghost"
-          className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7 p-0"
+          className="absolute -bottom-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
           onClick={(e) => { e.stopPropagation(); setIsEditing(true); }}
           title="Editar descrição"
         >
@@ -87,28 +87,32 @@ export const DashboardSection = ({ cards, isAdmin, userViewMode }: DashboardSect
   const effectiveIsAdmin = isAdmin && !userViewMode;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {cards.map((card) => (
         <button
           key={card.key}
           onClick={card.onClick}
-          className="group text-left bg-card rounded-xl shadow-lg border-2 border-primary/30 hover:border-accent hover:shadow-xl transition-all p-5 flex flex-col gap-3 hover:-translate-y-1"
+          className="group text-left bg-card rounded-2xl border border-border p-5 hover:border-accent/50 hover:shadow-md hover:-translate-y-0.5 transition-all"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-hero flex items-center justify-center text-accent flex-shrink-0">
+          <div className="flex items-start gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center text-accent flex-shrink-0 transition-transform group-hover:scale-110">
               {card.icon}
             </div>
-            <h3 className="text-lg font-black text-foreground flex-1 whitespace-pre-line">
-              {card.title.replace(/\n/g, ' ')}
-            </h3>
-            <ArrowRight className="w-4 h-4 text-accent opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-primary flex-1 leading-tight">
+                  {card.title.replace(/\n/g, ' ')}
+                </h3>
+                <ArrowRight className="w-4 h-4 text-accent flex-shrink-0 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+              </div>
+              <EditableDescription
+                sectionKey={`dashboard_card_${card.key}`}
+                title={card.title}
+                defaultDescription={card.defaultDescription}
+                effectiveIsAdmin={effectiveIsAdmin}
+              />
+            </div>
           </div>
-          <EditableDescription
-            sectionKey={`dashboard_card_${card.key}`}
-            title={card.title}
-            defaultDescription={card.defaultDescription}
-            effectiveIsAdmin={effectiveIsAdmin}
-          />
         </button>
       ))}
     </div>

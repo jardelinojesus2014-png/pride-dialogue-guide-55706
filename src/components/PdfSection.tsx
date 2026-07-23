@@ -208,23 +208,23 @@ export const PdfSection = ({ darkMode, userViewMode }: PdfSectionProps) => {
 
   if (loading) {
     return (
-      <section className="bg-card rounded-2xl shadow-xl p-8 mb-6">
+      <section className="p-6">
         <div className="text-center text-muted-foreground">Carregando PDFs...</div>
       </section>
     );
   }
 
   return (
-    <section className="bg-card rounded-2xl shadow-xl p-6 sm:p-8 mb-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl sm:text-3xl font-black text-primary flex items-center gap-3">
-          <FileText className="w-8 h-8" />
+    <section className="p-5 sm:p-6">
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="text-base font-bold text-foreground flex items-center gap-2">
+          <FileText className="w-5 h-5 text-accent" />
           Materiais em PDF
-        </h2>
+        </h3>
         {showAdminFeatures && (
           <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-primary hover:bg-primary/90">
+              <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90">
                 <Upload className="w-4 h-4 mr-2" />
                 Adicionar PDF
               </Button>
@@ -291,10 +291,10 @@ export const PdfSection = ({ darkMode, userViewMode }: PdfSectionProps) => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {pdfFiles.map((pdf) => (
-            <Card key={pdf.id} className="bg-gradient-subtle border-2 border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg overflow-hidden">
+            <Card key={pdf.id} className="bg-card rounded-2xl border border-border hover:border-accent/50 transition-all hover:shadow-md overflow-hidden">
               <div className="flex flex-col h-full">
                 {/* PDF Preview/Thumbnail */}
-                <div className="bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5 h-48 flex items-center justify-center overflow-hidden relative border-b-4 border-primary/30">
+                <div className="bg-muted/50 h-44 flex items-center justify-center overflow-hidden relative border-b border-border">
                   {pdf.thumbnail_url ? (
                     <img
                       src={pdf.thumbnail_url}

@@ -75,10 +75,10 @@ export const ScriptSection = ({
   };
 
   return (
-    <div className="bg-card rounded-lg shadow-md overflow-hidden border-2 border-border hover:shadow-xl hover:border-accent transition-all duration-300">
+    <div className="bg-card rounded-2xl shadow-sm overflow-hidden border border-border hover:shadow-md hover:border-accent/40 transition-all duration-300">
       <div className="w-full">
         <div
-          className={`w-full p-5 flex items-center justify-between ${section.colorClass} border-l-4 border-accent transition-all hover:opacity-90 hover:border-l-8 cursor-pointer`}
+          className={`w-full p-5 flex items-center justify-between ${section.colorClass} border-l-4 border-accent transition-all hover:opacity-95 cursor-pointer`}
         >
           <div className="text-left flex-1" onClick={onToggle}>
             <h2 className="text-base sm:text-lg font-bold text-primary">{section.title}</h2>

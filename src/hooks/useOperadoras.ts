@@ -8,6 +8,9 @@ export interface Operadora {
   logo_url: string;
   logo_path: string | null;
   display_order: number;
+  subtitle?: string | null;
+  tags?: string[] | null;
+  ans?: string | null;
   created_at: string;
   updated_at: string;
   created_by: string | null;
@@ -82,6 +85,59 @@ export const useOperadoras = () => {
     }
   };
 
+  const updateOperadoraLogo = async (id: string, logoFile: File, oldLogoPath: string | null) => {
+    try {
+      const fileExt = logoFile.name.split('.').pop();
+      const fileName = `logos/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('operadoras')
+        .upload(fileName, logoFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('operadoras')
+        .getPublicUrl(fileName);
+
+      const { error } = await supabase
+        .from('operadoras')
+        .update({ logo_url: publicUrl, logo_path: fileName })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // Remove o logo antigo do storage depois de trocar com sucesso
+      if (oldLogoPath) {
+        await supabase.storage.from('operadoras').remove([oldLogoPath]);
+      }
+
+      toast.success('Logo atualizado com sucesso!');
+      fetchOperadoras();
+    } catch (error) {
+      console.error('Error updating operadora logo:', error);
+      toast.error('Erro ao atualizar logo');
+    }
+  };
+
+  const updateOperadoraMeta = async (
+    id: string,
+    meta: { subtitle: string | null; tags: string[] | null; ans: string | null }
+  ) => {
+    try {
+      const { error } = await (supabase as any)
+        .from('operadoras')
+        .update({ subtitle: meta.subtitle, tags: meta.tags, ans: meta.ans })
+        .eq('id', id);
+      if (error) throw error;
+      toast.success('Cabeçalho atualizado!');
+      fetchOperadoras();
+    } catch (error) {
+      console.error('Error updating operadora meta:', error);
+      toast.error('Erro ao atualizar cabeçalho');
+    }
+  };
+
   const deleteOperadora = async (id: string, logoPath: string | null) => {
     try {
       if (logoPath) {
@@ -107,7 +163,7 @@ export const useOperadoras = () => {
     fetchOperadoras();
   }, []);
 
-  return { operadoras, loading, addOperadora, deleteOperadora, refetch: fetchOperadoras };
+  return { operadoras, loading, addOperadora, updateOperadoraLogo, updateOperadoraMeta, deleteOperadora, refetch: fetchOperadoras };
 };
 
 export const useOperadoraContent = (operadoraId: string | null) => {

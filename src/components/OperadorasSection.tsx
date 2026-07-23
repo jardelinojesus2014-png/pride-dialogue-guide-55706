@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Plus, Trash2, ChevronDown, ChevronUp, Video, FileText, Image, Music, ExternalLink, Download, Pencil } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Trash2, ChevronDown, ChevronUp, ChevronRight, Video, FileText, Image, Music, ExternalLink, Download, Pencil, GraduationCap, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -12,11 +13,22 @@ import { EditableBanner } from './EditableBanner';
 interface OperadorasSectionProps {
   isAdmin: boolean;
   userViewMode: boolean;
+  isOperadoraFavorite?: (id: string) => boolean;
+  onToggleOperadoraFavorite?: (op: Operadora) => void;
+  onOperadoraOpened?: (op: Operadora) => void;
+  embedded?: boolean;
 }
 
-export const OperadorasSection = ({ isAdmin, userViewMode }: OperadorasSectionProps) => {
-  const { operadoras, loading, addOperadora, deleteOperadora } = useOperadoras();
-  const [expandedOperadora, setExpandedOperadora] = useState<string | null>(null);
+export const OperadorasSection = ({
+  isAdmin,
+  userViewMode,
+  isOperadoraFavorite,
+  onToggleOperadoraFavorite,
+  onOperadoraOpened,
+  embedded,
+}: OperadorasSectionProps) => {
+  const { operadoras, loading, addOperadora, updateOperadoraLogo, deleteOperadora } = useOperadoras();
+  const navigate = useNavigate();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newName, setNewName] = useState('');
   const [newLogo, setNewLogo] = useState<File | null>(null);
@@ -39,17 +51,41 @@ export const OperadorasSection = ({ isAdmin, userViewMode }: OperadorasSectionPr
 
   if (loading) {
     return (
-      <div className="bg-card rounded-lg shadow-xl p-12 text-center border-2 border-border">
-        <p className="text-muted-foreground">Carregando operadoras...</p>
+      <div className="bg-card rounded-2xl shadow-xl p-6 border border-border/60">
+        <div className="h-7 w-64 bg-muted rounded-lg animate-pulse mb-6" />
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} className="aspect-square rounded-2xl border border-border/40 bg-muted animate-pulse" />
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-card rounded-lg shadow-xl p-6 border-2 border-border">
-      <EditableBanner sectionKey="banner_operadoras" isAdmin={isAdmin} userViewMode={userViewMode} />
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-black text-primary">🎓 Treinamentos de Operadoras</h2>
+    <div className={embedded ? '' : 'bg-card rounded-2xl shadow-xl p-6 sm:p-8 border border-border/60'}>
+      {!embedded && <EditableBanner sectionKey="banner_operadoras" isAdmin={isAdmin} userViewMode={userViewMode} />}
+      <div className={`flex flex-col sm:flex-row sm:items-center gap-4 mb-8 ${embedded ? 'sm:justify-end' : 'sm:justify-between'}`}>
+        {!embedded && (
+          <div className="flex items-start gap-3">
+            <div className="hidden sm:flex flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-accent items-center justify-center shadow-md">
+              <GraduationCap className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-black text-primary tracking-tight">Treinamentos de Operadoras</h2>
+                {operadoras.length > 0 && (
+                  <span className="text-xs font-bold text-accent-foreground bg-accent px-2 py-0.5 rounded-full">
+                    {operadoras.length}
+                  </span>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Selecione uma operadora para acessar vídeos, materiais e conteúdos de treinamento.
+              </p>
+            </div>
+          </div>
+        )}
         {showAdminControls && (
           <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
             <DialogTrigger asChild>
@@ -103,42 +139,24 @@ export const OperadorasSection = ({ isAdmin, userViewMode }: OperadorasSectionPr
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
           {operadoras.map((operadora) => (
             <OperadoraCard
               key={operadora.id}
               operadora={operadora}
-              isExpanded={expandedOperadora === operadora.id}
-              onToggle={() => setExpandedOperadora(
-                expandedOperadora === operadora.id ? null : operadora.id
-              )}
+              isExpanded={false}
+              onToggle={() => {
+                onOperadoraOpened?.(operadora);
+                navigate(`/operadora/${operadora.id}`);
+              }}
               showAdminControls={showAdminControls}
               onDelete={() => handleDeleteOperadora(operadora)}
+              onReplaceLogo={(file) => updateOperadoraLogo(operadora.id, file, operadora.logo_path)}
+              isFavorite={isOperadoraFavorite?.(`operadora:${operadora.id}`) || false}
+              onToggleFavorite={() => onToggleOperadoraFavorite?.(operadora)}
             />
           ))}
         </div>
-      )}
-
-      {/* Expanded Content Area */}
-      {expandedOperadora && (
-        <ExpandedOperadoraContent
-          operadoraId={expandedOperadora}
-          operadoraName={operadoras.find(o => o.id === expandedOperadora)?.name || ''}
-          showAdminControls={showAdminControls}
-          onClose={() => setExpandedOperadora(null)}
-        />
-      )}
-
-      {/* Botão Minimizar Tudo */}
-      {expandedOperadora && (
-        <button
-          onClick={() => setExpandedOperadora(null)}
-          className="fixed bottom-6 right-6 bg-gradient-hero hover:opacity-90 text-accent font-bold px-4 py-3 rounded-full shadow-2xl flex items-center gap-2 transition-all duration-300 hover:scale-110 z-50 border-2 border-accent"
-          title="Minimizar todas as seções"
-        >
-          <ChevronUp className="w-5 h-5" />
-          <span className="hidden sm:inline">Minimizar Tudo</span>
-        </button>
       )}
     </div>
   );
@@ -150,41 +168,162 @@ interface OperadoraCardProps {
   onToggle: () => void;
   showAdminControls: boolean;
   onDelete: () => void;
+  onReplaceLogo: (file: File) => void;
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
 }
 
-const OperadoraCard = ({ operadora, isExpanded, onToggle, showAdminControls, onDelete }: OperadoraCardProps) => {
+const OperadoraCard = ({ operadora, isExpanded, onToggle, showAdminControls, onDelete, onReplaceLogo, isFavorite, onToggleFavorite }: OperadoraCardProps) => {
+  // Detecta automaticamente a cor de fundo da marca (pixel do canto do logo)
+  // para preencher o quadrado inteiro sem cortar o logo.
+  const [bgColor, setBgColor] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setBgColor(null);
+    const img = new window.Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0);
+        const w = canvas.width;
+        const h = canvas.height;
+
+        // 1) Amostra os 4 cantos, considerando apenas os OPACOS (alpha alto)
+        const corners = [
+          ctx.getImageData(2, 2, 1, 1).data,
+          ctx.getImageData(w - 3, 2, 1, 1).data,
+          ctx.getImageData(2, h - 3, 1, 1).data,
+          ctx.getImageData(w - 3, h - 3, 1, 1).data,
+        ];
+        const opaque = corners.filter((p) => p[3] > 200);
+
+        if (opaque.length >= 2) {
+          // Logo com fundo sólido → usa a cor de canto mais frequente
+          const counts: Record<string, { rgb: string; n: number }> = {};
+          opaque.forEach((p) => {
+            const key = `${p[0]},${p[1]},${p[2]}`;
+            counts[key] = counts[key] || { rgb: `rgb(${p[0]}, ${p[1]}, ${p[2]})`, n: 0 };
+            counts[key].n += 1;
+          });
+          const best = Object.values(counts).sort((a, b) => b.n - a.n)[0];
+          if (!cancelled && best) setBgColor(best.rgb);
+          return;
+        }
+
+        // 2) Logo com fundo transparente → escolhe o fundo pela luminância do logo
+        const data = ctx.getImageData(0, 0, w, h).data;
+        let rs = 0, gs = 0, bs = 0, count = 0;
+        for (let i = 0; i < data.length; i += 40) {
+          if (data[i + 3] > 128) {
+            rs += data[i];
+            gs += data[i + 1];
+            bs += data[i + 2];
+            count += 1;
+          }
+        }
+        if (count === 0) {
+          if (!cancelled) setBgColor('#ffffff');
+          return;
+        }
+        const lum = (0.299 * rs + 0.587 * gs + 0.114 * bs) / count;
+        // Logo claro (ex: texto branco) → fundo escuro; logo escuro/colorido → fundo branco
+        if (!cancelled) setBgColor(lum > 150 ? '#13234b' : '#ffffff');
+      } catch {
+        // Falha de CORS/leitura — mantém o fundo padrão
+        if (!cancelled) setBgColor('#ffffff');
+      }
+    };
+    img.src = operadora.logo_url;
+    return () => {
+      cancelled = true;
+    };
+  }, [operadora.logo_url]);
+
   return (
     <div className="relative group">
       <button
         onClick={onToggle}
-        className={`w-full h-32 rounded-lg border-2 transition-all duration-200 overflow-hidden hover:shadow-lg hover:scale-105 bg-white ${
-          isExpanded 
-            ? 'border-accent ring-2 ring-accent/50 shadow-lg' 
-            : 'border-border hover:border-accent/50'
+        className={`w-full aspect-square rounded-2xl border overflow-hidden text-left transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl ${
+          isExpanded
+            ? 'border-accent ring-2 ring-accent/50 shadow-lg -translate-y-1'
+            : 'border-border/40 hover:border-accent/60'
         }`}
       >
-        <img
-          src={operadora.logo_url}
-          alt={operadora.name}
-          className="w-full h-full object-contain p-2"
-        />
-      </button>
-      
-      {showAdminControls && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete();
-          }}
-          className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-destructive/90"
+        <div
+          className="relative w-full h-full transition-colors duration-300"
+          style={{ backgroundColor: bgColor || '#ffffff' }}
         >
-          <Trash2 className="w-3 h-3" />
-        </button>
-      )}
+          {/* Logo aparece inteiro; o quadrado é pintado com a cor da marca */}
+          <img
+            src={operadora.logo_url}
+            alt={operadora.name}
+            crossOrigin="anonymous"
+            className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+          />
+          {/* Overlay de dica no hover */}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors duration-300 flex items-end justify-center pb-3 opacity-0 group-hover:opacity-100">
+            <span className="text-[11px] font-bold text-white bg-primary/80 backdrop-blur-sm px-2.5 py-1 rounded-full flex items-center gap-0.5 shadow-lg">
+              Ver treinamentos <ChevronRight className="w-3 h-3" />
+            </span>
+          </div>
+        </div>
+      </button>
 
-      <p className="text-center text-xs font-medium mt-2 text-foreground truncate">
-        {operadora.name}
-      </p>
+      {/* Favoritar (todos os usuários) */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggleFavorite();
+        }}
+        className={`absolute top-2 left-2 p-1.5 rounded-full transition-all z-10 ${
+          isFavorite
+            ? 'bg-white/90 text-accent shadow-lg'
+            : 'bg-black/30 text-white opacity-0 group-hover:opacity-100 hover:bg-black/50'
+        }`}
+        title={isFavorite ? 'Remover dos favoritos' : 'Favoritar'}
+      >
+        <Star className={`w-3.5 h-3.5 ${isFavorite ? 'fill-accent' : ''}`} />
+      </button>
+
+      {showAdminControls && (
+        <div className="absolute top-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+          {/* Trocar logo */}
+          <label
+            onClick={(e) => e.stopPropagation()}
+            className="cursor-pointer bg-blue-500 text-white rounded-full p-1.5 shadow-lg hover:bg-blue-600 hover:scale-110 transition-all"
+            title="Trocar logo"
+          >
+            <Pencil className="w-3 h-3" />
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) onReplaceLogo(file);
+                e.target.value = '';
+              }}
+            />
+          </label>
+          {/* Excluir */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            className="bg-destructive text-destructive-foreground rounded-full p-1.5 shadow-lg hover:bg-destructive/90 hover:scale-110 transition-all"
+            title="Excluir operadora"
+          >
+            <Trash2 className="w-3 h-3" />
+          </button>
+        </div>
+      )}
     </div>
   );
 };
@@ -194,10 +333,13 @@ interface ExpandedOperadoraContentProps {
   operadoraName: string;
   showAdminControls: boolean;
   onClose: () => void;
+  embedded?: boolean;
+  hideVideos?: boolean;
 }
 
-const ExpandedOperadoraContent = ({ operadoraId, operadoraName, showAdminControls, onClose }: ExpandedOperadoraContentProps) => {
-  const { content, loading, addContent, deleteContent, updateContent } = useOperadoraContent(operadoraId);
+export const ExpandedOperadoraContent = ({ operadoraId, operadoraName, showAdminControls, onClose, embedded, hideVideos }: ExpandedOperadoraContentProps) => {
+  const { content: allContent, loading, addContent, deleteContent, updateContent } = useOperadoraContent(operadoraId);
+  const content = hideVideos ? allContent.filter((c) => c.content_type !== 'video') : allContent;
   const [showContentDialog, setShowContentDialog] = useState(false);
   const [editingItem, setEditingItem] = useState<OperadoraContent | null>(null);
   const [editTitle, setEditTitle] = useState('');
@@ -258,11 +400,11 @@ const ExpandedOperadoraContent = ({ operadoraId, operadoraName, showAdminControl
   };
 
   return (
-    <div className="mt-6 p-6 bg-muted/50 rounded-lg border-2 border-accent/30">
+    <div className={embedded ? '' : 'mt-6 p-6 bg-muted/50 rounded-lg border-2 border-accent/30 scroll-mt-24'}>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xl font-bold text-primary flex items-center gap-2">
-          Conteúdos de {operadoraName}
-          <ChevronUp className="w-5 h-5 cursor-pointer hover:text-accent" onClick={onClose} />
+          {embedded ? 'Materiais e downloads' : `Conteúdos de ${operadoraName}`}
+          {!embedded && <ChevronUp className="w-5 h-5 cursor-pointer hover:text-accent" onClick={onClose} />}
         </h3>
         {showAdminControls && (
           <>

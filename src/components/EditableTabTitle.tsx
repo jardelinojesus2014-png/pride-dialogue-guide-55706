@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Edit, Check, X } from 'lucide-react';
+import { Edit } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { useUpdateSectionTitle, useSectionTitles } from '@/hooks/useSectionTitles';
 import { cn } from '@/lib/utils';
 
@@ -15,6 +17,8 @@ interface EditableTabTitleProps {
   showShortOnMobile?: boolean;
   className?: string;
   iconOnly?: boolean;
+  showEdit?: boolean;
+  showLabel?: boolean;
 }
 
 export const EditableTabTitle = ({
@@ -26,9 +30,8 @@ export const EditableTabTitle = ({
   icon,
   showShortOnMobile = true,
   className = '',
-  iconOnly = false,
+  showEdit = false,
 }: EditableTabTitleProps) => {
-
   const { data: sectionTitles = {} } = useSectionTitles();
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState('');
@@ -38,107 +41,83 @@ export const EditableTabTitle = ({
   const currentTitle = sectionTitles[sectionKey]?.title || defaultTitle;
   const currentShortTitle = sectionTitles[sectionKey]?.subtitle || defaultShortTitle || '';
 
-  useEffect(() => {
-    setEditTitle(currentTitle);
-    setEditShortTitle(currentShortTitle);
-  }, [currentTitle, currentShortTitle]);
-
   const effectiveIsAdmin = isAdmin && !userViewMode;
+  const label = currentShortTitle || currentTitle.replace(/\n/g, ' ');
 
-  const handleSave = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    updateTitle.mutate({
-      sectionKey,
-      title: editTitle,
-      subtitle: editShortTitle,
-    });
-    setIsEditing(false);
-  };
+  // Preenche os campos quando o modal abre
+  useEffect(() => {
+    if (isEditing) {
+      setEditTitle(currentTitle);
+      setEditShortTitle(currentShortTitle);
+    }
+  }, [isEditing, currentTitle, currentShortTitle]);
 
-  const handleCancel = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    setEditTitle(currentTitle);
-    setEditShortTitle(currentShortTitle);
-    setIsEditing(false);
-  };
-
-  const handleEditClick = (e: React.MouseEvent) => {
+  const openEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
     setIsEditing(true);
   };
 
-  if (isEditing && effectiveIsAdmin) {
-    return (
-      <div className={cn("flex flex-col gap-2 p-2 min-w-[200px]", className)} onClick={(e) => e.stopPropagation()}>
-        <Input
-          value={editTitle}
-          onChange={(e) => setEditTitle(e.target.value)}
-          className="text-xs font-bold h-8"
-          placeholder="Título completo"
-          onClick={(e) => e.stopPropagation()}
-        />
-        {showShortOnMobile && (
-          <Input
-            value={editShortTitle}
-            onChange={(e) => setEditShortTitle(e.target.value)}
-            className="text-xs h-7"
-            placeholder="Título curto (mobile)"
-            onClick={(e) => e.stopPropagation()}
-          />
-        )}
-        <div className="flex gap-1 justify-center">
-          <Button
-            size="sm"
-            onClick={handleSave}
-            disabled={updateTitle.isPending}
-            className="bg-green-600 hover:bg-green-700 h-7 px-2 text-xs"
-          >
-            <Check className="w-3 h-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleCancel}
-            className="h-7 px-2 text-xs"
-          >
-            <X className="w-3 h-3" />
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  const handleSave = () => {
+    updateTitle.mutate({ sectionKey, title: editTitle, subtitle: editShortTitle });
+    setIsEditing(false);
+  };
 
   return (
-    <div className={cn("relative group/tab flex items-center justify-center gap-1.5", className)}>
+    <div className={cn("flex flex-col items-center justify-center gap-1 min-h-[42px]", className)} title={label}>
       {icon}
-      {iconOnly ? (
-        <span className="max-w-0 overflow-hidden whitespace-nowrap opacity-0 group-hover/tab:max-w-[200px] group-hover/tab:opacity-100 group-hover/tab:ml-0.5 transition-all duration-300 ease-out text-center leading-tight">
-          {currentShortTitle || currentTitle.replace(/\n/g, ' ')}
+      <div className="flex items-center gap-1">
+        <span className="text-[11px] font-semibold text-center leading-tight max-w-[86px] line-clamp-2">
+          {label}
         </span>
-      ) : showShortOnMobile ? (
-        <>
-          <span className="hidden md:inline text-center leading-tight whitespace-pre-line">
-            {currentTitle}
-          </span>
-          <span className="md:hidden">{currentShortTitle || currentTitle}</span>
-        </>
-      ) : (
-        <span>{currentTitle}</span>
-      )}
-      {effectiveIsAdmin && (
-        <Button
-          size="sm"
-          variant="ghost"
-          className="absolute -top-1 -right-1 opacity-0 group-hover/tab:opacity-100 transition-opacity h-5 w-5 p-0 bg-accent/80 hover:bg-accent"
-          onClick={handleEditClick}
-        >
-          <Edit className="w-3 h-3 text-accent-foreground" />
-        </Button>
-      )}
+        {effectiveIsAdmin && showEdit && (
+          <button
+            type="button"
+            onClick={openEdit}
+            className="flex-shrink-0 flex items-center justify-center h-4 w-4 rounded bg-black/25 hover:bg-black/40 transition-colors"
+            title="Editar nome da aba"
+          >
+            <Edit className="w-2.5 h-2.5" />
+          </button>
+        )}
+      </div>
+
+      {/* Modal de edição do nome da aba */}
+      <Dialog open={isEditing} onOpenChange={setIsEditing}>
+        <DialogContent onClick={(e) => e.stopPropagation()}>
+          <DialogHeader>
+            <DialogTitle>Editar nome da aba</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor={`tab-title-${sectionKey}`}>Nome</Label>
+              <Input
+                id={`tab-title-${sectionKey}`}
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                placeholder="Nome da aba"
+              />
+            </div>
+            {showShortOnMobile && (
+              <div>
+                <Label htmlFor={`tab-short-${sectionKey}`}>Nome curto (exibido na barra)</Label>
+                <Input
+                  id={`tab-short-${sectionKey}`}
+                  value={editShortTitle}
+                  onChange={(e) => setEditShortTitle(e.target.value)}
+                  placeholder="Ex: Treinamentos, Materiais..."
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Deixe curto para a barra de abas ficar organizada. Se vazio, usa o nome completo.
+                </p>
+              </div>
+            )}
+            <Button onClick={handleSave} disabled={updateTitle.isPending || !editTitle.trim()} className="w-full">
+              Salvar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
-

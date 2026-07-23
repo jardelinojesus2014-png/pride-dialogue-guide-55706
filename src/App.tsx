@@ -10,6 +10,8 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
 import ArtesCampanhas from "./pages/ArtesCampanhas";
+import Central from "./pages/Central";
+import OperadoraDoc from "./pages/OperadoraDoc";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +29,8 @@ const App = () => (
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path="/artes-campanhas" element={<ProtectedRoute><ArtesCampanhas /></ProtectedRoute>} />
+            <Route path="/central/:categoryId" element={<ProtectedRoute><Central /></ProtectedRoute>} />
+            <Route path="/operadora/:operadoraId" element={<ProtectedRoute><OperadoraDoc /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

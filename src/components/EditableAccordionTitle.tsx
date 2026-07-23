@@ -87,7 +87,7 @@ export const EditableAccordionTitle = ({
 
   return (
     <div className={cn("relative group inline-flex items-center gap-2", className)}>
-      <h2 className="text-xl font-black text-primary">{currentTitle}</h2>
+      <h2 className="text-base sm:text-lg font-bold text-primary">{currentTitle}</h2>
       {effectiveIsAdmin && (
         <Button
           size="sm"
