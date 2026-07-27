@@ -16,8 +16,8 @@ import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useAuth } from '@/hooks/useAuth';
 import { useTrainingActivity } from '@/hooks/useTrainingActivity';
 import { useTrainingCategories } from '@/hooks/useTrainingCategories';
-import { MarkdownContent } from '@/components/MarkdownContent';
-import { FormattingHelp } from '@/components/FormattingHelp';
+import { RichContent } from '@/components/RichContent';
+import { RichContentEditor } from '@/components/RichContentEditor';
 import { MainTabsNav } from '@/components/MainTabsNav';
 import { AppHeader } from '@/components/AppHeader';
 import { OperadoraVideos } from '@/components/OperadoraVideos';
@@ -295,7 +295,7 @@ const OperadoraDoc = () => {
                       </div>
                       {isOpen && (
                         <div className="px-4 pb-4 pt-1 border-t border-border">
-                          <MarkdownContent content={t.body || ''} />
+                          <RichContent content={t.body || ''} />
                         </div>
                       )}
                     </div>
@@ -380,7 +380,7 @@ const TopicDialog = ({ open, onOpenChange, topic, onSave }: TopicDialogProps) =>
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{topic ? 'Editar tópico' : 'Novo tópico'}</DialogTitle>
         </DialogHeader>
@@ -391,11 +391,12 @@ const TopicDialog = ({ open, onOpenChange, topic, onSave }: TopicDialogProps) =>
               placeholder="Ex: Regras comerciais, Carências, Reembolso..." />
           </div>
           <div>
-            <Label htmlFor="topic-body">Conteúdo (Markdown)</Label>
-            <Textarea id="topic-body" value={body} onChange={(e) => setBody(e.target.value)} rows={12}
-              className="font-mono text-sm"
-              placeholder={'**Negrito**, listas com - item, e caixas de destaque com >\n\n> [!red] Regra crítica de atenção\n> [!green] Isenção / permitido\n\nPalavra {red}vermelha{/red} ou {blue}azul{/blue}.'} />
-            <FormattingHelp />
+            <Label>Conteúdo</Label>
+            <RichContentEditor
+              value={body}
+              onChange={setBody}
+              placeholder="Escreva aqui. Cole prints (Ctrl+V), arraste imagens ou cole links do YouTube/Loom."
+            />
           </div>
           <Button onClick={() => title.trim() && onSave(title.trim(), body)} disabled={!title.trim()} className="w-full">
             {topic ? 'Salvar alterações' : 'Adicionar tópico'}
