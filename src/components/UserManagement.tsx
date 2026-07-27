@@ -42,6 +42,49 @@ export const UserManagement = ({ users, onUserUpdated }: UserManagementProps) =>
   const [resetingPasswordFor, setResetingPasswordFor] = useState<string | null>(null);
   const [deletingUser, setDeletingUser] = useState(false);
   const [forcingLogout, setForcingLogout] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newIsAdmin, setNewIsAdmin] = useState(false);
+  const [creatingUser, setCreatingUser] = useState(false);
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const email = newEmail.trim().toLowerCase();
+    if (!email.endsWith('@pridecorretora.com.br')) {
+      toast({ title: 'Email inválido', description: 'Apenas emails @pridecorretora.com.br são permitidos.', variant: 'destructive' });
+      return;
+    }
+    if (newPassword.length < 6) {
+      toast({ title: 'Senha muito curta', description: 'Mínimo de 6 caracteres.', variant: 'destructive' });
+      return;
+    }
+    setCreatingUser(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${sessionData.session?.access_token}`,
+          },
+          body: JSON.stringify({ email, password: newPassword, makeAdmin: newIsAdmin }),
+        },
+      );
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Erro ao criar usuário');
+      toast({ title: 'Usuário criado', description: `${email} foi cadastrado com sucesso.` });
+      setNewEmail('');
+      setNewPassword('');
+      setNewIsAdmin(false);
+      onUserUpdated();
+    } catch (error: any) {
+      toast({ title: 'Erro ao criar usuário', description: error.message, variant: 'destructive' });
+    } finally {
+      setCreatingUser(false);
+    }
+  };
 
   const handleRoleChange = async () => {
     if (!selectedUser) return;
