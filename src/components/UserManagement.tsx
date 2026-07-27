@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Shield, ShieldOff, Calendar, Trash2, KeyRound, Loader2, LogOut } from 'lucide-react';
+import { Shield, ShieldOff, Calendar, Trash2, KeyRound, Loader2, LogOut, UserPlus } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -40,6 +42,49 @@ export const UserManagement = ({ users, onUserUpdated }: UserManagementProps) =>
   const [resetingPasswordFor, setResetingPasswordFor] = useState<string | null>(null);
   const [deletingUser, setDeletingUser] = useState(false);
   const [forcingLogout, setForcingLogout] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newIsAdmin, setNewIsAdmin] = useState(false);
+  const [creatingUser, setCreatingUser] = useState(false);
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const email = newEmail.trim().toLowerCase();
+    if (!email.endsWith('@pridecorretora.com.br')) {
+      toast({ title: 'Email inválido', description: 'Apenas emails @pridecorretora.com.br são permitidos.', variant: 'destructive' });
+      return;
+    }
+    if (newPassword.length < 6) {
+      toast({ title: 'Senha muito curta', description: 'Mínimo de 6 caracteres.', variant: 'destructive' });
+      return;
+    }
+    setCreatingUser(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${sessionData.session?.access_token}`,
+          },
+          body: JSON.stringify({ email, password: newPassword, makeAdmin: newIsAdmin }),
+        },
+      );
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Erro ao criar usuário');
+      toast({ title: 'Usuário criado', description: `${email} foi cadastrado com sucesso.` });
+      setNewEmail('');
+      setNewPassword('');
+      setNewIsAdmin(false);
+      onUserUpdated();
+    } catch (error: any) {
+      toast({ title: 'Erro ao criar usuário', description: error.message, variant: 'destructive' });
+    } finally {
+      setCreatingUser(false);
+    }
+  };
 
   const handleRoleChange = async () => {
     if (!selectedUser) return;
@@ -243,6 +288,59 @@ export const UserManagement = ({ users, onUserUpdated }: UserManagementProps) =>
   return (
     <>
       <div className="space-y-4">
+        <Card className="border-primary/30">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <UserPlus className="w-4 h-4" /> Criar novo usuário
+            </CardTitle>
+            <CardDescription>
+              Cadastre usuários manualmente sem depender do envio de e-mail de confirmação.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleCreateUser} className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+              <div className="space-y-1">
+                <Label htmlFor="new-user-email">Email</Label>
+                <Input
+                  id="new-user-email"
+                  type="email"
+                  placeholder="nome@pridecorretora.com.br"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="new-user-password">Senha</Label>
+                <Input
+                  id="new-user-password"
+                  type="text"
+                  placeholder="Mínimo 6 caracteres"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  minLength={6}
+                  required
+                />
+              </div>
+              <Button type="submit" disabled={creatingUser}>
+                {creatingUser ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Criando...</>
+                ) : (
+                  <><UserPlus className="w-4 h-4 mr-2" />Criar</>
+                )}
+              </Button>
+              <label className="flex items-center gap-2 text-sm sm:col-span-3">
+                <input
+                  type="checkbox"
+                  checked={newIsAdmin}
+                  onChange={(e) => setNewIsAdmin(e.target.checked)}
+                />
+                Cadastrar como administrador
+              </label>
+            </form>
+          </CardContent>
+        </Card>
+
         {users.length === 0 ? (
           <p className="text-center text-muted-foreground py-8">
             Nenhum usuário encontrado
