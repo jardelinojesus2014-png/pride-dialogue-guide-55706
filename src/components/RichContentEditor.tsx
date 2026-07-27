@@ -290,3 +290,113 @@ export const RichContentEditor = ({ value, onChange, placeholder }: RichContentE
     </div>
   );
 };
+
+const ColorSwatch = ({ color, label, onClick, active }: { color: string | null; label: string; onClick: () => void; active?: boolean }) => (
+  <button
+    type="button"
+    onMouseDown={(e) => e.preventDefault()}
+    onClick={onClick}
+    title={label}
+    className={`w-7 h-7 rounded border transition ${active ? 'ring-2 ring-accent' : 'border-border hover:scale-110'}`}
+    style={{
+      background: color ?? 'transparent',
+      backgroundImage: color ? undefined : 'linear-gradient(45deg,#eee 25%,transparent 25%,transparent 75%,#eee 75%),linear-gradient(45deg,#eee 25%,transparent 25%,transparent 75%,#eee 75%)',
+      backgroundSize: '8px 8px',
+      backgroundPosition: '0 0,4px 4px',
+    }}
+  />
+);
+
+const ColorPicker = ({ editor }: { editor: Editor }) => {
+  const current = (editor.getAttributes('textStyle').color as string | undefined) || null;
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          title="Cor do texto"
+          className="p-1.5 rounded hover:bg-muted text-foreground/80 flex flex-col items-center gap-0.5"
+        >
+          <Baseline className="w-4 h-4" />
+          <span className="block w-4 h-1 rounded-sm" style={{ background: current || '#dc2626' }} />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-56 p-3" align="start">
+        <p className="text-xs font-semibold mb-2 text-muted-foreground">Cor do texto</p>
+        <div className="grid grid-cols-5 gap-1.5">
+          {TEXT_COLORS.map((c) => (
+            <ColorSwatch
+              key={c.name}
+              color={c.value}
+              label={c.name}
+              active={current === c.value}
+              onClick={() => {
+                if (c.value) editor.chain().focus().setColor(c.value).run();
+                else editor.chain().focus().unsetColor().run();
+                setOpen(false);
+              }}
+            />
+          ))}
+        </div>
+        <label className="mt-3 flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+          <input
+            type="color"
+            value={current || '#000000'}
+            onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
+            className="w-7 h-7 rounded cursor-pointer border border-border"
+          />
+          Cor personalizada
+        </label>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
+const HighlightPicker = ({ editor }: { editor: Editor }) => {
+  const current = (editor.getAttributes('highlight').color as string | undefined) || null;
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          title="Marca-texto"
+          className={`p-1.5 rounded hover:bg-muted flex flex-col items-center gap-0.5 ${editor.isActive('highlight') ? 'bg-accent/15 text-accent' : 'text-foreground/80'}`}
+        >
+          <Highlighter className="w-4 h-4" />
+          <span className="block w-4 h-1 rounded-sm" style={{ background: current || '#fef08a' }} />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-56 p-3" align="start">
+        <p className="text-xs font-semibold mb-2 text-muted-foreground">Marca-texto</p>
+        <div className="grid grid-cols-5 gap-1.5">
+          {HIGHLIGHT_COLORS.map((c) => (
+            <ColorSwatch
+              key={c.name}
+              color={c.value}
+              label={c.name}
+              active={current === c.value}
+              onClick={() => {
+                if (c.value) editor.chain().focus().setHighlight({ color: c.value }).run();
+                else editor.chain().focus().unsetHighlight().run();
+                setOpen(false);
+              }}
+            />
+          ))}
+        </div>
+        <label className="mt-3 flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+          <input
+            type="color"
+            value={current || '#fef08a'}
+            onChange={(e) => editor.chain().focus().setHighlight({ color: e.target.value }).run()}
+            className="w-7 h-7 rounded cursor-pointer border border-border"
+          />
+          Cor personalizada
+        </label>
+      </PopoverContent>
+    </Popover>
+  );
+};
