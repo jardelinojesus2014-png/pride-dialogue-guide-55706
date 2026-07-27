@@ -120,6 +120,9 @@ export const RichContentEditor = ({ value, onChange, placeholder }: RichContentE
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ heading: { levels: [2, 3] } }),
+      TextStyle,
+      Color.configure({ types: ['textStyle'] }),
+      Highlight.configure({ multicolor: true }),
       Link.configure({ openOnClick: false, autolink: true, HTMLAttributes: { class: 'text-accent underline' } }),
       ResizeImage.configure({ inline: false, allowBase64: false }),
       Youtube.configure({ controls: true, nocookie: true, width: 640, height: 360, HTMLAttributes: { class: 'rounded-lg my-2' } }),
