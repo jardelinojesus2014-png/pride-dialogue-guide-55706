@@ -3,13 +3,42 @@ import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Youtube from '@tiptap/extension-youtube';
 import ResizeImage from 'tiptap-extension-resize-image';
-import { useCallback, useEffect, useRef } from 'react';
+import { TextStyle } from '@tiptap/extension-text-style';
+import { Color } from '@tiptap/extension-color';
+import { Highlight } from '@tiptap/extension-highlight';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
   Bold, Italic, Strikethrough, List, ListOrdered, Link as LinkIcon,
   Image as ImageIcon, Video, Heading2, Heading3, Quote, Undo, Redo,
+  Baseline, Highlighter,
 } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+
+const TEXT_COLORS = [
+  { name: 'Padrão', value: null },
+  { name: 'Vermelho', value: '#dc2626' },
+  { name: 'Verde', value: '#16a34a' },
+  { name: 'Azul', value: '#2563eb' },
+  { name: 'Laranja', value: '#ea580c' },
+  { name: 'Amarelo', value: '#ca8a04' },
+  { name: 'Roxo', value: '#9333ea' },
+  { name: 'Rosa', value: '#db2777' },
+  { name: 'Cinza', value: '#6b7280' },
+  { name: 'Preto', value: '#000000' },
+];
+
+const HIGHLIGHT_COLORS = [
+  { name: 'Nenhum', value: null },
+  { name: 'Amarelo', value: '#fef08a' },
+  { name: 'Verde', value: '#bbf7d0' },
+  { name: 'Azul', value: '#bfdbfe' },
+  { name: 'Rosa', value: '#fbcfe8' },
+  { name: 'Laranja', value: '#fed7aa' },
+  { name: 'Roxo', value: '#e9d5ff' },
+  { name: 'Cinza', value: '#e5e7eb' },
+];
 
 interface RichContentEditorProps {
   value: string;
@@ -91,6 +120,9 @@ export const RichContentEditor = ({ value, onChange, placeholder }: RichContentE
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ heading: { levels: [2, 3] } }),
+      TextStyle,
+      Color.configure({ types: ['textStyle'] }),
+      Highlight.configure({ multicolor: true }),
       Link.configure({ openOnClick: false, autolink: true, HTMLAttributes: { class: 'text-accent underline' } }),
       ResizeImage.configure({ inline: false, allowBase64: false }),
       Youtube.configure({ controls: true, nocookie: true, width: 640, height: 360, HTMLAttributes: { class: 'rounded-lg my-2' } }),
@@ -225,6 +257,9 @@ export const RichContentEditor = ({ value, onChange, placeholder }: RichContentE
           <Quote className="w-4 h-4" />
         </ToolbarButton>
         <div className="w-px h-5 bg-border mx-1" />
+        <ColorPicker editor={editor} />
+        <HighlightPicker editor={editor} />
+        <div className="w-px h-5 bg-border mx-1" />
         <ToolbarButton onClick={insertLink} active={editor.isActive('link')} title="Link">
           <LinkIcon className="w-4 h-4" />
         </ToolbarButton>
@@ -253,5 +288,115 @@ export const RichContentEditor = ({ value, onChange, placeholder }: RichContentE
         Dica: cole prints com <kbd className="rounded bg-background border border-border px-1">Ctrl+V</kbd>, arraste imagens ou cole links do YouTube/Loom para incorporar.
       </p>
     </div>
+  );
+};
+
+const ColorSwatch = ({ color, label, onClick, active }: { color: string | null; label: string; onClick: () => void; active?: boolean }) => (
+  <button
+    type="button"
+    onMouseDown={(e) => e.preventDefault()}
+    onClick={onClick}
+    title={label}
+    className={`w-7 h-7 rounded border transition ${active ? 'ring-2 ring-accent' : 'border-border hover:scale-110'}`}
+    style={{
+      background: color ?? 'transparent',
+      backgroundImage: color ? undefined : 'linear-gradient(45deg,#eee 25%,transparent 25%,transparent 75%,#eee 75%),linear-gradient(45deg,#eee 25%,transparent 25%,transparent 75%,#eee 75%)',
+      backgroundSize: '8px 8px',
+      backgroundPosition: '0 0,4px 4px',
+    }}
+  />
+);
+
+const ColorPicker = ({ editor }: { editor: Editor }) => {
+  const current = (editor.getAttributes('textStyle').color as string | undefined) || null;
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          title="Cor do texto"
+          className="p-1.5 rounded hover:bg-muted text-foreground/80 flex flex-col items-center gap-0.5"
+        >
+          <Baseline className="w-4 h-4" />
+          <span className="block w-4 h-1 rounded-sm" style={{ background: current || '#dc2626' }} />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-56 p-3" align="start">
+        <p className="text-xs font-semibold mb-2 text-muted-foreground">Cor do texto</p>
+        <div className="grid grid-cols-5 gap-1.5">
+          {TEXT_COLORS.map((c) => (
+            <ColorSwatch
+              key={c.name}
+              color={c.value}
+              label={c.name}
+              active={current === c.value}
+              onClick={() => {
+                if (c.value) editor.chain().focus().setColor(c.value).run();
+                else editor.chain().focus().unsetColor().run();
+                setOpen(false);
+              }}
+            />
+          ))}
+        </div>
+        <label className="mt-3 flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+          <input
+            type="color"
+            value={current || '#000000'}
+            onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
+            className="w-7 h-7 rounded cursor-pointer border border-border"
+          />
+          Cor personalizada
+        </label>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
+const HighlightPicker = ({ editor }: { editor: Editor }) => {
+  const current = (editor.getAttributes('highlight').color as string | undefined) || null;
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          title="Marca-texto"
+          className={`p-1.5 rounded hover:bg-muted flex flex-col items-center gap-0.5 ${editor.isActive('highlight') ? 'bg-accent/15 text-accent' : 'text-foreground/80'}`}
+        >
+          <Highlighter className="w-4 h-4" />
+          <span className="block w-4 h-1 rounded-sm" style={{ background: current || '#fef08a' }} />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-56 p-3" align="start">
+        <p className="text-xs font-semibold mb-2 text-muted-foreground">Marca-texto</p>
+        <div className="grid grid-cols-5 gap-1.5">
+          {HIGHLIGHT_COLORS.map((c) => (
+            <ColorSwatch
+              key={c.name}
+              color={c.value}
+              label={c.name}
+              active={current === c.value}
+              onClick={() => {
+                if (c.value) editor.chain().focus().setHighlight({ color: c.value }).run();
+                else editor.chain().focus().unsetHighlight().run();
+                setOpen(false);
+              }}
+            />
+          ))}
+        </div>
+        <label className="mt-3 flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+          <input
+            type="color"
+            value={current || '#fef08a'}
+            onChange={(e) => editor.chain().focus().setHighlight({ color: e.target.value }).run()}
+            className="w-7 h-7 rounded cursor-pointer border border-border"
+          />
+          Cor personalizada
+        </label>
+      </PopoverContent>
+    </Popover>
   );
 };
