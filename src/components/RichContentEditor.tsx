@@ -3,13 +3,42 @@ import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Youtube from '@tiptap/extension-youtube';
 import ResizeImage from 'tiptap-extension-resize-image';
-import { useCallback, useEffect, useRef } from 'react';
+import TextStyle from '@tiptap/extension-text-style';
+import Color from '@tiptap/extension-color';
+import Highlight from '@tiptap/extension-highlight';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
   Bold, Italic, Strikethrough, List, ListOrdered, Link as LinkIcon,
   Image as ImageIcon, Video, Heading2, Heading3, Quote, Undo, Redo,
+  Baseline, Highlighter,
 } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+
+const TEXT_COLORS = [
+  { name: 'Padrão', value: null },
+  { name: 'Vermelho', value: '#dc2626' },
+  { name: 'Verde', value: '#16a34a' },
+  { name: 'Azul', value: '#2563eb' },
+  { name: 'Laranja', value: '#ea580c' },
+  { name: 'Amarelo', value: '#ca8a04' },
+  { name: 'Roxo', value: '#9333ea' },
+  { name: 'Rosa', value: '#db2777' },
+  { name: 'Cinza', value: '#6b7280' },
+  { name: 'Preto', value: '#000000' },
+];
+
+const HIGHLIGHT_COLORS = [
+  { name: 'Nenhum', value: null },
+  { name: 'Amarelo', value: '#fef08a' },
+  { name: 'Verde', value: '#bbf7d0' },
+  { name: 'Azul', value: '#bfdbfe' },
+  { name: 'Rosa', value: '#fbcfe8' },
+  { name: 'Laranja', value: '#fed7aa' },
+  { name: 'Roxo', value: '#e9d5ff' },
+  { name: 'Cinza', value: '#e5e7eb' },
+];
 
 interface RichContentEditorProps {
   value: string;
