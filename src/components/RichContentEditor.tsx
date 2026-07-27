@@ -257,6 +257,9 @@ export const RichContentEditor = ({ value, onChange, placeholder }: RichContentE
           <Quote className="w-4 h-4" />
         </ToolbarButton>
         <div className="w-px h-5 bg-border mx-1" />
+        <ColorPicker editor={editor} />
+        <HighlightPicker editor={editor} />
+        <div className="w-px h-5 bg-border mx-1" />
         <ToolbarButton onClick={insertLink} active={editor.isActive('link')} title="Link">
           <LinkIcon className="w-4 h-4" />
         </ToolbarButton>
