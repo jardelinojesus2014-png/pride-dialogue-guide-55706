@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Shield, ShieldOff, Calendar, Trash2, KeyRound, Loader2, LogOut } from 'lucide-react';
+import { Shield, ShieldOff, Calendar, Trash2, KeyRound, Loader2, LogOut, UserPlus } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
