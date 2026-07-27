@@ -2,13 +2,12 @@ import { useState, useEffect } from 'react';
 import { Plus, Pencil, Trash2, ArrowUp, ArrowDown, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useCategoryTopics, CategoryTopic } from '@/hooks/useCategoryTopics';
 import { useTopicDeepLink, scrollToTopicEl } from '@/hooks/useTopicDeepLink';
-import { MarkdownContent } from '@/components/MarkdownContent';
-import { FormattingHelp } from '@/components/FormattingHelp';
+import { RichContent } from '@/components/RichContent';
+import { RichContentEditor } from '@/components/RichContentEditor';
 import { CategoryContentSection } from '@/components/TrainingCategoriesSection';
 
 interface CategoryDocProps {
@@ -106,7 +105,7 @@ export const CategoryDoc = ({ categoryId, categoryName, isAdmin, onClose }: Cate
                       </div>
                     )}
                   </div>
-                  <MarkdownContent content={t.body || ''} />
+                  <RichContent content={t.body || ''} />
                 </section>
               ))}
             </div>
@@ -157,7 +156,7 @@ const CategoryTopicDialog = ({ open, onOpenChange, topic, onSave }: CategoryTopi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{topic ? 'Editar tópico' : 'Novo tópico'}</DialogTitle>
         </DialogHeader>
@@ -168,11 +167,12 @@ const CategoryTopicDialog = ({ open, onOpenChange, topic, onSave }: CategoryTopi
               placeholder="Ex: Dia 01, Dia 02, Mensagem de fechamento..." />
           </div>
           <div>
-            <Label htmlFor="cat-topic-body">Conteúdo (Markdown)</Label>
-            <Textarea id="cat-topic-body" value={body} onChange={(e) => setBody(e.target.value)} rows={12}
-              className="font-mono text-sm"
-              placeholder={'**Negrito**, listas com - item e caixas de destaque com >\n\n> [!blue] Mensagem pronta para o cliente\n\nPalavra {red}vermelha{/red} ou {green}verde{/green}.'} />
-            <FormattingHelp />
+            <Label>Conteúdo</Label>
+            <RichContentEditor
+              value={body}
+              onChange={setBody}
+              placeholder="Escreva aqui. Cole prints (Ctrl+V), arraste imagens ou cole links do YouTube/Loom."
+            />
           </div>
           <Button onClick={() => title.trim() && onSave(title.trim(), body)} disabled={!title.trim()} className="w-full">
             {topic ? 'Salvar alterações' : 'Adicionar tópico'}
