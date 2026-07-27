@@ -288,6 +288,59 @@ export const UserManagement = ({ users, onUserUpdated }: UserManagementProps) =>
   return (
     <>
       <div className="space-y-4">
+        <Card className="border-primary/30">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <UserPlus className="w-4 h-4" /> Criar novo usuário
+            </CardTitle>
+            <CardDescription>
+              Cadastre usuários manualmente sem depender do envio de e-mail de confirmação.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleCreateUser} className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+              <div className="space-y-1">
+                <Label htmlFor="new-user-email">Email</Label>
+                <Input
+                  id="new-user-email"
+                  type="email"
+                  placeholder="nome@pridecorretora.com.br"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="new-user-password">Senha</Label>
+                <Input
+                  id="new-user-password"
+                  type="text"
+                  placeholder="Mínimo 6 caracteres"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  minLength={6}
+                  required
+                />
+              </div>
+              <Button type="submit" disabled={creatingUser}>
+                {creatingUser ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Criando...</>
+                ) : (
+                  <><UserPlus className="w-4 h-4 mr-2" />Criar</>
+                )}
+              </Button>
+              <label className="flex items-center gap-2 text-sm sm:col-span-3">
+                <input
+                  type="checkbox"
+                  checked={newIsAdmin}
+                  onChange={(e) => setNewIsAdmin(e.target.checked)}
+                />
+                Cadastrar como administrador
+              </label>
+            </form>
+          </CardContent>
+        </Card>
+
         {users.length === 0 ? (
           <p className="text-center text-muted-foreground py-8">
             Nenhum usuário encontrado
