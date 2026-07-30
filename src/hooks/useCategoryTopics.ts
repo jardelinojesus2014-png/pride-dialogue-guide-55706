@@ -30,7 +30,8 @@ export const useCategoryTopics = (categoryId: string | null | undefined) => {
         .from('category_topics')
         .select('*')
         .eq('category_id', categoryId)
-        .order('display_order', { ascending: true });
+        .order('display_order', { ascending: true })
+        .order('created_at', { ascending: true });
       if (error) throw error;
       setTopics((data || []) as CategoryTopic[]);
     } catch (error) {

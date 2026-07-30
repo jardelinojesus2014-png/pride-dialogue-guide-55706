@@ -30,7 +30,8 @@ export const useOperadoraTopics = (operadoraId: string | null | undefined) => {
         .from('operadora_topics')
         .select('*')
         .eq('operadora_id', operadoraId)
-        .order('display_order', { ascending: true });
+        .order('display_order', { ascending: true })
+        .order('created_at', { ascending: true });
       if (error) throw error;
       setTopics((data || []) as OperadoraTopic[]);
     } catch (error) {
