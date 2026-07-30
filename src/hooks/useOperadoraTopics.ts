@@ -85,32 +85,35 @@ export const useOperadoraTopics = (operadoraId: string | null | undefined) => {
     }
   };
 
-  // Move um tópico para cima/baixo, trocando a ordem com o vizinho
+  // Move um tópico para cima/baixo. Regrava display_order sequencial de todos,
+  // pois registros antigos podem ter ordens duplicadas (a troca simples falhava).
   const moveTopic = async (id: string, direction: 'up' | 'down') => {
     const index = topics.findIndex((t) => t.id === id);
     if (index < 0) return;
     const swapWith = direction === 'up' ? index - 1 : index + 1;
     if (swapWith < 0 || swapWith >= topics.length) return;
 
-    const a = topics[index];
-    const b = topics[swapWith];
-    // Atualização otimista
     const reordered = [...topics];
-    reordered[index] = b;
-    reordered[swapWith] = a;
-    setTopics(reordered);
+    [reordered[index], reordered[swapWith]] = [reordered[swapWith], reordered[index]];
+    // Atualização otimista
+    setTopics(reordered.map((t, i) => ({ ...t, display_order: i })));
 
     try {
-      await Promise.all([
-        db.from('operadora_topics').update({ display_order: b.display_order }).eq('id', a.id),
-        db.from('operadora_topics').update({ display_order: a.display_order }).eq('id', b.id),
-      ]);
+      const results = await Promise.all(
+        reordered.map((t, i) =>
+          db.from('operadora_topics').update({ display_order: i }).eq('id', t.id),
+        ),
+      );
+      const failed = results.find((r: any) => r?.error);
+      if (failed) throw failed.error;
       fetchTopics();
     } catch (error) {
       console.error('Error reordering topics:', error);
+      toast.error('Erro ao reordenar tópicos');
       fetchTopics();
     }
   };
+
 
   useEffect(() => {
     fetchTopics();
