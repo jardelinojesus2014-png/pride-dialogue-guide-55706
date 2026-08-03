@@ -360,6 +360,30 @@ function verifyAppAccess(payload){
   });
 }
 
+// Lista TODOS os logins cadastrados no app (via service role na edge function),
+// funcionando tanto dentro do iframe quanto com login direto de admin.
+function ensureAvProfiles(force){
+  if(window.__avProfilesLoading)return;
+  if(window.__avProfiles&&!force)return;
+  var token=window.__avAdmToken||window.__parentAccessToken||null;
+  if(!token){
+    try{window.parent.postMessage({type:'avaliacoes:requestProfiles'},'*');}catch(e){}
+    ensureParentAuth();
+    return;
+  }
+  window.__avProfilesLoading=true;
+  verifyAppAccess({accessToken:token,listUsers:true}).then(function(res){
+    window.__avProfilesLoading=false;
+    if(Array.isArray(res.users)){
+      window.__avProfiles=res.users.map(function(u){return {id:u.id,email:u.email,isAdmin:u.isAdmin};});
+      try{render();}catch(_){}
+    }
+  }).catch(function(){
+    window.__avProfilesLoading=false;
+    try{window.parent.postMessage({type:'avaliacoes:requestProfiles'},'*');}catch(e){}
+  });
+}
+
 function requestParentAuth(){
   try{window.parent.postMessage({type:'avaliacoes:requestAuth'},'*');}catch(e){}
 }
