@@ -2918,6 +2918,9 @@ function renderAdmDashboard(){
   const filterEmailsSet=new Set();
   allResults.forEach(r=>{ if(r.email) filterEmailsSet.add(String(r.email).toLowerCase()); });
   allStudy.forEach(s=>{ if(s.email) filterEmailsSet.add(String(s.email).toLowerCase()); });
+  // Inclui TODOS os logins cadastrados no app, mesmo quem nunca fez prova/chat
+  ensureAvProfiles();
+  (window.__avProfiles||[]).forEach(p=>{ if(p&&p.email) filterEmailsSet.add(String(p.email).toLowerCase()); });
   const filterEmails=[...filterEmailsSet].sort();
   const activeFilter=(S.admFilterEmail||'').toLowerCase();
   const results=activeFilter?allResults.filter(r=>String(r.email||'').toLowerCase()===activeFilter):allResults;
