@@ -25,6 +25,8 @@ const App = () => (
         <Sonner />
         <AuthProvider>
           <InactivityReloader />
+          <SignedStorageUrlBridge />
+
           <Routes>
             <Route path="/auth" element={<Auth />} />
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
