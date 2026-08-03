@@ -1624,7 +1624,7 @@ function render(){
   else if(v==='quiz')renderQuiz();
   else if(v==='quiz_result')renderResult();
   else if(v==='adm_login'){
-    if(PARENT_IS_ADMIN){ S.admLogged=true; S.view='adm'; S.admView=S.admView||'dashboard'; renderAdm(); }
+    if(PARENT_IS_ADMIN||window.__avIsAdmin){ S.admLogged=true; S.view='adm'; S.admView=S.admView||'dashboard'; renderAdm(); }
     else renderAdmLogin();
   }
   else if(v==='adm')renderAdm();
@@ -3714,6 +3714,14 @@ window.addEventListener('message',function(ev){
   if(d&&d.type==='avaliacoes:auth'){
     window.__parentAccessToken=d.accessToken||null;
     window.__parentUserId=d.userId||null;
+    // Espelha a permissão de admin do app principal (user_roles) dentro das avaliações
+    if(window.__parentAccessToken){
+      verifyAppAccess({accessToken:window.__parentAccessToken}).then(function(res){
+        window.__avIsAdmin=!!res.isAdmin;
+        if(res.email&&!S.email)S.email=res.email;
+        if(res.name&&!S.name)S.name=res.name;
+      }).catch(function(){});
+    }
     if(d.userEmail){S.email=String(d.userEmail).toLowerCase();}
     if(d.userName){S.name=String(d.userName);}
     flushPendingRemoteWrites();
