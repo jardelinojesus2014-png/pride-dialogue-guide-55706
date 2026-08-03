@@ -360,6 +360,30 @@ function verifyAppAccess(payload){
   });
 }
 
+// Lista TODOS os logins cadastrados no app (via service role na edge function),
+// funcionando tanto dentro do iframe quanto com login direto de admin.
+function ensureAvProfiles(force){
+  if(window.__avProfilesLoading)return;
+  if(window.__avProfiles&&!force)return;
+  var token=window.__avAdmToken||window.__parentAccessToken||null;
+  if(!token){
+    try{window.parent.postMessage({type:'avaliacoes:requestProfiles'},'*');}catch(e){}
+    ensureParentAuth();
+    return;
+  }
+  window.__avProfilesLoading=true;
+  verifyAppAccess({accessToken:token,listUsers:true}).then(function(res){
+    window.__avProfilesLoading=false;
+    if(Array.isArray(res.users)){
+      window.__avProfiles=res.users.map(function(u){return {id:u.id,email:u.email,isAdmin:u.isAdmin};});
+      try{render();}catch(_){}
+    }
+  }).catch(function(){
+    window.__avProfilesLoading=false;
+    try{window.parent.postMessage({type:'avaliacoes:requestProfiles'},'*');}catch(e){}
+  });
+}
+
 function requestParentAuth(){
   try{window.parent.postMessage({type:'avaliacoes:requestAuth'},'*');}catch(e){}
 }
@@ -2650,7 +2674,10 @@ function admLogin(){
     if(!res.isAdmin){fail('Este acesso não possui permissão de administrador.');return;}
     S.email=res.email||email;
     if(res.name&&!S.name)S.name=res.name;
-    S.admLogged=true;S.view='adm';S.admView='dashboard';render();
+    if(res.accessToken)window.__avAdmToken=res.accessToken;
+    S.admLogged=true;S.view='adm';S.admView='dashboard';
+    ensureAvProfiles(true);
+    render();
   }).catch(function(e){
     if(email===ADM_EMAIL&&pass===ADM_PASSWORD){S.admLogged=true;S.view='adm';S.admView='dashboard';render();return;}
     fail(e.message||'E-mail ou senha incorretos.');
@@ -2662,6 +2689,7 @@ function admLogin(){
 //  ADM PANEL
 // ══════════════════════════════════════════
 function renderAdm(){
+  ensureAvProfiles();
   if(S.admView==='dashboard')return renderAdmDashboard();
   if(S.admView==='questions')return renderAdmQuestions();
   if(S.admView==='evolution')return renderAdmEvolution();
@@ -2890,6 +2918,9 @@ function renderAdmDashboard(){
   const filterEmailsSet=new Set();
   allResults.forEach(r=>{ if(r.email) filterEmailsSet.add(String(r.email).toLowerCase()); });
   allStudy.forEach(s=>{ if(s.email) filterEmailsSet.add(String(s.email).toLowerCase()); });
+  // Inclui TODOS os logins cadastrados no app, mesmo quem nunca fez prova/chat
+  ensureAvProfiles();
+  (window.__avProfiles||[]).forEach(p=>{ if(p&&p.email) filterEmailsSet.add(String(p.email).toLowerCase()); });
   const filterEmails=[...filterEmailsSet].sort();
   const activeFilter=(S.admFilterEmail||'').toLowerCase();
   const results=activeFilter?allResults.filter(r=>String(r.email||'').toLowerCase()===activeFilter):allResults;
@@ -3066,9 +3097,35 @@ ${activeFilter?`<button class="btn btn-outline btn-sm" onclick="S.admFilterEmail
   const grantsLogHtml=`<div class="card"><div class="card-hd"><h2>Histórico de liberações</h2></div>
 ${grantsLog.length?`<div style="overflow-x:auto"><table><thead><tr><th>Data/Hora</th><th>Admin</th><th>Ação</th><th>Usuário</th><th>Versões</th></tr></thead><tbody>${grantsLogRows}</tbody></table></div>`:'<div style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">Nenhuma liberação registrada ainda.</div>'}
 </div>`;
+  // Card com TODOS os logins cadastrados no app (mesmo quem nunca fez prova nem usou a ErminIA)
+  const appProfiles=window.__avProfiles;
+  let appUsersHtml='';
+  if(!appProfiles){
+    appUsersHtml=`<div class="card"><div class="card-hd"><h2>Logins cadastrados no app</h2></div><div style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">Carregando logins cadastrados...</div></div>`;
+  } else {
+    const attemptsByEmail={};
+    allResults.forEach(r=>{const e=String(r.email||'').toLowerCase();if(e)attemptsByEmail[e]=(attemptsByEmail[e]||0)+1;});
+    const studyByEmail={};
+    allStudy.forEach(s=>{const e=String(s.email||'').toLowerCase();if(e)studyByEmail[e]=(studyByEmail[e]||0)+1;});
+    let appUserRows='';
+    appProfiles.slice().sort((a,b)=>String(a.email||'').localeCompare(String(b.email||''))).forEach(p=>{
+      const em=String(p.email||'').toLowerCase();
+      const safe=em.replace(/'/g,"\\'");
+      appUserRows+=`<tr>
+<td style="font-size:12px"><strong>${em}</strong>${p.isAdmin?' <span class="badge badge-blue">admin</span>':''}</td>
+<td style="text-align:center;font-size:12px">${attemptsByEmail[em]||0}</td>
+<td style="text-align:center;font-size:12px">${studyByEmail[em]||0}</td>
+<td style="text-align:right"><button class="btn btn-outline btn-sm" style="padding:2px 8px;font-size:11px" onclick="S.admFilterEmail='${safe}';S.expandedResult=null;S.expandedUser=null;renderAdmDashboard()">Ver registros</button></td>
+</tr>`;
+    });
+    appUsersHtml=`<div class="card"><div class="card-hd"><h2>Logins cadastrados no app (${appProfiles.length})</h2><button class="btn btn-ghost btn-sm" onclick="ensureAvProfiles(true)">↻ Atualizar logins</button></div>
+${appProfiles.length?`<div style="overflow-x:auto"><table><thead><tr><th>Login</th><th style="text-align:center">Tentativas</th><th style="text-align:center">Sessões ErminIA</th><th></th></tr></thead><tbody>${appUserRows}</tbody></table></div>`:'<div style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">Nenhum login encontrado.</div>'}
+</div>`;
+  }
   root.innerHTML=admNav()+`<div class="page">
 <div id="admAlert" class="hidden"></div>
 ${filterBarHtml}
+${appUsersHtml}
 <div class="metrics">
 <div class="metric"><div class="metric-val">${results.length}</div><div class="metric-lbl">Total de tentativas</div></div>
 <div class="metric"><div class="metric-val">${emails.length}</div><div class="metric-lbl">Participantes únicos</div></div>
@@ -3423,7 +3480,7 @@ function renderAdmExams(){
       const allowedSet=new Set(allowed.map(s=>String(s).toLowerCase()));
       let body='';
       if(!profs){
-        try{window.parent.postMessage({type:'avaliacoes:requestProfiles'},'*');}catch(e){}
+        ensureAvProfiles();
         body=`<div style="padding:14px;text-align:center;color:#64748b;font-size:13px">Carregando usuários cadastrados...</div>`;
       } else if(!profs.length){
         body=`<div style="padding:14px;text-align:center;color:#64748b;font-size:13px">Nenhum usuário cadastrado encontrado.</div>`;
@@ -3467,7 +3524,7 @@ ${body}
         return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
       }
       var profs2=window.__avProfiles;
-      if(!profs2){try{window.parent.postMessage({type:'avaliacoes:requestProfiles'},'*');}catch(e){}}
+      if(!profs2){ensureAvProfiles();}
       var winsList=getExamWindows(ex);
       var winRows='';
       if(!winsList.length){
