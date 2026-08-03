@@ -3447,7 +3447,7 @@ function renderAdmExams(){
       const allowedSet=new Set(allowed.map(s=>String(s).toLowerCase()));
       let body='';
       if(!profs){
-        try{window.parent.postMessage({type:'avaliacoes:requestProfiles'},'*');}catch(e){}
+        ensureAvProfiles();
         body=`<div style="padding:14px;text-align:center;color:#64748b;font-size:13px">Carregando usuários cadastrados...</div>`;
       } else if(!profs.length){
         body=`<div style="padding:14px;text-align:center;color:#64748b;font-size:13px">Nenhum usuário cadastrado encontrado.</div>`;
