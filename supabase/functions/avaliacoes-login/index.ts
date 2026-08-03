@@ -27,6 +27,7 @@ serve(async (req: Request) => {
     const email = String(body?.email || "").trim().toLowerCase();
     const password = String(body?.password || "");
     const token = String(body?.accessToken || "");
+    const listUsers = Boolean(body?.listUsers);
 
     const admin = createClient(supabaseUrl, serviceKey, {
       auth: { autoRefreshToken: false, persistSession: false },
@@ -35,6 +36,7 @@ serve(async (req: Request) => {
     let userId: string | null = null;
     let userEmail: string | null = null;
     let userMeta: Record<string, unknown> = {};
+    let sessionToken: string | null = null;
 
     if (token) {
       // Reuse an existing app session (iframe inside the main app)
@@ -43,6 +45,7 @@ serve(async (req: Request) => {
       userId = data.user.id;
       userEmail = (data.user.email || "").toLowerCase();
       userMeta = (data.user.user_metadata || {}) as Record<string, unknown>;
+      sessionToken = token;
     } else {
       if (!email || !password) return json({ error: "Informe e-mail e senha." }, 400);
       // Validate the exact same credentials used in the main app
@@ -54,7 +57,7 @@ serve(async (req: Request) => {
       userId = data.user.id;
       userEmail = (data.user.email || "").toLowerCase();
       userMeta = (data.user.user_metadata || {}) as Record<string, unknown>;
-      await publicClient.auth.signOut().catch(() => {});
+      sessionToken = data.session?.access_token || null;
     }
 
     const { data: role } = await admin
@@ -64,13 +67,36 @@ serve(async (req: Request) => {
       .eq("role", "admin")
       .maybeSingle();
 
+    const isAdmin = !!role;
+
+    // Admins can pull the full list of app logins (used by the exams admin panel)
+    let users: Array<{ id: string; email: string; isAdmin: boolean }> | undefined;
+    if (listUsers) {
+      if (!isAdmin) return json({ error: "Permissão de administrador necessária." }, 403);
+      const { data: profiles, error: profErr } = await admin
+        .from("profiles")
+        .select("id,email")
+        .order("email", { ascending: true });
+      if (profErr) return json({ error: profErr.message }, 500);
+      const { data: roles } = await admin.from("user_roles").select("user_id,role");
+      const adminIds = new Set((roles || []).filter((r) => r.role === "admin").map((r) => r.user_id));
+      users = (profiles || []).map((p) => ({
+        id: p.id as string,
+        email: String(p.email || "").toLowerCase(),
+        isAdmin: adminIds.has(p.id),
+      }));
+    }
+
     return json({
       ok: true,
       userId,
       email: userEmail,
       name: (userMeta?.full_name as string) || (userMeta?.name as string) || "",
-      isAdmin: !!role,
+      isAdmin,
+      accessToken: sessionToken,
+      users,
     });
+
   } catch (e) {
     return json({ error: (e as Error).message || "Erro inesperado" }, 500);
   }
