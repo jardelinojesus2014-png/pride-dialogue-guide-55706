@@ -3097,9 +3097,35 @@ ${activeFilter?`<button class="btn btn-outline btn-sm" onclick="S.admFilterEmail
   const grantsLogHtml=`<div class="card"><div class="card-hd"><h2>Histórico de liberações</h2></div>
 ${grantsLog.length?`<div style="overflow-x:auto"><table><thead><tr><th>Data/Hora</th><th>Admin</th><th>Ação</th><th>Usuário</th><th>Versões</th></tr></thead><tbody>${grantsLogRows}</tbody></table></div>`:'<div style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">Nenhuma liberação registrada ainda.</div>'}
 </div>`;
+  // Card com TODOS os logins cadastrados no app (mesmo quem nunca fez prova nem usou a ErminIA)
+  const appProfiles=window.__avProfiles;
+  let appUsersHtml='';
+  if(!appProfiles){
+    appUsersHtml=`<div class="card"><div class="card-hd"><h2>Logins cadastrados no app</h2></div><div style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">Carregando logins cadastrados...</div></div>`;
+  } else {
+    const attemptsByEmail={};
+    allResults.forEach(r=>{const e=String(r.email||'').toLowerCase();if(e)attemptsByEmail[e]=(attemptsByEmail[e]||0)+1;});
+    const studyByEmail={};
+    allStudy.forEach(s=>{const e=String(s.email||'').toLowerCase();if(e)studyByEmail[e]=(studyByEmail[e]||0)+1;});
+    let appUserRows='';
+    appProfiles.slice().sort((a,b)=>String(a.email||'').localeCompare(String(b.email||''))).forEach(p=>{
+      const em=String(p.email||'').toLowerCase();
+      const safe=em.replace(/'/g,"\\'");
+      appUserRows+=`<tr>
+<td style="font-size:12px"><strong>${em}</strong>${p.isAdmin?' <span class="badge badge-blue">admin</span>':''}</td>
+<td style="text-align:center;font-size:12px">${attemptsByEmail[em]||0}</td>
+<td style="text-align:center;font-size:12px">${studyByEmail[em]||0}</td>
+<td style="text-align:right"><button class="btn btn-outline btn-sm" style="padding:2px 8px;font-size:11px" onclick="S.admFilterEmail='${safe}';S.expandedResult=null;S.expandedUser=null;renderAdmDashboard()">Ver registros</button></td>
+</tr>`;
+    });
+    appUsersHtml=`<div class="card"><div class="card-hd"><h2>Logins cadastrados no app (${appProfiles.length})</h2><button class="btn btn-ghost btn-sm" onclick="ensureAvProfiles(true)">↻ Atualizar logins</button></div>
+${appProfiles.length?`<div style="overflow-x:auto"><table><thead><tr><th>Login</th><th style="text-align:center">Tentativas</th><th style="text-align:center">Sessões ErminIA</th><th></th></tr></thead><tbody>${appUserRows}</tbody></table></div>`:'<div style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">Nenhum login encontrado.</div>'}
+</div>`;
+  }
   root.innerHTML=admNav()+`<div class="page">
 <div id="admAlert" class="hidden"></div>
 ${filterBarHtml}
+${appUsersHtml}
 <div class="metrics">
 <div class="metric"><div class="metric-val">${results.length}</div><div class="metric-lbl">Total de tentativas</div></div>
 <div class="metric"><div class="metric-val">${emails.length}</div><div class="metric-lbl">Participantes únicos</div></div>
