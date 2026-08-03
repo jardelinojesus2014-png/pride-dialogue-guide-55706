@@ -2180,33 +2180,46 @@ function renderName(){
   root.innerHTML=`<div class="name-wrap">
 <div class="name-card">
 <h2>Identificação</h2>
-<p>Preencha seus dados para iniciar. Certifique-se de usar seu e-mail corporativo.</p>
+<p>Entre com o mesmo e-mail e senha que você usa no artefato Pride.</p>
 <div id="nameErr" class="alert alert-err hidden"></div>
-<div class="form-row"><label>Nome completo</label><input type="text" id="nameInp" placeholder="Ex: João Silva" maxlength="80" onkeydown="if(event.key==='Enter')document.getElementById('emailInp').focus()"></div>
-<div class="form-row"><label>E-mail corporativo <span style="font-weight:400;color:#94a3b8">(@pridecorretora.com.br)</span></label><input type="text" id="emailInp" placeholder="seunome@pridecorretora.com.br" maxlength="120" onkeydown="if(event.key==='Enter')beginQuiz()"></div>
-<button class="btn btn-gold" style="width:100%;padding:12px;font-size:15px" onclick="beginQuiz()">Iniciar prova</button>
+<div class="form-row"><label>E-mail corporativo <span style="font-weight:400;color:#94a3b8">(@pridecorretora.com.br)</span></label><input type="text" id="emailInp" placeholder="seunome@pridecorretora.com.br" maxlength="120" onkeydown="if(event.key==='Enter')document.getElementById('passInp').focus()"></div>
+<div class="form-row"><label>Senha do artefato</label><input type="password" id="passInp" placeholder="Sua senha de acesso" onkeydown="if(event.key==='Enter')beginQuiz()"></div>
+<div class="form-row"><label>Nome completo <span style="font-weight:400;color:#94a3b8">(opcional)</span></label><input type="text" id="nameInp" placeholder="Ex: João Silva" maxlength="80" onkeydown="if(event.key==='Enter')beginQuiz()"></div>
+<button class="btn btn-gold" id="beginBtn" style="width:100%;padding:12px;font-size:15px" onclick="beginQuiz()">Entrar e iniciar prova</button>
 <div style="margin-top:14px;text-align:center"><button class="btn btn-ghost" style="font-size:12px" onclick="S.view='instructions';render()">Voltar às instruções</button></div>
 </div>
 </div>`;
-  setTimeout(()=>{document.getElementById('nameInp')?.focus();},50);
+  setTimeout(()=>{document.getElementById('emailInp')?.focus();},50);
 }
 
 function beginQuiz(){
   const name=(document.getElementById('nameInp')?.value||'').trim();
   const email=(document.getElementById('emailInp')?.value||'').trim().toLowerCase();
+  const pass=document.getElementById('passInp')?.value||'';
+  const btn=document.getElementById('beginBtn');
   const err=document.getElementById('nameErr');
-  function showErr(msg){if(err){err.textContent=msg;err.classList.remove('hidden');}}
-  if(!name){showErr('Informe seu nome completo.');return;}
+  function showErr(msg){if(err){err.textContent=msg;err.classList.remove('hidden');}if(btn){btn.disabled=false;btn.textContent='Entrar e iniciar prova';}}
   if(!email){showErr('Informe seu e-mail corporativo.');return;}
   if(!email.endsWith(DOMAIN)){showErr('Somente e-mails '+DOMAIN+' são aceitos para realizar esta prova.');return;}
+  if(!pass){showErr('Informe a senha do seu acesso ao artefato.');return;}
   if(!canAttempt(email)){
     showErr('Você atingiu o limite de '+MAX_ATTEMPTS+' tentativas para este tema. Solicite liberação ao gestor.');return;
   }
   err&&err.classList.add('hidden');
-  S.name=name; S.email=email;
-  S.view='exam_select';
-  render();
+  if(btn){btn.disabled=true;btn.textContent='Validando acesso…';}
+  // Só entra quem realmente possui acesso cadastrado no app principal.
+  verifyAppAccess({email:email,password:pass}).then(function(res){
+    S.email=res.email||email;
+    S.name=name||res.name||(res.email||email).split('@')[0];
+    window.__parentUserId=window.__parentUserId||res.userId||null;
+    S.isAdminAccount=!!res.isAdmin;
+    S.view='exam_select';
+    render();
+  }).catch(function(e){
+    showErr(e.message||'Acesso não encontrado. Confirme e-mail e senha do artefato.');
+  });
 }
+
 
 
 // ══════════════════════════════════════════
