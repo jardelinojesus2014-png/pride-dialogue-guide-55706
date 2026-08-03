@@ -2,3 +2,6 @@ project_id = "suyafjzrjzqhztsaxmdc"
 
 [functions.extract-exam-pdf]
 verify_jwt = false
+
+[functions.avaliacoes-login]
+verify_jwt = false
