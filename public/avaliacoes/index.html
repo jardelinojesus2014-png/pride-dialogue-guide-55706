@@ -2629,9 +2629,21 @@ function admLogin(){
   const email=(document.getElementById('admEmail')?.value||'').trim().toLowerCase();
   const pass=document.getElementById('admPass')?.value||'';
   const err=document.getElementById('loginErr');
-  if(email===ADM_EMAIL&&pass===ADM_PASSWORD){S.admLogged=true;S.view='adm';S.admView='dashboard';render();}
-  else{if(err){err.textContent='E-mail ou senha incorretos.';err.classList.remove('hidden');}}
+  function fail(msg){if(err){err.textContent=msg;err.classList.remove('hidden');}}
+  if(!email||!pass){fail('Informe e-mail e senha.');return;}
+  if(err)err.classList.add('hidden');
+  // Permissão espelhada do app principal: só entra quem é admin lá.
+  verifyAppAccess({email:email,password:pass}).then(function(res){
+    if(!res.isAdmin){fail('Este acesso não possui permissão de administrador.');return;}
+    S.email=res.email||email;
+    if(res.name&&!S.name)S.name=res.name;
+    S.admLogged=true;S.view='adm';S.admView='dashboard';render();
+  }).catch(function(e){
+    if(email===ADM_EMAIL&&pass===ADM_PASSWORD){S.admLogged=true;S.view='adm';S.admView='dashboard';render();return;}
+    fail(e.message||'E-mail ou senha incorretos.');
+  });
 }
+
 
 // ══════════════════════════════════════════
 //  ADM PANEL
