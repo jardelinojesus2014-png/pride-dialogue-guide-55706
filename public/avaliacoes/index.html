@@ -340,6 +340,26 @@ const PRESET_NAME = __QS.get('userName') || '';
 const PRESET_EMAIL = __QS.get('userEmail') || '';
 const PARENT_IS_ADMIN = __QS.get('isAdmin') === '1';
 
+// ── Acessos e permissões espelhados do app principal ──
+const AV_SUPA_URL = ERMINIA_SUPA_URL || 'https://suyafjzrjzqhztsaxmdc.supabase.co';
+const AV_SUPA_KEY = ERMINIA_SUPA_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1eWFmanpyanpxaHp0c2F4bWRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0MTQ4MzQsImV4cCI6MjA3Njk5MDgzNH0.OA9SKIWDyG_OTx6H2k6aPn8iqLMSatIXv88Bvwx2UME';
+const AV_LOGIN_URL = AV_SUPA_URL + '/functions/v1/avaliacoes-login';
+
+// Valida e-mail/senha (ou a sessão do app pai) contra os acessos do app principal,
+// retornando também a permissão de administrador vinda de user_roles.
+function verifyAppAccess(payload){
+  return fetch(AV_LOGIN_URL,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','apikey':AV_SUPA_KEY,'Authorization':'Bearer '+AV_SUPA_KEY},
+    body:JSON.stringify(payload)
+  }).then(function(r){
+    return r.json().catch(function(){return {error:'Resposta inválida do servidor.'};}).then(function(j){
+      if(!r.ok||!j||!j.ok) throw new Error((j&&j.error)||'Não foi possível validar o acesso.');
+      return j;
+    });
+  });
+}
+
 function requestParentAuth(){
   try{window.parent.postMessage({type:'avaliacoes:requestAuth'},'*');}catch(e){}
 }
