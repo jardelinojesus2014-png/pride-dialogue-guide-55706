@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { InactivityReloader } from "@/components/InactivityReloader";
+import { SignedStorageUrlBridge } from "@/components/SignedStorageUrlBridge";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
@@ -24,6 +25,8 @@ const App = () => (
         <Sonner />
         <AuthProvider>
           <InactivityReloader />
+          <SignedStorageUrlBridge />
+
           <Routes>
             <Route path="/auth" element={<Auth />} />
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
