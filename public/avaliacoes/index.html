@@ -3491,7 +3491,7 @@ ${body}
         return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
       }
       var profs2=window.__avProfiles;
-      if(!profs2){try{window.parent.postMessage({type:'avaliacoes:requestProfiles'},'*');}catch(e){}}
+      if(!profs2){ensureAvProfiles();}
       var winsList=getExamWindows(ex);
       var winRows='';
       if(!winsList.length){
