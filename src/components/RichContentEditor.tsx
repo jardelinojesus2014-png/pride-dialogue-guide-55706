@@ -1,6 +1,6 @@
 import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import Link from '@tiptap/extension-link';
+import TextAlign from '@tiptap/extension-text-align';
 import Youtube from '@tiptap/extension-youtube';
 import ResizeImage from 'tiptap-extension-resize-image';
 import { TextStyle } from '@tiptap/extension-text-style';
@@ -10,9 +10,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
-  Bold, Italic, Strikethrough, List, ListOrdered, Link as LinkIcon,
+  Bold, Italic, Underline as UnderlineIcon, Strikethrough, List, ListOrdered, Link as LinkIcon,
   Image as ImageIcon, Video, Heading2, Heading3, Quote, Undo, Redo,
-  Baseline, Highlighter,
+  Baseline, Highlighter, AlignLeft, AlignCenter, AlignRight, AlignJustify,
 } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
@@ -119,11 +119,15 @@ export const RichContentEditor = ({ value, onChange, placeholder }: RichContentE
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({ heading: { levels: [2, 3] } }),
+      // StarterKit v3 já inclui Link e Underline — configuramos aqui para não duplicar extensões.
+      StarterKit.configure({
+        heading: { levels: [2, 3] },
+        link: { openOnClick: false, autolink: true, HTMLAttributes: { class: 'text-accent underline' } },
+      }),
       TextStyle,
       Color.configure({ types: ['textStyle'] }),
       Highlight.configure({ multicolor: true }),
-      Link.configure({ openOnClick: false, autolink: true, HTMLAttributes: { class: 'text-accent underline' } }),
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
       ResizeImage.configure({ inline: false, allowBase64: false }),
       Youtube.configure({ controls: true, nocookie: true, width: 640, height: 360, HTMLAttributes: { class: 'rounded-lg my-2' } }),
     ],
@@ -240,6 +244,9 @@ export const RichContentEditor = ({ value, onChange, placeholder }: RichContentE
         <ToolbarButton onClick={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive('strike')} title="Riscado">
           <Strikethrough className="w-4 h-4" />
         </ToolbarButton>
+        <ToolbarButton onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive('underline')} title="Sublinhado (Ctrl+U)">
+          <UnderlineIcon className="w-4 h-4" />
+        </ToolbarButton>
         <div className="w-px h-5 bg-border mx-1" />
         <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive('heading', { level: 2 })} title="Título">
           <Heading2 className="w-4 h-4" />
@@ -259,6 +266,19 @@ export const RichContentEditor = ({ value, onChange, placeholder }: RichContentE
         <div className="w-px h-5 bg-border mx-1" />
         <ColorPicker editor={editor} />
         <HighlightPicker editor={editor} />
+        <div className="w-px h-5 bg-border mx-1" />
+        <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('left').run()} active={editor.isActive({ textAlign: 'left' })} title="Alinhar à esquerda">
+          <AlignLeft className="w-4 h-4" />
+        </ToolbarButton>
+        <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('center').run()} active={editor.isActive({ textAlign: 'center' })} title="Centralizar">
+          <AlignCenter className="w-4 h-4" />
+        </ToolbarButton>
+        <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('right').run()} active={editor.isActive({ textAlign: 'right' })} title="Alinhar à direita">
+          <AlignRight className="w-4 h-4" />
+        </ToolbarButton>
+        <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('justify').run()} active={editor.isActive({ textAlign: 'justify' })} title="Justificar">
+          <AlignJustify className="w-4 h-4" />
+        </ToolbarButton>
         <div className="w-px h-5 bg-border mx-1" />
         <ToolbarButton onClick={insertLink} active={editor.isActive('link')} title="Link">
           <LinkIcon className="w-4 h-4" />
