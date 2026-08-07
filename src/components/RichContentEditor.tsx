@@ -130,7 +130,7 @@ export const RichContentEditor = ({ value, onChange, placeholder }: RichContentE
     content: value || '',
     editorProps: {
       attributes: {
-        class: 'prose prose-sm max-w-none focus:outline-none min-h-[280px] px-4 py-3',
+        class: 'rich-editor max-w-none focus:outline-none min-h-[280px] px-4 py-3',
       },
       handlePaste: (view, event) => {
         // Imagem colada (Ctrl+V)

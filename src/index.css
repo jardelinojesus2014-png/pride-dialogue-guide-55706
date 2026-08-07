@@ -158,4 +158,88 @@ All colors MUST be HSL.
   .dark audio::-webkit-media-controls-panel {
     background-color: hsl(var(--card));
   }
+
+  /* ===== Editor de conteúdo rico (treinamentos/tópicos) =====
+     O preflight do Tailwind remove os marcadores de listas; aqui
+     restauramos o visual dentro do editor para WYSIWYG real. */
+  .rich-editor {
+    @apply text-[15px] leading-relaxed text-foreground;
+  }
+
+  .rich-editor p {
+    @apply my-2;
+  }
+
+  .rich-editor ul {
+    @apply list-disc pl-6 my-2 space-y-1;
+  }
+
+  .rich-editor ol {
+    @apply list-decimal pl-6 my-2 space-y-1;
+  }
+
+  .rich-editor li {
+    @apply pl-1;
+  }
+
+  .rich-editor li > p {
+    @apply my-0;
+  }
+
+  .rich-editor ul ul,
+  .rich-editor ol ul {
+    list-style-type: circle;
+    @apply my-1;
+  }
+
+  .rich-editor ul ul ul,
+  .rich-editor ol ul ul {
+    list-style-type: square;
+  }
+
+  .rich-editor ol ol,
+  .rich-editor ul ol {
+    list-style-type: lower-alpha;
+    @apply my-1;
+  }
+
+  .rich-editor h2 {
+    @apply text-lg font-bold mt-4 mb-2;
+  }
+
+  .rich-editor h3 {
+    @apply text-base font-bold mt-3 mb-1.5;
+  }
+
+  .rich-editor strong {
+    @apply font-semibold;
+  }
+
+  .rich-editor a {
+    @apply text-accent underline underline-offset-2;
+  }
+
+  .rich-editor blockquote {
+    @apply border-l-4 border-accent bg-accent/5 px-4 py-2 my-2 rounded-r-lg;
+  }
+
+  .rich-editor code {
+    @apply rounded bg-muted px-1.5 py-0.5 text-sm font-mono;
+  }
+
+  .rich-editor hr {
+    @apply border-border my-4;
+  }
+
+  .rich-editor img {
+    @apply rounded-lg my-2 max-w-full;
+  }
+
+  .rich-editor iframe {
+    @apply rounded-lg max-w-full;
+  }
+
+  .rich-editor mark {
+    @apply rounded-sm px-0.5;
+  }
 }
