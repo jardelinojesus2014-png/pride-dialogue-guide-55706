@@ -186,6 +186,32 @@ All colors MUST be HSL.
     @apply my-0;
   }
 
+  /* O conteúdo editável do TipTap recebe também a classe ProseMirror.
+     Estes estilos explícitos impedem o preflight de ocultar os marcadores
+     enquanto a lista ainda está sendo digitada. */
+  .ProseMirror.rich-editor ul {
+    display: block;
+    list-style-type: disc !important;
+    list-style-position: outside;
+    padding-inline-start: 1.75rem;
+  }
+
+  .ProseMirror.rich-editor ol {
+    display: block;
+    list-style-type: decimal !important;
+    list-style-position: outside;
+    padding-inline-start: 1.75rem;
+  }
+
+  .ProseMirror.rich-editor li {
+    display: list-item;
+  }
+
+  .ProseMirror.rich-editor li::marker {
+    color: currentColor;
+    font-size: 1em;
+  }
+
   .rich-editor ul ul,
   .rich-editor ol ul {
     list-style-type: circle;
