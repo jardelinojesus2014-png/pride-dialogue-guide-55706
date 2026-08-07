@@ -14,7 +14,6 @@ import ArtesCampanhas from "./pages/ArtesCampanhas";
 import Central from "./pages/Central";
 import OperadoraDoc from "./pages/OperadoraDoc";
 import NotFound from "./pages/NotFound";
-import EditorTest from "./pages/__EditorTest";
 
 const queryClient = new QueryClient();
 
@@ -35,7 +34,6 @@ const App = () => (
             <Route path="/artes-campanhas" element={<ProtectedRoute><ArtesCampanhas /></ProtectedRoute>} />
             <Route path="/central/:categoryId" element={<ProtectedRoute><Central /></ProtectedRoute>} />
             <Route path="/operadora/:operadoraId" element={<ProtectedRoute><OperadoraDoc /></ProtectedRoute>} />
-            <Route path="/__editor-test" element={<EditorTest />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
