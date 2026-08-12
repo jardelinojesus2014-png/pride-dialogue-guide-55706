@@ -10,7 +10,12 @@ interface TrainingSearchBarProps {
   onSelect: (item: TrainingSearchItem) => void;
   onSearch?: (query: string) => void;
   className?: string;
+  /** Quando informado, a busca fica restrita a `items` e oferece a opção de buscar em `allItems` */
+  allItems?: TrainingSearchItem[];
+  scopeLabel?: string;
+  placeholder?: string;
 }
+
 
 const kindLabel = (it: TrainingSearchItem) => {
   if (it.kind === 'operadora') return 'Operadora';
@@ -39,10 +44,19 @@ const ItemIcon = ({ it }: { it: TrainingSearchItem }) => {
   }
 };
 
-export const TrainingSearchBar = ({ items, onSelect, onSearch, className }: TrainingSearchBarProps) => {
+export const TrainingSearchBar = ({
+  items,
+  onSelect,
+  onSearch,
+  className,
+  allItems,
+  scopeLabel,
+  placeholder,
+}: TrainingSearchBarProps) => {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [highlight, setHighlight] = useState(0);
+  const [global, setGlobal] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const onSearchRef = useRef(onSearch);
   onSearchRef.current = onSearch;
@@ -55,23 +69,36 @@ export const TrainingSearchBar = ({ items, onSelect, onSearch, className }: Trai
     return () => clearTimeout(t);
   }, [query]);
 
+  const source = global && allItems ? allItems : items;
+
+  const match = (list: TrainingSearchItem[], q: string) => {
+    const terms = q.split(/\s+/);
+    return list.filter((it) => {
+      const hay = normalize(
+        [it.title, it.parentName, it.description, kindLabel(it)].filter(Boolean).join(' ')
+      );
+      return terms.every((t) => hay.includes(t));
+    });
+  };
+
   const results = useMemo(() => {
     const q = normalize(query.trim());
     if (!q) return [];
-    const terms = q.split(/\s+/);
-    return items
-      .filter((it) => {
-        const hay = normalize(
-          [it.title, it.parentName, it.description, kindLabel(it)].filter(Boolean).join(' ')
-        );
-        return terms.every((t) => hay.includes(t));
-      })
-      .slice(0, 8);
-  }, [query, items]);
+    return match(source, q).slice(0, 8);
+  }, [query, source]);
+
+  const globalCount = useMemo(() => {
+    const q = normalize(query.trim());
+    if (!q || !allItems || global || results.length > 0) return 0;
+    return match(allItems, q).length;
+  }, [query, allItems, global, results.length]);
+
 
   useEffect(() => {
     setHighlight(0);
+    if (!query.trim()) setGlobal(false);
   }, [query]);
+
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -117,7 +144,13 @@ export const TrainingSearchBar = ({ items, onSelect, onSearch, className }: Trai
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
-          placeholder="Pesquisar operadora, documento, vídeo, regra..."
+          placeholder={
+            placeholder ||
+            (scopeLabel && !global
+              ? `Pesquisar em ${scopeLabel}...`
+              : 'Pesquisar operadora, documento, vídeo, regra...')
+          }
+
           className="w-full h-14 pl-12 pr-11 rounded-2xl border border-border bg-card text-base text-foreground placeholder:text-muted-foreground shadow-md focus:outline-none focus:ring-2 focus:ring-accent/60 focus:border-accent transition-all"
         />
         {query && (
@@ -138,9 +171,19 @@ export const TrainingSearchBar = ({ items, onSelect, onSearch, className }: Trai
         <div className="absolute z-50 mt-2 w-full rounded-xl border border-border bg-popover shadow-xl overflow-hidden animate-fade-in">
           {results.length === 0 ? (
             <div className="px-4 py-6 text-center text-sm text-muted-foreground">
-              Nenhum resultado para <span className="font-semibold text-foreground">"{query}"</span>
+              Nenhum resultado{scopeLabel && !global ? ` em ${scopeLabel}` : ''} para{' '}
+              <span className="font-semibold text-foreground">"{query}"</span>
+              {globalCount > 0 && (
+                <button
+                  onClick={() => setGlobal(true)}
+                  className="mt-3 block w-full text-xs font-semibold text-accent hover:underline"
+                >
+                  Ver {globalCount} resultado{globalCount > 1 ? 's' : ''} em toda a Central
+                </button>
+              )}
             </div>
           ) : (
+
             <ul className="max-h-80 overflow-y-auto py-1">
               {results.map((it, idx) => (
                 <li key={it.key}>

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Construction } from 'lucide-react';
 import { useTrainingCategories } from '@/hooks/useTrainingCategories';
@@ -26,6 +26,16 @@ const Central = () => {
   const { items: searchItems } = useTrainingSearch();
 
   const current = categories.find((c) => c.id === categoryId);
+
+  // Dentro de uma área, a busca fica restrita ao conteúdo desta área
+  const scopedSearchItems = useMemo(() => {
+    if (!current) return [];
+    if (current.is_operadoras_section) {
+      return searchItems.filter((it) => it.kind === 'operadora' || it.parentType === 'operadora');
+    }
+    return searchItems.filter((it) => it.parentType === 'category' && it.parentId === current.id);
+  }, [searchItems, current?.id, current?.is_operadoras_section]);
+
 
   // Registra o acesso à área (analytics do admin)
   useEffect(() => {
@@ -162,12 +172,15 @@ const Central = () => {
             {/* Barra de pesquisa fixa no topo do conteúdo */}
             <div data-sticky-header className="sticky top-[210px] z-30 mb-6">
               <TrainingSearchBar
-                items={searchItems}
+                items={scopedSearchItems}
+                allItems={searchItems}
+                scopeLabel={current.title}
                 onSelect={handleSearchSelect}
                 onSearch={(q) => logTrainingEvent(user?.id, 'search', null, q)}
                 className="w-full"
               />
             </div>
+
 
             {/* Banner "Em Construção" */}
             {current.show_banner && (
