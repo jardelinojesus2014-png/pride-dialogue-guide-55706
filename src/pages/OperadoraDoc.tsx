@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, ArrowRight, Star, ChevronRight as ChevronRightIcon, ChevronDown, Plus, Pencil, Trash2,
-  ArrowUp, ArrowDown, BookOpen,
+  ArrowUp, ArrowDown, BookOpen, GripVertical,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useOperadoras, Operadora } from '@/hooks/useOperadoras';
 import { useOperadoraTopics, OperadoraTopic } from '@/hooks/useOperadoraTopics';
+import { useDragReorder } from '@/hooks/useDragReorder';
 import { useTopicDeepLink, scrollToTopicEl } from '@/hooks/useTopicDeepLink';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useAuth } from '@/hooks/useAuth';
@@ -30,9 +31,10 @@ const OperadoraDoc = () => {
   const navigate = useNavigate();
 
   const { operadoras, loading, updateOperadoraMeta } = useOperadoras();
-  const { topics, loading: topicsLoading, addTopic, updateTopic, deleteTopic, moveTopic } =
+  const { topics, loading: topicsLoading, addTopic, updateTopic, deleteTopic, moveTopic, reorderTopics } =
     useOperadoraTopics(operadoraId);
   const { isAdmin } = useIsAdmin();
+  const { getItemProps, getItemClassName, getHandleProps } = useDragReorder(topics, reorderTopics);
   const { user } = useAuth();
   const { isFavorite, toggleFavorite } = useTrainingActivity(user?.id);
   const { categories } = useTrainingCategories();
@@ -261,9 +263,15 @@ const OperadoraDoc = () => {
                       id={`topic-${t.id}`}
                       className={`scroll-mt-24 rounded-2xl border bg-card overflow-hidden transition-colors ${
                         isOpen ? 'border-accent/50' : 'border-border hover:border-accent/40'
-                      }`}
+                      } ${isAdmin ? getItemClassName(t.id) : ''}`}
+                      {...(isAdmin ? getItemProps(t.id) : {})}
                     >
                       <div className="flex items-center gap-2 px-4 py-3">
+                        {isAdmin && (
+                          <span title="Arraste para reordenar" {...getHandleProps(t.id)} className="cursor-grab active:cursor-grabbing flex-shrink-0">
+                            <GripVertical className="w-4 h-4 text-muted-foreground" />
+                          </span>
+                        )}
                         <button
                           onClick={() => toggleTopic(t.id)}
                           className="flex-1 flex items-center gap-3 text-left min-w-0"

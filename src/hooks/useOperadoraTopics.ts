@@ -116,9 +116,31 @@ export const useOperadoraTopics = (operadoraId: string | null | undefined) => {
   };
 
 
+  // Reordena a lista completa a partir de uma nova ordem de ids (drag & drop)
+  const reorderTopics = async (orderedIds: string[]) => {
+    const map = new Map(topics.map((t) => [t.id, t]));
+    const reordered = orderedIds.map((id) => map.get(id)).filter(Boolean) as typeof topics;
+    if (reordered.length !== topics.length) return;
+    setTopics(reordered.map((t, i) => ({ ...t, display_order: i })));
+    try {
+      const results = await Promise.all(
+        reordered.map((t, i) =>
+          db.from('operadora_topics').update({ display_order: i }).eq('id', t.id),
+        ),
+      );
+      const failed = results.find((r: any) => r?.error);
+      if (failed) throw failed.error;
+      fetchTopics();
+    } catch (error) {
+      console.error('Error reordering topics:', error);
+      toast.error('Erro ao reordenar tópicos');
+      fetchTopics();
+    }
+  };
+
   useEffect(() => {
     fetchTopics();
   }, [fetchTopics]);
 
-  return { topics, loading, addTopic, updateTopic, deleteTopic, moveTopic, refetch: fetchTopics };
+  return { topics, loading, addTopic, updateTopic, deleteTopic, moveTopic, reorderTopics, refetch: fetchTopics };
 };
