@@ -169,9 +169,19 @@ export const TrainingSearchBar = ({
         <div className="absolute z-50 mt-2 w-full rounded-xl border border-border bg-popover shadow-xl overflow-hidden animate-fade-in">
           {results.length === 0 ? (
             <div className="px-4 py-6 text-center text-sm text-muted-foreground">
-              Nenhum resultado para <span className="font-semibold text-foreground">"{query}"</span>
+              Nenhum resultado{scopeLabel && !global ? ` em ${scopeLabel}` : ''} para{' '}
+              <span className="font-semibold text-foreground">"{query}"</span>
+              {globalCount > 0 && (
+                <button
+                  onClick={() => setGlobal(true)}
+                  className="mt-3 block w-full text-xs font-semibold text-accent hover:underline"
+                >
+                  Ver {globalCount} resultado{globalCount > 1 ? 's' : ''} em toda a Central
+                </button>
+              )}
             </div>
           ) : (
+
             <ul className="max-h-80 overflow-y-auto py-1">
               {results.map((it, idx) => (
                 <li key={it.key}>
