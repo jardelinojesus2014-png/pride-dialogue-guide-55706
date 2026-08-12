@@ -96,7 +96,9 @@ export const TrainingSearchBar = ({
 
   useEffect(() => {
     setHighlight(0);
+    if (!query.trim()) setGlobal(false);
   }, [query]);
+
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
