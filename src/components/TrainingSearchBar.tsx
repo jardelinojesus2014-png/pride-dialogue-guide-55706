@@ -10,7 +10,12 @@ interface TrainingSearchBarProps {
   onSelect: (item: TrainingSearchItem) => void;
   onSearch?: (query: string) => void;
   className?: string;
+  /** Quando informado, a busca fica restrita a `items` e oferece a opção de buscar em `allItems` */
+  allItems?: TrainingSearchItem[];
+  scopeLabel?: string;
+  placeholder?: string;
 }
+
 
 const kindLabel = (it: TrainingSearchItem) => {
   if (it.kind === 'operadora') return 'Operadora';
