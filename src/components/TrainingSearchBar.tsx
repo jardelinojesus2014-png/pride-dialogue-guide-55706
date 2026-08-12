@@ -44,10 +44,19 @@ const ItemIcon = ({ it }: { it: TrainingSearchItem }) => {
   }
 };
 
-export const TrainingSearchBar = ({ items, onSelect, onSearch, className }: TrainingSearchBarProps) => {
+export const TrainingSearchBar = ({
+  items,
+  onSelect,
+  onSearch,
+  className,
+  allItems,
+  scopeLabel,
+  placeholder,
+}: TrainingSearchBarProps) => {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [highlight, setHighlight] = useState(0);
+  const [global, setGlobal] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const onSearchRef = useRef(onSearch);
   onSearchRef.current = onSearch;
@@ -60,19 +69,30 @@ export const TrainingSearchBar = ({ items, onSelect, onSearch, className }: Trai
     return () => clearTimeout(t);
   }, [query]);
 
+  const source = global && allItems ? allItems : items;
+
+  const match = (list: TrainingSearchItem[], q: string) => {
+    const terms = q.split(/\s+/);
+    return list.filter((it) => {
+      const hay = normalize(
+        [it.title, it.parentName, it.description, kindLabel(it)].filter(Boolean).join(' ')
+      );
+      return terms.every((t) => hay.includes(t));
+    });
+  };
+
   const results = useMemo(() => {
     const q = normalize(query.trim());
     if (!q) return [];
-    const terms = q.split(/\s+/);
-    return items
-      .filter((it) => {
-        const hay = normalize(
-          [it.title, it.parentName, it.description, kindLabel(it)].filter(Boolean).join(' ')
-        );
-        return terms.every((t) => hay.includes(t));
-      })
-      .slice(0, 8);
-  }, [query, items]);
+    return match(source, q).slice(0, 8);
+  }, [query, source]);
+
+  const globalCount = useMemo(() => {
+    const q = normalize(query.trim());
+    if (!q || !allItems || global || results.length > 0) return 0;
+    return match(allItems, q).length;
+  }, [query, allItems, global, results.length]);
+
 
   useEffect(() => {
     setHighlight(0);
