@@ -20,9 +20,11 @@ interface CategoryDocProps {
 }
 
 export const CategoryDoc = ({ categoryId, categoryName, isAdmin, onClose }: CategoryDocProps) => {
-  const { topics, loading, addTopic, updateTopic, deleteTopic, moveTopic } = useCategoryTopics(categoryId);
+  const { topics, loading, addTopic, updateTopic, deleteTopic, moveTopic, reorderTopics } = useCategoryTopics(categoryId);
   const [editingTopic, setEditingTopic] = useState<CategoryTopic | null>(null);
   const [isTopicDialogOpen, setIsTopicDialogOpen] = useState(false);
+  const { getItemProps, getItemClassName } = useDragReorder(topics, reorderTopics);
+
 
   // Rola até a âncora (#topic-...) quando vem de uma busca.
   // Offset maior: a Central tem nav de abas + barra de busca fixas no topo.
