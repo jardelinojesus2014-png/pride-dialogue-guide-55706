@@ -84,12 +84,23 @@ export const CategoryDoc = ({ categoryId, categoryName, isAdmin, onClose }: Cate
           ) : (
             <div className="space-y-8">
               {topics.map((t, i) => (
-                <section key={t.id} id={`topic-${t.id}`} className="scroll-mt-6">
+                <section
+                  key={t.id}
+                  id={`topic-${t.id}`}
+                  className={`scroll-mt-6 rounded-lg transition-shadow ${isAdmin ? getItemClassName(t.id) : ''}`}
+                  {...(isAdmin ? getItemProps(t.id) : {})}
+                >
                   <div className="flex items-center justify-between gap-2 border-b border-border pb-2 mb-3">
-                    <h3 className="text-xl font-bold text-foreground">{t.title}</h3>
+                    <div className="flex items-center gap-2 min-w-0">
+                      {isAdmin && (
+                        <GripVertical className="w-4 h-4 text-muted-foreground cursor-grab active:cursor-grabbing flex-shrink-0" title="Arraste para reordenar" />
+                      )}
+                      <h3 className="text-xl font-bold text-foreground truncate">{t.title}</h3>
+                    </div>
                     {isAdmin && (
                       <div className="flex items-center gap-1 flex-shrink-0">
                         <button onClick={() => moveTopic(t.id, 'up')} disabled={i === 0}
+
                           className="p-1.5 rounded hover:bg-muted text-muted-foreground disabled:opacity-30" title="Mover para cima">
                           <ArrowUp className="w-3.5 h-3.5" />
                         </button>
