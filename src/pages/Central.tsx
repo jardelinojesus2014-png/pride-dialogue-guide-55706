@@ -27,6 +27,16 @@ const Central = () => {
 
   const current = categories.find((c) => c.id === categoryId);
 
+  // Dentro de uma área, a busca fica restrita ao conteúdo desta área
+  const scopedSearchItems = useMemo(() => {
+    if (!current) return [];
+    if (current.is_operadoras_section) {
+      return searchItems.filter((it) => it.kind === 'operadora' || it.parentType === 'operadora');
+    }
+    return searchItems.filter((it) => it.parentType === 'category' && it.parentId === current.id);
+  }, [searchItems, current?.id, current?.is_operadoras_section]);
+
+
   // Registra o acesso à área (analytics do admin)
   useEffect(() => {
     if (current) logTrainingEvent(user?.id, 'category_view', current.id, current.title);
