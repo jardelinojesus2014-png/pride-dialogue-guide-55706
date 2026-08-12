@@ -142,7 +142,13 @@ export const TrainingSearchBar = ({
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
-          placeholder="Pesquisar operadora, documento, vídeo, regra..."
+          placeholder={
+            placeholder ||
+            (scopeLabel && !global
+              ? `Pesquisar em ${scopeLabel}...`
+              : 'Pesquisar operadora, documento, vídeo, regra...')
+          }
+
           className="w-full h-14 pl-12 pr-11 rounded-2xl border border-border bg-card text-base text-foreground placeholder:text-muted-foreground shadow-md focus:outline-none focus:ring-2 focus:ring-accent/60 focus:border-accent transition-all"
         />
         {query && (
