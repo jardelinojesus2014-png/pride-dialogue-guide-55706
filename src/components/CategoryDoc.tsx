@@ -23,7 +23,7 @@ export const CategoryDoc = ({ categoryId, categoryName, isAdmin, onClose }: Cate
   const { topics, loading, addTopic, updateTopic, deleteTopic, moveTopic, reorderTopics } = useCategoryTopics(categoryId);
   const [editingTopic, setEditingTopic] = useState<CategoryTopic | null>(null);
   const [isTopicDialogOpen, setIsTopicDialogOpen] = useState(false);
-  const { getItemProps, getItemClassName } = useDragReorder(topics, reorderTopics);
+  const { getItemProps, getItemClassName, getHandleProps } = useDragReorder(topics, reorderTopics);
 
 
   // Rola até a âncora (#topic-...) quando vem de uma busca.
@@ -93,7 +93,7 @@ export const CategoryDoc = ({ categoryId, categoryName, isAdmin, onClose }: Cate
                   <div className="flex items-center justify-between gap-2 border-b border-border pb-2 mb-3">
                     <div className="flex items-center gap-2 min-w-0">
                       {isAdmin && (
-                        <span title="Arraste para reordenar" className="cursor-grab active:cursor-grabbing flex-shrink-0">
+                        <span title="Arraste para reordenar" {...getHandleProps(t.id)} className="cursor-grab active:cursor-grabbing flex-shrink-0">
                           <GripVertical className="w-4 h-4 text-muted-foreground" />
                         </span>
                       )}

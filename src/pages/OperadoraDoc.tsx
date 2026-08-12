@@ -34,7 +34,7 @@ const OperadoraDoc = () => {
   const { topics, loading: topicsLoading, addTopic, updateTopic, deleteTopic, moveTopic, reorderTopics } =
     useOperadoraTopics(operadoraId);
   const { isAdmin } = useIsAdmin();
-  const { getItemProps, getItemClassName } = useDragReorder(topics, reorderTopics);
+  const { getItemProps, getItemClassName, getHandleProps } = useDragReorder(topics, reorderTopics);
   const { user } = useAuth();
   const { isFavorite, toggleFavorite } = useTrainingActivity(user?.id);
   const { categories } = useTrainingCategories();
@@ -268,7 +268,7 @@ const OperadoraDoc = () => {
                     >
                       <div className="flex items-center gap-2 px-4 py-3">
                         {isAdmin && (
-                          <span title="Arraste para reordenar" className="cursor-grab active:cursor-grabbing flex-shrink-0">
+                          <span title="Arraste para reordenar" {...getHandleProps(t.id)} className="cursor-grab active:cursor-grabbing flex-shrink-0">
                             <GripVertical className="w-4 h-4 text-muted-foreground" />
                           </span>
                         )}

@@ -10,9 +10,17 @@ export const useDragReorder = <T extends { id: string }>(
 ) => {
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
+  const [armedId, setArmedId] = useState<string | null>(null);
+
+  // Só habilita o arrasto quando a alça (grip) é pressionada,
+  // preservando a seleção de texto no corpo do tópico.
+  const getHandleProps = (id: string) => ({
+    onMouseDown: () => setArmedId(id),
+    onTouchStart: () => setArmedId(id),
+  });
 
   const getItemProps = (id: string) => ({
-    draggable: true,
+    draggable: armedId === id,
     onDragStart: (e: React.DragEvent) => {
       setDraggingId(id);
       e.dataTransfer.effectAllowed = 'move';
@@ -31,6 +39,7 @@ export const useDragReorder = <T extends { id: string }>(
       const sourceId = draggingId || e.dataTransfer.getData('text/plain');
       setDraggingId(null);
       setOverId(null);
+      setArmedId(null);
       if (!sourceId || sourceId === id) return;
       const ids = items.map((it) => it.id);
       const from = ids.indexOf(sourceId);
@@ -42,6 +51,7 @@ export const useDragReorder = <T extends { id: string }>(
     onDragEnd: () => {
       setDraggingId(null);
       setOverId(null);
+      setArmedId(null);
     },
   });
 
@@ -53,5 +63,5 @@ export const useDragReorder = <T extends { id: string }>(
       .filter(Boolean)
       .join(' ');
 
-  return { draggingId, overId, getItemProps, getItemClassName };
+  return { draggingId, overId, getItemProps, getItemClassName, getHandleProps };
 };
