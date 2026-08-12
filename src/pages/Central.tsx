@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Construction } from 'lucide-react';
 import { useTrainingCategories } from '@/hooks/useTrainingCategories';
