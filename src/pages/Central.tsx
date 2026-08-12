@@ -162,12 +162,15 @@ const Central = () => {
             {/* Barra de pesquisa fixa no topo do conteúdo */}
             <div data-sticky-header className="sticky top-[210px] z-30 mb-6">
               <TrainingSearchBar
-                items={searchItems}
+                items={scopedSearchItems}
+                allItems={searchItems}
+                scopeLabel={current.title}
                 onSelect={handleSearchSelect}
                 onSearch={(q) => logTrainingEvent(user?.id, 'search', null, q)}
                 className="w-full"
               />
             </div>
+
 
             {/* Banner "Em Construção" */}
             {current.show_banner && (
