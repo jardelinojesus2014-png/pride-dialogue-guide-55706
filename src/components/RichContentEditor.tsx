@@ -300,16 +300,16 @@ export const RichContentEditor = ({ value, onChange, placeholder }: RichContentE
         <ColorPicker editor={editor} />
         <HighlightPicker editor={editor} />
         <div className="w-px h-5 bg-border mx-1" />
-        <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('left').run()} active={editor.isActive({ textAlign: 'left' })} title="Alinhar à esquerda">
+        <ToolbarButton onClick={() => applyAlign('left')} active={editor.isActive({ textAlign: 'left' })} title="Alinhar à esquerda">
           <AlignLeft className="w-4 h-4" />
         </ToolbarButton>
-        <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('center').run()} active={editor.isActive({ textAlign: 'center' })} title="Centralizar">
+        <ToolbarButton onClick={() => applyAlign('center')} active={editor.isActive({ textAlign: 'center' })} title="Centralizar">
           <AlignCenter className="w-4 h-4" />
         </ToolbarButton>
-        <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('right').run()} active={editor.isActive({ textAlign: 'right' })} title="Alinhar à direita">
+        <ToolbarButton onClick={() => applyAlign('right')} active={editor.isActive({ textAlign: 'right' })} title="Alinhar à direita">
           <AlignRight className="w-4 h-4" />
         </ToolbarButton>
-        <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('justify').run()} active={editor.isActive({ textAlign: 'justify' })} title="Justificar">
+        <ToolbarButton onClick={() => applyAlign('justify')} active={editor.isActive({ textAlign: 'justify' })} title="Justificar">
           <AlignJustify className="w-4 h-4" />
         </ToolbarButton>
         <div className="w-px h-5 bg-border mx-1" />
