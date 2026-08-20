@@ -38,13 +38,23 @@ const OperadoraDoc = () => {
   const { isAdmin } = useIsAdmin();
   const { getItemProps, getItemClassName, getHandleProps } = useDragReorder(topics, reorderTopics);
   const { user } = useAuth();
-  const { isFavorite, toggleFavorite } = useTrainingActivity(user?.id);
+  const { isFavorite, toggleFavorite, addRecent } = useTrainingActivity(user?.id);
   const { categories } = useTrainingCategories();
+  const { items: searchItems } = useTrainingSearch();
 
   const operadora = operadoras.find((o) => o.id === operadoraId);
   const index = operadoras.findIndex((o) => o.id === operadoraId);
   const prev = index > 0 ? operadoras[index - 1] : null;
   const next = index >= 0 && index < operadoras.length - 1 ? operadoras[index + 1] : null;
+
+  // Busca restrita ao conteúdo desta operadora
+  const scopedSearchItems = useMemo(() => {
+    if (!operadora) return [];
+    return searchItems.filter((it) =>
+      (it.kind === 'operadora' && it.parentId === operadora.id) ||
+      (it.parentType === 'operadora' && it.parentId === operadora.id)
+    );
+  }, [searchItems, operadora?.id]);
 
   const [editingTopic, setEditingTopic] = useState<OperadoraTopic | null>(null);
   const [isTopicDialogOpen, setIsTopicDialogOpen] = useState(false);
