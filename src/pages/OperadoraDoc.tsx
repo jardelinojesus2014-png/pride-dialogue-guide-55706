@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, ArrowRight, Star, ChevronRight as ChevronRightIcon, ChevronDown, Plus, Pencil, Trash2,
@@ -17,12 +17,14 @@ import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useAuth } from '@/hooks/useAuth';
 import { useTrainingActivity } from '@/hooks/useTrainingActivity';
 import { useTrainingCategories } from '@/hooks/useTrainingCategories';
+import { useTrainingSearch, TrainingSearchItem } from '@/hooks/useTrainingSearch';
 import { RichContent } from '@/components/RichContent';
 import { RichContentEditor } from '@/components/RichContentEditor';
 import { MainTabsNav } from '@/components/MainTabsNav';
 import { AppHeader } from '@/components/AppHeader';
 import { OperadoraVideos } from '@/components/OperadoraVideos';
 import { OperadoraLogo } from '@/components/OperadoraLogo';
+import { TrainingSearchBar } from '@/components/TrainingSearchBar';
 import { logTrainingEvent } from '@/lib/trainingEvents';
 import { ExpandedOperadoraContent } from '@/components/OperadorasSection';
 
