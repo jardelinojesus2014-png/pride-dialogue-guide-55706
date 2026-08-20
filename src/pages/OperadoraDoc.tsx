@@ -73,6 +73,20 @@ const OperadoraDoc = () => {
     scrollToTopicEl(id, 100);
   };
 
+  // Navega a partir de um resultado da busca local da operadora
+  const handleSearchSelect = (it: TrainingSearchItem) => {
+    if (it.kind === 'content' && it.fileUrl) {
+      window.open(it.fileUrl, '_blank', 'noopener,noreferrer');
+      addRecent({ id: `content:${it.key}`, kind: 'content', title: it.title, subtitle: it.parentName, contentType: it.contentType, fileUrl: it.fileUrl });
+    } else if (it.kind === 'topic' && it.topicId) {
+      openAndScroll(it.topicId);
+      addRecent({ id: `operadora:${operadora?.id}`, kind: 'operadora', title: operadora?.name || it.title, refId: operadora?.id });
+    } else if (it.kind === 'operadora' && it.parentId) {
+      navigate(`/operadora/${it.parentId}`);
+      addRecent({ id: `operadora:${it.parentId}`, kind: 'operadora', title: it.title, refId: it.parentId });
+    }
+  };
+
   // Abertura inicial: todos os tópicos já vêm abertos (leitura corrida).
   // O corretor recolhe o que não interessa.
   useEffect(() => {
