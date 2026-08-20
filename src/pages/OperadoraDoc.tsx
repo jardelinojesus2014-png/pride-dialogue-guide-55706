@@ -209,6 +209,18 @@ const OperadoraDoc = () => {
 
           {/* Conteúdo */}
           <main className="min-w-0">
+            {/* Barra de pesquisa restrita a esta operadora */}
+            <div className="mb-6">
+              <TrainingSearchBar
+                items={scopedSearchItems}
+                allItems={searchItems}
+                scopeLabel={operadora.name}
+                onSelect={handleSearchSelect}
+                onSearch={(q) => logTrainingEvent(user?.id, 'search', operadora?.id, q)}
+                className="w-full"
+              />
+            </div>
+
             {/* Cabeçalho da operadora */}
             <div className="flex items-start gap-4 mb-6">
               <OperadoraLogo url={operadora.logo_url} name={operadora.name} className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20" />
