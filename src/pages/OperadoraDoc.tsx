@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, ArrowRight, Star, ChevronRight as ChevronRightIcon, ChevronDown, Plus, Pencil, Trash2,
@@ -17,12 +17,14 @@ import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useAuth } from '@/hooks/useAuth';
 import { useTrainingActivity } from '@/hooks/useTrainingActivity';
 import { useTrainingCategories } from '@/hooks/useTrainingCategories';
+import { useTrainingSearch, TrainingSearchItem } from '@/hooks/useTrainingSearch';
 import { RichContent } from '@/components/RichContent';
 import { RichContentEditor } from '@/components/RichContentEditor';
 import { MainTabsNav } from '@/components/MainTabsNav';
 import { AppHeader } from '@/components/AppHeader';
 import { OperadoraVideos } from '@/components/OperadoraVideos';
 import { OperadoraLogo } from '@/components/OperadoraLogo';
+import { TrainingSearchBar } from '@/components/TrainingSearchBar';
 import { logTrainingEvent } from '@/lib/trainingEvents';
 import { ExpandedOperadoraContent } from '@/components/OperadorasSection';
 
@@ -36,13 +38,23 @@ const OperadoraDoc = () => {
   const { isAdmin } = useIsAdmin();
   const { getItemProps, getItemClassName, getHandleProps } = useDragReorder(topics, reorderTopics);
   const { user } = useAuth();
-  const { isFavorite, toggleFavorite } = useTrainingActivity(user?.id);
+  const { isFavorite, toggleFavorite, addRecent } = useTrainingActivity(user?.id);
   const { categories } = useTrainingCategories();
+  const { items: searchItems } = useTrainingSearch();
 
   const operadora = operadoras.find((o) => o.id === operadoraId);
   const index = operadoras.findIndex((o) => o.id === operadoraId);
   const prev = index > 0 ? operadoras[index - 1] : null;
   const next = index >= 0 && index < operadoras.length - 1 ? operadoras[index + 1] : null;
+
+  // Busca restrita ao conteúdo desta operadora
+  const scopedSearchItems = useMemo(() => {
+    if (!operadora) return [];
+    return searchItems.filter((it) =>
+      (it.kind === 'operadora' && it.parentId === operadora.id) ||
+      (it.parentType === 'operadora' && it.parentId === operadora.id)
+    );
+  }, [searchItems, operadora?.id]);
 
   const [editingTopic, setEditingTopic] = useState<OperadoraTopic | null>(null);
   const [isTopicDialogOpen, setIsTopicDialogOpen] = useState(false);
@@ -59,6 +71,20 @@ const OperadoraDoc = () => {
   const openAndScroll = (id: string) => {
     openTopicId(id);
     scrollToTopicEl(id, 100);
+  };
+
+  // Navega a partir de um resultado da busca local da operadora
+  const handleSearchSelect = (it: TrainingSearchItem) => {
+    if (it.kind === 'content' && it.fileUrl) {
+      window.open(it.fileUrl, '_blank', 'noopener,noreferrer');
+      addRecent({ id: `content:${it.key}`, kind: 'content', title: it.title, subtitle: it.parentName, contentType: it.contentType, fileUrl: it.fileUrl });
+    } else if (it.kind === 'topic' && it.topicId) {
+      openAndScroll(it.topicId);
+      addRecent({ id: `operadora:${operadora?.id}`, kind: 'operadora', title: operadora?.name || it.title, refId: operadora?.id });
+    } else if (it.kind === 'operadora' && it.parentId) {
+      navigate(`/operadora/${it.parentId}`);
+      addRecent({ id: `operadora:${it.parentId}`, kind: 'operadora', title: it.title, refId: it.parentId });
+    }
   };
 
   // Abertura inicial: todos os tópicos já vêm abertos (leitura corrida).
@@ -183,6 +209,18 @@ const OperadoraDoc = () => {
 
           {/* Conteúdo */}
           <main className="min-w-0">
+            {/* Barra de pesquisa restrita a esta operadora */}
+            <div className="mb-6">
+              <TrainingSearchBar
+                items={scopedSearchItems}
+                allItems={searchItems}
+                scopeLabel={operadora.name}
+                onSelect={handleSearchSelect}
+                onSearch={(q) => logTrainingEvent(user?.id, 'search', operadora?.id, q)}
+                className="w-full"
+              />
+            </div>
+
             {/* Cabeçalho da operadora */}
             <div className="flex items-start gap-4 mb-6">
               <OperadoraLogo url={operadora.logo_url} name={operadora.name} className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20" />
