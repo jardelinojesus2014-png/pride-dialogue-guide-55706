@@ -26,6 +26,7 @@ import { OperadoraVideos } from '@/components/OperadoraVideos';
 import { OperadoraLogo } from '@/components/OperadoraLogo';
 import { TrainingSearchBar } from '@/components/TrainingSearchBar';
 import { logTrainingEvent } from '@/lib/trainingEvents';
+import { exportDocToPdf } from '@/lib/exportDocPdf';
 import { ExpandedOperadoraContent } from '@/components/OperadorasSection';
 
 const OperadoraDoc = () => {
