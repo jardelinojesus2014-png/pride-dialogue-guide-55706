@@ -154,7 +154,7 @@ const OperadoraDoc = () => {
       logoUrl: operadora.logo_url,
       topics: topics.map((t) => ({ title: t.title, body: t.body })),
     });
-    logTrainingEvent(user?.id, 'export_pdf', operadora.id, operadora.name);
+    logTrainingEvent(user?.id, 'operadora_view', operadora.id, operadora.name);
   };
 
 
