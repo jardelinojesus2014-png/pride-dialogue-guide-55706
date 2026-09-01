@@ -248,6 +248,15 @@ const OperadoraDoc = () => {
                   >
                     <Star className={`w-5 h-5 ${fav ? 'fill-accent' : ''}`} />
                   </button>
+                  <Button
+                    onClick={handleExportPdf}
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5 ml-1"
+                    title="Exportar este treinamento em PDF"
+                  >
+                    <FileDown className="w-4 h-4" /> Exportar PDF
+                  </Button>
                   {isAdmin && (
                     <button
                       onClick={() => setIsMetaDialogOpen(true)}
