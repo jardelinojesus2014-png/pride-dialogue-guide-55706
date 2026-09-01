@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, ArrowRight, Star, ChevronRight as ChevronRightIcon, ChevronDown, Plus, Pencil, Trash2,
-  ArrowUp, ArrowDown, BookOpen, GripVertical,
+  ArrowUp, ArrowDown, BookOpen, GripVertical, FileDown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,6 +26,7 @@ import { OperadoraVideos } from '@/components/OperadoraVideos';
 import { OperadoraLogo } from '@/components/OperadoraLogo';
 import { TrainingSearchBar } from '@/components/TrainingSearchBar';
 import { logTrainingEvent } from '@/lib/trainingEvents';
+import { exportDocToPdf } from '@/lib/exportDocPdf';
 import { ExpandedOperadoraContent } from '@/components/OperadorasSection';
 
 const OperadoraDoc = () => {
@@ -145,6 +146,19 @@ const OperadoraDoc = () => {
     setIsTopicDialogOpen(true);
   };
 
+  const handleExportPdf = () => {
+    exportDocToPdf({
+      title: operadora.name,
+      subtitle: operadora.subtitle,
+      meta: operadora.ans ? `ANS nº ${operadora.ans}` : null,
+      logoUrl: operadora.logo_url,
+      topics: topics.map((t) => ({ title: t.title, body: t.body })),
+    });
+    logTrainingEvent(user?.id, 'operadora_view', operadora.id, operadora.name);
+  };
+
+
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-6xl mx-auto px-4 py-6">
@@ -234,6 +248,15 @@ const OperadoraDoc = () => {
                   >
                     <Star className={`w-5 h-5 ${fav ? 'fill-accent' : ''}`} />
                   </button>
+                  <Button
+                    onClick={handleExportPdf}
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5 ml-1"
+                    title="Exportar este treinamento em PDF"
+                  >
+                    <FileDown className="w-4 h-4" /> Exportar PDF
+                  </Button>
                   {isAdmin && (
                     <button
                       onClick={() => setIsMetaDialogOpen(true)}
