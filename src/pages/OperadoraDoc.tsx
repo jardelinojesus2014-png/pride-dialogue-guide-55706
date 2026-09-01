@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, ArrowRight, Star, ChevronRight as ChevronRightIcon, ChevronDown, Plus, Pencil, Trash2,
-  ArrowUp, ArrowDown, BookOpen, GripVertical,
+  ArrowUp, ArrowDown, BookOpen, GripVertical, FileDown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
