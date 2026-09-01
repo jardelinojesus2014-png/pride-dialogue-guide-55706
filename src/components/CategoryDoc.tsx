@@ -10,6 +10,7 @@ import { useTopicDeepLink, scrollToTopicEl } from '@/hooks/useTopicDeepLink';
 import { RichContent } from '@/components/RichContent';
 import { RichContentEditor } from '@/components/RichContentEditor';
 import { CategoryContentSection } from '@/components/TrainingCategoriesSection';
+import { exportDocToPdf } from '@/lib/exportDocPdf';
 
 
 interface CategoryDocProps {
