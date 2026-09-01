@@ -49,12 +49,31 @@ export const CategoryDoc = ({ categoryId, categoryName, isAdmin, onClose }: Cate
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
               Nesta página
             </h2>
-            {isAdmin && (
-              <Button onClick={openNewTopic} variant="outline" size="sm" className="gap-1.5">
-                <Plus className="w-4 h-4" /> Adicionar tópico
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {topics.length > 0 && (
+                <Button
+                  onClick={() =>
+                    exportDocToPdf({
+                      title: categoryName,
+                      topics: topics.map((t) => ({ title: t.title, body: t.body })),
+                    })
+                  }
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5"
+                  title="Exportar este treinamento em PDF"
+                >
+                  <FileDown className="w-4 h-4" /> Exportar PDF
+                </Button>
+              )}
+              {isAdmin && (
+                <Button onClick={openNewTopic} variant="outline" size="sm" className="gap-1.5">
+                  <Plus className="w-4 h-4" /> Adicionar tópico
+                </Button>
+              )}
+            </div>
           </div>
+
 
           {/* Índice de âncoras */}
           {topics.length > 1 && (
