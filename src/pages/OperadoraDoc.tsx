@@ -146,6 +146,19 @@ const OperadoraDoc = () => {
     setIsTopicDialogOpen(true);
   };
 
+  const handleExportPdf = () => {
+    exportDocToPdf({
+      title: operadora.name,
+      subtitle: operadora.subtitle,
+      meta: operadora.ans ? `ANS nº ${operadora.ans}` : null,
+      logoUrl: operadora.logo_url,
+      topics: topics.map((t) => ({ title: t.title, body: t.body })),
+    });
+    logTrainingEvent(user?.id, 'export_pdf', operadora.id, operadora.name);
+  };
+
+
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-6xl mx-auto px-4 py-6">
